@@ -1,5 +1,5 @@
-#ifndef MAIN_MANAGER_H
-#define MAIN_MANAGER_H
+#ifndef gl_manager_H
+#define gl_manager_H
 
 #include <glad/glad.h>
 
@@ -8,7 +8,7 @@
 
 namespace opengl_wrapper {
 
-class main_manager {
+class gl_manager {
   public:
     /**
      * @brief Returns the global MainManager instance. Makes sure it is
@@ -18,7 +18,7 @@ class main_manager {
      *
      * @throws GlfwError When the initialization of GLFW fails
      */
-    static main_manager &instance();
+    static gl_manager &instance();
 
     /**
      * @brief Displays a window
@@ -39,7 +39,7 @@ class main_manager {
      */
     void render_loop(GLFWwindow *window) noexcept;
 
-    ~main_manager();
+    ~gl_manager();
 
   private:
     /**
@@ -47,7 +47,7 @@ class main_manager {
      * @throws GlfwError When the initialization of GLFW fails
      *
      */
-    main_manager();
+    gl_manager();
 
     static GLFWerrorfun error_handler;
     static GLFWframebuffersizefun resize_handler;
