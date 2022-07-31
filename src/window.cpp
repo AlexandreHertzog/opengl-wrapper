@@ -7,54 +7,54 @@
 
 namespace opengl_wrapper {
 
-GLFWframebuffersizefun window::resize_handler = [](GLFWwindow *window,
-                                                   int width, int height) {
+GLFWframebuffersizefun Window::resize_handler_ = [](GLFWwindow *window,
+                                                    int width, int height) {
     BOOST_LOG_TRIVIAL(debug)
-        << "window::resize_handler(window=" << window << ", width=" << width
+        << "Window::resize_handler_(window=" << window << ", width=" << width
         << ", height=" << height << ")";
 
     glViewport(0, 0, width, height);
 
     BOOST_LOG_TRIVIAL(trace)
-        << "window::resize_handler(window=" << window << ", width=" << width
+        << "Window::resize_handler_(window=" << window << ", width=" << width
         << ", height=" << height << ") end";
 };
 
-window::window(int width, int height, const char *title) {
+Window::Window(int width, int height, const char *title) {
     BOOST_LOG_TRIVIAL(debug)
-        << "window::window(width=" << width << ", height=" << height
+        << "Window::Window(width=" << width << ", height=" << height
         << ", title=" << title << ")";
 
     glfw_window_ = glfwCreateWindow(width, height, title, NULL, NULL);
     if (NULL == glfw_window_) {
         BOOST_LOG_TRIVIAL(trace)
-            << "window::window(width=" << width << ", height=" << height
-            << ", title=" << title << ") glfw_error";
-        throw glfw_error("glfwCreateWindow() failed");
+            << "Window::Window(width=" << width << ", height=" << height
+            << ", title=" << title << ") GlfwError";
+        throw GlfwError("glfwCreateWindow() failed");
     }
 
     glfwMakeContextCurrent(glfw_window_);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         BOOST_LOG_TRIVIAL(trace)
-            << "window::window(width=" << width << ", height=" << height
-            << ", title=" << title << ") glad_error";
-        throw glad_error("gladLoadGLLoader() failed");
+            << "Window::Window(width=" << width << ", height=" << height
+            << ", title=" << title << ") GladError";
+        throw GladError("gladLoadGLLoader() failed");
     }
 
-    if (glfwSetFramebufferSizeCallback(glfw_window_, resize_handler)) {
+    if (glfwSetFramebufferSizeCallback(glfw_window_, resize_handler_)) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting previous resize callback";
     }
 
     glViewport(0, 0, width, height);
     BOOST_LOG_TRIVIAL(trace)
-        << "window::window(width=" << width << ", height=" << height
+        << "Window::Window(width=" << width << ", height=" << height
         << ", title=" << title << ") end";
 }
 
-void window::render_loop() noexcept {
+void Window::renderLoop() noexcept {
     BOOST_LOG_TRIVIAL(debug)
-        << "window::render_loop(glfw_window_=" << glfw_window_ << ")";
+        << "Window::renderLoop(glfw_window_=" << glfw_window_ << ")";
 
     while (!glfwWindowShouldClose(glfw_window_)) {
         glfwSwapBuffers(glfw_window_);
@@ -62,7 +62,7 @@ void window::render_loop() noexcept {
     }
 
     BOOST_LOG_TRIVIAL(trace)
-        << "window::render_loop(glfw_window_=" << glfw_window_ << ") end";
+        << "Window::renderLoop(glfw_window_=" << glfw_window_ << ") end";
 }
 
 } // namespace opengl_wrapper

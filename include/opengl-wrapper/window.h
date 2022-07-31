@@ -7,10 +7,10 @@
 
 namespace opengl_wrapper {
 
-class window {
+class Window {
   public:
     /**
-     * @brief Creates a window object
+     * @brief Creates a Window object
      *
      * @param width Window width
      * @param height Window height
@@ -18,15 +18,15 @@ class window {
      *
      * @throws GladError When the initialization of GLAD fails
      */
-    window(int width, int height, const char *title);
+    Window(int width, int height, const char *title);
 
     /**
-     * @brief Engages the window render loop
+     * @brief Engages the Window render loop
      */
-    void render_loop() noexcept;
+    void renderLoop() noexcept;
 
   private:
-    static GLFWframebuffersizefun resize_handler;
+    static GLFWframebuffersizefun resize_handler_;
     GLFWwindow *glfw_window_;
 };
 

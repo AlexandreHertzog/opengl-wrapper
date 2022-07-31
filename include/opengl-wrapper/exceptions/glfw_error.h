@@ -5,9 +5,9 @@
 
 namespace opengl_wrapper {
 
-class glfw_error : public exception {
+class GlfwError : public Exception {
   public:
-    glfw_error(std::string description);
+    GlfwError(std::string description);
 };
 
 } // namespace opengl_wrapper

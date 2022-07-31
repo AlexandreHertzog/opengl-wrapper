@@ -5,9 +5,9 @@
 
 namespace opengl_wrapper {
 
-class exception : public std::runtime_error {
+class Exception : public std::runtime_error {
   public:
-    exception(std::string description);
+    Exception(std::string description);
 };
 
 } // namespace opengl_wrapper

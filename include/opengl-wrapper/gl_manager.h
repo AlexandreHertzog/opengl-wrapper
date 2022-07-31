@@ -8,7 +8,7 @@
 
 namespace opengl_wrapper {
 
-class gl_manager {
+class GlManager {
   public:
     /**
      * @brief Returns the global MainManager instance. Makes sure it is
@@ -18,9 +18,9 @@ class gl_manager {
      *
      * @throws GlfwError When the initialization of GLFW fails
      */
-    static gl_manager &instance();
+    static GlManager &instance();
 
-    ~gl_manager();
+    ~GlManager();
 
   private:
     /**
@@ -28,9 +28,9 @@ class gl_manager {
      * @throws GlfwError When the initialization of GLFW fails
      *
      */
-    gl_manager();
+    GlManager();
 
-    static GLFWerrorfun error_handler;
+    static GLFWerrorfun error_handler_;
 };
 
 } // namespace opengl_wrapper

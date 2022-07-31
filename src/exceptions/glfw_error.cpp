@@ -2,6 +2,6 @@
 
 namespace opengl_wrapper {
 
-glfw_error::glfw_error(std::string description) : exception(description) {}
+GlfwError::GlfwError(std::string description) : Exception(description) {}
 
 } // namespace opengl_wrapper
