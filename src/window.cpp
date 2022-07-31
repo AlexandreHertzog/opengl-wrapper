@@ -52,9 +52,9 @@ window::window(int width, int height, const char *title) {
         << ", title=" << title << ") end";
 }
 
-void window::show() noexcept {
+void window::render_loop() noexcept {
     BOOST_LOG_TRIVIAL(debug)
-        << "window::show(glfw_window_=" << glfw_window_ << ")";
+        << "window::render_loop(glfw_window_=" << glfw_window_ << ")";
 
     while (!glfwWindowShouldClose(glfw_window_)) {
         glfwSwapBuffers(glfw_window_);
@@ -62,7 +62,7 @@ void window::show() noexcept {
     }
 
     BOOST_LOG_TRIVIAL(trace)
-        << "window::show(glfw_window_=" << glfw_window_ << ") end";
+        << "window::render_loop(glfw_window_=" << glfw_window_ << ") end";
 }
 
 } // namespace opengl_wrapper

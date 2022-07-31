@@ -21,9 +21,9 @@ class window {
     window(int width, int height, const char *title);
 
     /**
-     * @brief Shows the window
+     * @brief Engages the window render loop
      */
-    void show() noexcept;
+    void render_loop() noexcept;
 
   private:
     static GLFWframebuffersizefun resize_handler;
