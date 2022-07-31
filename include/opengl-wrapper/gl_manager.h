@@ -20,25 +20,6 @@ class gl_manager {
      */
     static gl_manager &instance();
 
-    /**
-     * @brief Displays a window
-     *
-     * @param width Window width
-     * @param height Window height
-     * @param title Window title
-     * @return GLFWwindow* Window instance
-     *
-     * @throws GladError When the initialization of GLAD fails
-     */
-    GLFWwindow *display_window(int width, int height, const char *title);
-
-    /**
-     * @brief Invokes the main render loop
-     *
-     * @param window Previously generated window
-     */
-    void render_loop(GLFWwindow *window) noexcept;
-
     ~gl_manager();
 
   private:
@@ -50,7 +31,6 @@ class gl_manager {
     gl_manager();
 
     static GLFWerrorfun error_handler;
-    static GLFWframebuffersizefun resize_handler;
 };
 
 } // namespace opengl_wrapper

@@ -31,6 +31,7 @@ add_library(opengl-wrapper-utils
 
 add_library(opengl-wrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
 )
 
 target_include_directories(opengl-wrapper
