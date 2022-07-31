@@ -13,7 +13,7 @@ namespace opengl_wrapper {
 GLFWerrorfun GlManager::error_handler_ = [](int error_code,
                                             const char *description) {
     BOOST_LOG_TRIVIAL(error) << "GLFW error: error_code="
-                             << Formatter::format_glfw_error_code(error_code)
+                             << Formatter::formatGlfwErrorCode(error_code)
                              << ", description=\"" << description << "\"";
 };
 

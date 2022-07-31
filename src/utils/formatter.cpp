@@ -4,10 +4,17 @@
 #include <sstream>
 
 namespace opengl_wrapper {
-std::string Formatter::format_glfw_error_code(int error_code) {
+std::string Formatter::formatGlfwErrorCode(int error_code) {
     std::stringstream stream;
     stream << "0x" << std::internal << std::hex << std::setw(8)
            << std::setfill('0') << error_code;
+    return stream.str();
+}
+
+std::string Formatter::formatGlfwWindow(GLFWwindow *window) {
+    std::stringstream stream;
+    stream << "0x" << std::internal << std::hex << std::setw(16)
+           << std::setfill('0') << window;
     return stream.str();
 }
 } // namespace opengl_wrapper
