@@ -13,7 +13,6 @@ add_library(opengl-wrapper-exceptions
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/exception.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glad_error.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glfw_error.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/unregistered_window_error.cpp
 )
 
 target_include_directories(opengl-wrapper-exceptions
@@ -32,7 +31,6 @@ add_library(opengl-wrapper-utils
 
 add_library(opengl-wrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/window_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
 )
 

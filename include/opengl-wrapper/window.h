@@ -20,9 +20,20 @@ class Window {
     using Action = std::function<void(int)>;
 
     /**
-     * @brief Engages the Window render loop
+     * @brief Returns the static window instance.
+     *
+     * @return Window& Static window instance.
      */
-    void renderLoop() noexcept;
+    static Window &instance();
+
+    /**
+     * @brief Initializes the static window.
+     *
+     * @param width Window width.
+     * @param height Window height.
+     * @param title Window title.
+     */
+    void init(int width, int height, const char *title);
 
     /**
      * @brief Set the given callback to be executed when key is pressed/released
@@ -33,31 +44,29 @@ class Window {
     void setKeyAction(int key, Action action) noexcept;
 
     /**
-     * @brief Get the underlying GLFW window
+     * @brief Set the Window Should Close object. Requires init() to be called
+     * beforehand.
      *
-     * @return GLFWwindow* non-null pointer
+     * @param value
      */
-    GLFWwindow *getWindow();
+    void setWindowShouldClose(int value) noexcept;
+
+    /**
+     * @brief Engages the Window render loop. Requires init() to be called
+     * beforehand.
+     */
+    void renderLoop() noexcept;
 
   private:
-    static GLFWframebuffersizefun resize_handler_;
-    static GLFWkeyfun key_handler_;
+    GLFWframebuffersizefun resize_handler_;
+    GLFWkeyfun key_handler_;
     GLFWwindow *glfw_window_;
     std::map<int, Action> action_map_;
+    bool initialized_;
 
     friend class WindowManager;
 
-    /**
-     * @brief Creates a Window object
-     *
-     * @param width Window width
-     * @param height Window height
-     * @param title Window title
-     *
-     * @throws GladError When the initialization of GLAD fails
-     */
-    Window(int width, int height, const char *title);
-
+    Window();
     Window(const Window &) = delete;
     Window(Window &&) = delete;
     Window &operator=(const Window &) = delete;

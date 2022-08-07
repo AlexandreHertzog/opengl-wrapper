@@ -5,51 +5,60 @@
 
 #include "exceptions/glad_error.h"
 #include "exceptions/glfw_error.h"
-#include "window_manager.h"
 
 namespace opengl_wrapper {
 
-GLFWframebuffersizefun Window::resize_handler_ = [](GLFWwindow *window,
-                                                    int width, int height) {
-    BOOST_LOG_TRIVIAL(debug)
-        << "Window::resize_handler_(window=" << window << ", width=" << width
-        << ", height=" << height << ")";
+Window::Window() {
+    BOOST_LOG_TRIVIAL(debug) << "Window::Window()";
 
-    glViewport(0, 0, width, height);
+    resize_handler_ = [](GLFWwindow *window, int width, int height) {
+        BOOST_LOG_TRIVIAL(debug)
+            << "Window::resize_handler_(window=" << window
+            << ", width=" << width << ", height=" << height << ")";
 
-    BOOST_LOG_TRIVIAL(trace)
-        << "Window::resize_handler_(window=" << window << ", width=" << width
-        << ", height=" << height << ") end";
-};
+        glViewport(0, 0, width, height);
 
-GLFWkeyfun Window::key_handler_ = [](GLFWwindow *glfw_window, int key,
-                                     int scancode, int action, int mods) {
-    BOOST_LOG_TRIVIAL(debug)
-        << "window::key_handler_(window=" << glfw_window << ", key=" << key
-        << ", scancode=" << scancode << ", mods=" << mods << ")";
+        BOOST_LOG_TRIVIAL(trace)
+            << "Window::resize_handler_(window=" << window
+            << ", width=" << width << ", height=" << height << ") end";
+    };
 
-    auto &window_manager = WindowManager::instance();
-    auto window = window_manager.getWindowByGlfwWindow(glfw_window);
+    key_handler_ = [](GLFWwindow *glfw_window, int key, int scancode,
+                      int action, int mods) {
+        BOOST_LOG_TRIVIAL(debug)
+            << "window::key_handler_(window=" << glfw_window << ", key=" << key
+            << ", scancode=" << scancode << ", mods=" << mods << ")";
 
-    if (!window) {
-        BOOST_LOG_TRIVIAL(error)
-            << "Window " << glfw_window << " was not found";
-    } else {
-        const auto existing_action = window->action_map_.find(key);
-        if (window->action_map_.end() != existing_action) {
+        auto &window = Window::instance();
+        if (glfw_window != window.glfw_window_) {
+            BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << glfw_window
+                                     << " against " << window.glfw_window_;
+            return;
+        }
+
+        const auto existing_action = window.action_map_.find(key);
+        if (window.action_map_.end() != existing_action) {
             existing_action->second(action);
         }
-    }
 
-    BOOST_LOG_TRIVIAL(trace)
-        << "window::key_handler_(window=" << window << ", key=" << key
-        << ", scancode=" << scancode << ", mods=" << mods << ") end";
-};
+        BOOST_LOG_TRIVIAL(trace)
+            << "window::key_handler_(window=" << glfw_window << ", key=" << key
+            << ", scancode=" << scancode << ", mods=" << mods << ") end";
+    };
+    BOOST_LOG_TRIVIAL(trace) << "Window::Window() end";
+}
 
-Window::Window(int width, int height, const char *title) {
+Window &Window::instance() {
+    static Window static_instance;
+    return static_instance;
+}
+
+void Window::init(int width, int height, const char *title) {
     BOOST_LOG_TRIVIAL(debug)
-        << "Window::Window(width=" << width << ", height=" << height
+        << "Window::init(width=" << width << ", height=" << height
         << ", title=" << title << ")";
+
+    assert(!initialized_);
 
     glfw_window_ = glfwCreateWindow(width, height, title, NULL, NULL);
     if (NULL == glfw_window_) {
@@ -63,7 +72,7 @@ Window::Window(int width, int height, const char *title) {
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         BOOST_LOG_TRIVIAL(trace)
-            << "Window::Window(width=" << width << ", height=" << height
+            << "Window::init(width=" << width << ", height=" << height
             << ", title=" << title << ") GladError";
         throw GladError("gladLoadGLLoader() failed");
     }
@@ -77,14 +86,19 @@ Window::Window(int width, int height, const char *title) {
     }
 
     glViewport(0, 0, width, height);
+
+    initialized_ = true;
+
     BOOST_LOG_TRIVIAL(trace)
-        << "Window::Window(width=" << width << ", height=" << height
+        << "Window::init(width=" << width << ", height=" << height
         << ", title=" << title << ") end";
 }
 
-void Window::renderLoop() noexcept {
+void Window::renderLoop() {
     BOOST_LOG_TRIVIAL(debug)
         << "Window::renderLoop(glfw_window_=" << glfw_window_ << ")";
+
+    assert(initialized_);
 
     while (!glfwWindowShouldClose(glfw_window_)) {
         glfwSwapBuffers(glfw_window_);
@@ -105,9 +119,9 @@ void Window::setKeyAction(int key, Action action) noexcept {
     }
 }
 
-GLFWwindow *Window::getWindow() {
-    assert(NULL != glfw_window_);
-    return glfw_window_;
+void Window::setWindowShouldClose(int value) {
+    assert(initialized_);
+    glfwSetWindowShouldClose(glfw_window_, value);
 }
 
 } // namespace opengl_wrapper
