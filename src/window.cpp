@@ -2,6 +2,8 @@
 
 #include <boost/log/trivial.hpp>
 #include <cassert>
+#include <chrono>
+#include <unistd.h>
 
 #include "exceptions/glad_error.h"
 #include "exceptions/glfw_error.h"
@@ -45,6 +47,8 @@ Window::Window() {
             << "window::key_handler_(window=" << glfw_window << ", key=" << key
             << ", scancode=" << scancode << ", mods=" << mods << ") end";
     };
+
+    setRefreshRate(60);
     BOOST_LOG_TRIVIAL(trace) << "Window::Window() end";
 }
 
@@ -94,15 +98,34 @@ void Window::init(int width, int height, const char *title) {
         << ", title=" << title << ") end";
 }
 
-void Window::renderLoop() {
+void Window::renderLoop() noexcept {
     BOOST_LOG_TRIVIAL(debug)
         << "Window::renderLoop(glfw_window_=" << glfw_window_ << ")";
 
     assert(initialized_);
 
     while (!glfwWindowShouldClose(glfw_window_)) {
+        auto start_time = std::chrono::high_resolution_clock::now();
+
         glfwSwapBuffers(glfw_window_);
         glfwPollEvents();
+
+        std::chrono::duration<double, std::milli> loop_time_ms =
+            std::chrono::high_resolution_clock::now() - start_time;
+
+        BOOST_LOG_TRIVIAL(debug)
+            << "renderLoop() frame_time_ms_=" << frame_time_ms_
+            << ", loop_time_ms=" << loop_time_ms.count();
+
+        if (loop_time_ms.count() < frame_time_ms_) {
+            auto wait_time_ms = frame_time_ms_ - loop_time_ms.count();
+            BOOST_LOG_TRIVIAL(debug)
+                << "Waiting " << wait_time_ms << "ms to fill frame_time";
+            usleep(wait_time_ms * 1000);
+        } else {
+            BOOST_LOG_TRIVIAL(debug)
+                << "loop_time too large, skipping time filler";
+        }
     }
 
     BOOST_LOG_TRIVIAL(trace)
@@ -119,9 +142,14 @@ void Window::setKeyAction(int key, Action action) noexcept {
     }
 }
 
-void Window::setWindowShouldClose(int value) {
+void Window::setWindowShouldClose(int value) noexcept {
     assert(initialized_);
     glfwSetWindowShouldClose(glfw_window_, value);
+}
+
+void Window::setRefreshRate(int refresh_rate) noexcept {
+    assert(refresh_rate > 0);
+    frame_time_ms_ = 1000L / refresh_rate;
 }
 
 } // namespace opengl_wrapper

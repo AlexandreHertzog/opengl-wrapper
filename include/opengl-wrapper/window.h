@@ -52,6 +52,13 @@ class Window {
     void setWindowShouldClose(int value) noexcept;
 
     /**
+     * @brief Sets the window refresh rate, in hertz.
+     *
+     * @param refresh_rate Refresh rate in hertz.
+     */
+    void setRefreshRate(int refresh_rate) noexcept;
+
+    /**
      * @brief Engages the Window render loop. Requires init() to be called
      * beforehand.
      */
@@ -63,6 +70,7 @@ class Window {
     GLFWwindow *glfw_window_;
     std::map<int, Action> action_map_;
     bool initialized_;
+    double frame_time_ms_;
 
     friend class WindowManager;
 
