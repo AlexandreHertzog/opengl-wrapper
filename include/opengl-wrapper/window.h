@@ -6,6 +6,11 @@
 #include <GLFW/glfw3.h>
 #include <functional>
 #include <map>
+#include <memory>
+
+#include "opengl-wrapper/wraps/buffer.h"
+#include "opengl-wrapper/wraps/program.h"
+#include "opengl-wrapper/wraps/vertex_arrays.h"
 
 namespace opengl_wrapper {
 
@@ -65,12 +70,20 @@ class Window {
     void renderLoop() noexcept;
 
   private:
+    static const char *vshader_source;
+    static const char *fshader_source;
+    static const float vertices_[];
+
     GLFWframebuffersizefun resize_handler_;
     GLFWkeyfun key_handler_;
     GLFWwindow *glfw_window_;
     std::map<int, Action> action_map_;
     bool initialized_;
     double frame_time_ms_;
+
+    std::unique_ptr<Program> program_;
+    std::unique_ptr<VertexArrays> vao_;
+    std::unique_ptr<Buffer> vbo_;
 
     friend class WindowManager;
 

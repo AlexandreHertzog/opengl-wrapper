@@ -5,10 +5,31 @@
 #include <chrono>
 #include <unistd.h>
 
+#include "exceptions/gl_error.h"
 #include "exceptions/glad_error.h"
 #include "exceptions/glfw_error.h"
+#include "wraps/buffer.h"
 
 namespace opengl_wrapper {
+
+const char *Window::vshader_source =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+const char *Window::fshader_source =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\0";
+
+const float Window::vertices_[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f,
+                                   0.0f,  0.0f,  0.5f, 0.0f};
 
 Window::Window() {
     BOOST_LOG_TRIVIAL(debug) << "Window::Window()";
@@ -19,6 +40,8 @@ Window::Window() {
             << ", width=" << width << ", height=" << height << ")";
 
         glViewport(0, 0, width, height);
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         BOOST_LOG_TRIVIAL(trace)
             << "Window::resize_handler_(window=" << window
@@ -90,6 +113,25 @@ void Window::init(int width, int height, const char *title) {
     }
 
     glViewport(0, 0, width, height);
+    vao_ = std::make_unique<VertexArrays>(1);
+    vao_->bind(0);
+
+    vbo_ = std::make_unique<Buffer>(1);
+    vbo_->bind(0, GL_ARRAY_BUFFER);
+    vbo_->buffer(sizeof(vertices_), vertices_, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
+    glEnableVertexAttribArray(0);
+
+    program_ = std::make_unique<Program>();
+    program_->addShader(Shader(GL_VERTEX_SHADER, vshader_source));
+    program_->addShader(Shader(GL_FRAGMENT_SHADER, fshader_source));
+    program_->link();
+    program_->use();
+
+    vao_->bind(0);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     initialized_ = true;
 

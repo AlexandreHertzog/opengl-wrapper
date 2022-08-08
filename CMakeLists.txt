@@ -11,6 +11,7 @@ add_subdirectory(lib)
 
 add_library(opengl-wrapper-exceptions
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/exception.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/gl_error.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glad_error.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glfw_error.cpp
 )
@@ -29,6 +30,24 @@ add_library(opengl-wrapper-utils
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/formatter.cpp
 )
 
+add_library(opengl-wrapper-wraps
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/buffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/program.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/shader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/vertex_arrays.cpp
+)
+
+target_include_directories(opengl-wrapper-wraps
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper/wraps
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(opengl-wrapper-wraps
+    PUBLIC glad opengl-wrapper-exceptions
+)
+
 add_library(opengl-wrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
@@ -41,7 +60,7 @@ target_include_directories(opengl-wrapper
 )
 
 target_link_libraries(opengl-wrapper
-    PUBLIC glad glfw opengl-wrapper-exceptions
+    PUBLIC glad glfw opengl-wrapper-exceptions opengl-wrapper-wraps
     PRIVATE opengl-wrapper-utils Boost::log
 )
 
