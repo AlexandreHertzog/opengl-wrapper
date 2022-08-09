@@ -23,7 +23,10 @@ class Shader {
      *
      * @param other Shader to be emptied.
      */
-    Shader(Shader &&other);
+    Shader(Shader &&other) noexcept;
+
+    Shader(const Shader &) = delete;
+    Shader &operator=(const Shader &) = delete;
 
     /**
      * @brief Destroy the Shader object. See
@@ -38,20 +41,17 @@ class Shader {
      * @param other Shader to be emptied.
      * @return Shader& Reference to this.
      */
-    Shader &operator=(Shader &&other);
+    Shader &operator=(Shader &&other) noexcept;
 
     /**
      * @brief Gets the internal OpenGL shader ID.
      *
      * @return GLuint Shader ID.
      */
-    GLuint getId() const;
+    [[nodiscard]] GLuint getId() const;
 
   private:
-    GLuint id_;
-
-    Shader(const Shader &) = delete;
-    Shader &operator=(const Shader &) = delete;
+    GLuint id_{};
 };
 
 } // namespace opengl_wrapper

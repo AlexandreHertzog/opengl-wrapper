@@ -20,6 +20,10 @@ class GlManager {
      */
     static GlManager &instance();
 
+    GlManager(const GlManager &) = delete;
+    GlManager(GlManager &&) = delete;
+    GlManager &operator=(const GlManager &) = delete;
+    GlManager &operator=(GlManager &&) = delete;
     ~GlManager();
 
   private:
@@ -29,10 +33,6 @@ class GlManager {
      *
      */
     GlManager();
-    GlManager(const GlManager &) = delete;
-    GlManager(GlManager &&) = delete;
-    GlManager &operator=(const GlManager &) = delete;
-    GlManager &operator=(GlManager &&) = delete;
 
     static GLFWerrorfun error_handler_;
 };

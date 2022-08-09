@@ -7,7 +7,7 @@ namespace opengl_wrapper {
 
 class GlfwError : public Exception {
   public:
-    GlfwError(std::string description);
+    explicit GlfwError(const std::string &description);
 };
 
 } // namespace opengl_wrapper

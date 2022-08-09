@@ -7,7 +7,7 @@ namespace opengl_wrapper {
 
 class GladError : public Exception {
   public:
-    GladError(std::string description);
+    explicit GladError(const std::string &description);
 };
 
 } // namespace opengl_wrapper

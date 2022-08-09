@@ -6,12 +6,10 @@
 
 namespace opengl_wrapper {
 class Formatter {
+  public:
     Formatter() = delete;
     ~Formatter() = delete;
-
-  public:
     static std::string formatGlfwErrorCode(int error_code);
-    static std::string formatGlfwWindow(GLFWwindow *window);
 };
 } // namespace opengl_wrapper
 

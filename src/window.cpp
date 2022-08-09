@@ -5,7 +5,6 @@
 #include <chrono>
 #include <unistd.h>
 
-#include "exceptions/gl_error.h"
 #include "exceptions/glad_error.h"
 #include "exceptions/glfw_error.h"
 #include "wraps/buffer.h"
@@ -87,8 +86,8 @@ void Window::init(int width, int height, const char *title) {
 
     assert(!initialized_);
 
-    glfw_window_ = glfwCreateWindow(width, height, title, NULL, NULL);
-    if (NULL == glfw_window_) {
+    glfw_window_ = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (nullptr == glfw_window_) {
         BOOST_LOG_TRIVIAL(trace)
             << "Window::Window(width=" << width << ", height=" << height
             << ", title=" << title << ") GlfwError";
@@ -120,7 +119,7 @@ void Window::init(int width, int height, const char *title) {
     vbo_->bind(0, GL_ARRAY_BUFFER);
     vbo_->buffer(sizeof(vertices_), vertices_, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
     program_ = std::make_unique<Program>();
@@ -128,8 +127,6 @@ void Window::init(int width, int height, const char *title) {
     program_->addShader(Shader(GL_FRAGMENT_SHADER, fshader_source));
     program_->link();
     program_->use();
-
-    vao_->bind(0);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -160,10 +157,10 @@ void Window::renderLoop() noexcept {
             << ", loop_time_ms=" << loop_time_ms.count();
 
         if (loop_time_ms.count() < frame_time_ms_) {
-            auto wait_time_ms = frame_time_ms_ - loop_time_ms.count();
+            const auto wait_time_ms = frame_time_ms_ - loop_time_ms.count();
             BOOST_LOG_TRIVIAL(debug)
                 << "Waiting " << wait_time_ms << "ms to fill frame_time";
-            usleep(wait_time_ms * 1000);
+            usleep(static_cast<unsigned int>(wait_time_ms) * 1000);
         } else {
             BOOST_LOG_TRIVIAL(debug)
                 << "loop_time too large, skipping time filler";
@@ -178,9 +175,9 @@ void Window::setKeyAction(int key, Action action) noexcept {
     auto existing_action = action_map_.find(key);
     if (action_map_.end() != existing_action) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting callback for key " << key;
-        existing_action->second = action;
+        existing_action->second = std::move(action);
     } else {
-        action_map_[key] = action;
+        action_map_[key] = std::move(action);
     }
 }
 
@@ -191,7 +188,7 @@ void Window::setWindowShouldClose(int value) noexcept {
 
 void Window::setRefreshRate(int refresh_rate) noexcept {
     assert(refresh_rate > 0);
-    frame_time_ms_ = 1000L / refresh_rate;
+    frame_time_ms_ = 1000.0 / refresh_rate;
 }
 
 } // namespace opengl_wrapper

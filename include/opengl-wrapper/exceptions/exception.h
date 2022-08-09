@@ -7,7 +7,7 @@ namespace opengl_wrapper {
 
 class Exception : public std::runtime_error {
   public:
-    Exception(std::string description);
+    explicit Exception(const std::string &description);
 };
 
 } // namespace opengl_wrapper

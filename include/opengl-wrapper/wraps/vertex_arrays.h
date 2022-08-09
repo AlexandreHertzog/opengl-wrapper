@@ -13,14 +13,17 @@ class VertexArrays {
      *
      * @param size Number of vertex arrays to be generated.
      */
-    VertexArrays(int size);
+    explicit VertexArrays(int size);
 
     /**
      * @brief VertexArrays move-constructor.
      *
      * @param other VectorArrays to be emptied.
      */
-    VertexArrays(VertexArrays &&other);
+    VertexArrays(VertexArrays &&other) noexcept;
+
+    VertexArrays(const VertexArrays &) = delete;
+    VertexArrays &operator=(const VertexArrays &) = delete;
 
     /**
      * @brief Destroy the Vertex Arrays object. See
@@ -35,7 +38,7 @@ class VertexArrays {
      * @param other VertexArrays to be emptied.
      * @return VertexArrays& Reference to this.
      */
-    VertexArrays &operator=(VertexArrays &&other);
+    VertexArrays &operator=(VertexArrays &&other) noexcept;
 
     /**
      * @brief Binds the VertexArray object. See
@@ -47,9 +50,6 @@ class VertexArrays {
 
   private:
     std::vector<GLuint> ids_;
-
-    VertexArrays(const VertexArrays &) = delete;
-    VertexArrays &operator=(const VertexArrays &) = delete;
 };
 } // namespace opengl_wrapper
 

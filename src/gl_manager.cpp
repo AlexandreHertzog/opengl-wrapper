@@ -1,10 +1,7 @@
 #include "gl_manager.h"
 
 #include <boost/log/trivial.hpp>
-#include <iomanip>
-#include <iostream>
 
-#include "exceptions/glad_error.h"
 #include "exceptions/glfw_error.h"
 #include "utils/formatter.h"
 
@@ -19,7 +16,7 @@ GLFWerrorfun GlManager::error_handler_ = [](int error_code,
 
 GlManager::GlManager() {
     BOOST_LOG_TRIVIAL(debug) << "GlManager::GlManager()";
-    if (NULL != glfwSetErrorCallback(GlManager::error_handler_)) {
+    if (nullptr != glfwSetErrorCallback(GlManager::error_handler_)) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting previous error callback";
     }
 

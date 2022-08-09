@@ -21,7 +21,7 @@ class Program {
      *
      * @param other Program to be emptied.
      */
-    Program(Program &&other);
+    Program(Program &&other) noexcept;
 
     /**
      * @brief Destroy the Program object. See
@@ -30,13 +30,16 @@ class Program {
      */
     ~Program();
 
+    Program(const Program &) = delete;
+    Program &operator=(const Program &) = delete;
+
     /**
      * @brief Program move-assignment operator.
      *
      * @param other Program to be emptied.
      * @return Program& Reference to this.
      */
-    Program &operator=(Program &&other);
+    Program &operator=(Program &&other) noexcept;
 
     /**
      * @brief Attaches a shader to the Program. See
@@ -63,7 +66,7 @@ class Program {
 
   private:
     std::vector<Shader> shaders_;
-    GLuint id_;
+    GLuint id_{};
 };
 } // namespace opengl_wrapper
 

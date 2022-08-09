@@ -13,14 +13,17 @@ class Buffer {
      *
      * @param size The number of buffer names to be generated.
      */
-    Buffer(int size);
+    explicit Buffer(int size);
 
     /**
      * @brief Buffer move-constructor.
      *
      * @param other Buffer to be emptied.
      */
-    Buffer(Buffer &&other);
+    Buffer(Buffer &&other) noexcept;
+
+    Buffer(const Buffer &) = delete;
+    Buffer &operator=(const Buffer &) = delete;
 
     /**
      * @brief Destroy the Buffer object. See
@@ -35,7 +38,7 @@ class Buffer {
      * @param other Buffer to be emptied.
      * @return Buffer& Reference to this.
      */
-    Buffer &operator=(Buffer &&other);
+    Buffer &operator=(Buffer &&other) noexcept;
 
     /**
      * @brief Binds the indicated buffer object.
@@ -56,10 +59,7 @@ class Buffer {
 
   private:
     std::vector<GLuint> ids_;
-    GLenum target_;
-
-    Buffer(const Buffer &) = delete;
-    Buffer &operator=(const Buffer &) = delete;
+    GLenum target_{};
 };
 } // namespace opengl_wrapper
 

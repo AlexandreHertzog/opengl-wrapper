@@ -11,10 +11,4 @@ std::string Formatter::formatGlfwErrorCode(int error_code) {
     return stream.str();
 }
 
-std::string Formatter::formatGlfwWindow(GLFWwindow *window) {
-    std::stringstream stream;
-    stream << "0x" << std::internal << std::hex << std::setw(16)
-           << std::setfill('0') << window;
-    return stream.str();
-}
 } // namespace opengl_wrapper

@@ -7,19 +7,20 @@ VertexArrays::VertexArrays(int size) {
     assert(size > 0);
 
     ids_.resize(size);
-    glGenVertexArrays(ids_.size(), ids_.data());
+    glGenVertexArrays(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
-VertexArrays::VertexArrays(VertexArrays &&other) {
+VertexArrays::VertexArrays(VertexArrays &&other) noexcept {
     std::swap(this->ids_, other.ids_);
 }
 
 VertexArrays::~VertexArrays() {
-    glDeleteVertexArrays(ids_.size(), ids_.data());
+    glDeleteVertexArrays(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
-VertexArrays &VertexArrays::operator=(VertexArrays &&other) {
+VertexArrays &VertexArrays::operator=(VertexArrays &&other) noexcept {
     this->ids_ = std::move(other.ids_);
+    return *this;
 }
 
 void VertexArrays::bind(int index) {

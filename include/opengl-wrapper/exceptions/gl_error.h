@@ -6,7 +6,7 @@
 namespace opengl_wrapper {
 class GlError : public Exception {
   public:
-    GlError(std::string message);
+    explicit GlError(const std::string &message);
 };
 } // namespace opengl_wrapper
 

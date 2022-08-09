@@ -24,6 +24,11 @@ class Window {
      */
     using Action = std::function<void(int)>;
 
+    Window(const Window &) = delete;
+    Window(Window &&) = delete;
+    Window &operator=(const Window &) = delete;
+    Window &operator=(Window &&) = delete;
+
     /**
      * @brief Returns the static window instance.
      *
@@ -76,22 +81,16 @@ class Window {
 
     GLFWframebuffersizefun resize_handler_;
     GLFWkeyfun key_handler_;
-    GLFWwindow *glfw_window_;
+    GLFWwindow *glfw_window_{};
     std::map<int, Action> action_map_;
-    bool initialized_;
-    double frame_time_ms_;
+    bool initialized_{};
+    double frame_time_ms_{};
 
     std::unique_ptr<Program> program_;
     std::unique_ptr<VertexArrays> vao_;
     std::unique_ptr<Buffer> vbo_;
 
-    friend class WindowManager;
-
     Window();
-    Window(const Window &) = delete;
-    Window(Window &&) = delete;
-    Window &operator=(const Window &) = delete;
-    Window &operator=(Window &&) = delete;
 };
 
 } // namespace opengl_wrapper
