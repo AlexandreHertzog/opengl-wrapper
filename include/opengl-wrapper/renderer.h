@@ -21,10 +21,11 @@ class Renderer {
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml,
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
      *
-     * @param vertices_size Size of the vertices array.
      * @param vertices Vertices array.
+     * @param indices Indices for element drawing.
      */
-    void addVertices(GLsizeiptr vertices_size, const float *vertices);
+    void addVertices(const std::vector<float> &vertices,
+                     const std::vector<unsigned int> &indices);
 
     /**
      * @brief Adds a shader to the renderer.
@@ -39,7 +40,7 @@ class Renderer {
 
     /**
      * @brief Draws the given vertices with the given shaders. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArrays.xhtml
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml
      *
      * @param mode Mode bypass to the OpenGL draw function.
      */
@@ -47,8 +48,10 @@ class Renderer {
 
   private:
     Program program_;
-    VertexArrays vao_;
-    Buffer vbo_;
+    VertexArrays vertex_arrays_;
+    Buffer vertex_buffer_;
+    GLsizei vertex_count_{};
+    GLsizei indices_count_{};
 };
 
 } // namespace opengl_wrapper

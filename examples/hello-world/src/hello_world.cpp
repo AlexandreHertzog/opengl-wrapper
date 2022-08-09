@@ -18,8 +18,10 @@ const char *fshader_source = "#version 330 core\n"
                              "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                              "}\0";
 
-const float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f,
-                          0.0f,  0.0f,  0.5f, 0.0f};
+const std::vector<float> vertices = {0.5f,  0.5f,  0.0f, 0.5f,  -0.5f, 0.0f,
+                                     -0.5f, -0.5f, 0.0f, -0.5f, 0.5f,  0.0f};
+
+const std::vector<unsigned int> indices = {0, 1, 3, 1, 2, 3};
 
 int main(int, char **) {
     try {
@@ -33,7 +35,7 @@ int main(int, char **) {
             }
         });
 
-        window.getRenderer().addVertices(sizeof(vertices), vertices);
+        window.getRenderer().addVertices(vertices, indices);
 
         window.getRenderer().addShader(
             opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));

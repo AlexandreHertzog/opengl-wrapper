@@ -41,7 +41,8 @@ class Buffer {
     Buffer &operator=(Buffer &&other) noexcept;
 
     /**
-     * @brief Binds the indicated buffer object.
+     * @brief Binds the indicated buffer object. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml
      *
      * @param index Index of the Buffer to be bound.
      * @param target Target to which the buffer object is bound.
@@ -49,7 +50,8 @@ class Buffer {
     void bind(int index, GLenum target);
 
     /**
-     * @brief Creates and initializes a buffer object data storage.
+     * @brief Creates and initializes a buffer object data storage. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml
      *
      * @param size Size of bytes of the buffer to be stored.
      * @param data Pointer to the data to be stored.
