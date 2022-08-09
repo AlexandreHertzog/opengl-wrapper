@@ -8,9 +8,7 @@
 #include <map>
 #include <memory>
 
-#include "opengl-wrapper/wraps/buffer.h"
-#include "opengl-wrapper/wraps/program.h"
-#include "opengl-wrapper/wraps/vertex_arrays.h"
+#include "renderer.h"
 
 namespace opengl_wrapper {
 
@@ -35,6 +33,13 @@ class Window {
      * @return Window& Static window instance.
      */
     static Window &instance();
+
+    /**
+     * @brief Returns the renderer associated with this window.
+     *
+     * @return Renderer reference.
+     */
+    Renderer &getRenderer();
 
     /**
      * @brief Initializes the static window.
@@ -75,10 +80,6 @@ class Window {
     void renderLoop() noexcept;
 
   private:
-    static const char *vshader_source;
-    static const char *fshader_source;
-    static const float vertices_[];
-
     GLFWframebuffersizefun resize_handler_;
     GLFWkeyfun key_handler_;
     GLFWwindow *glfw_window_{};
@@ -86,9 +87,7 @@ class Window {
     bool initialized_{};
     double frame_time_ms_{};
 
-    std::unique_ptr<Program> program_;
-    std::unique_ptr<VertexArrays> vao_;
-    std::unique_ptr<Buffer> vbo_;
+    std::unique_ptr<Renderer> renderer_;
 
     Window();
 };

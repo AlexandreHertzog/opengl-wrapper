@@ -16,6 +16,7 @@ Program &Program::operator=(Program &&other) noexcept {
     other.id_ = 0;
 
     this->shaders_ = std::move(other.shaders_);
+    return *this;
 }
 
 void Program::addShader(Shader shader) {
