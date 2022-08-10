@@ -3,6 +3,7 @@
 #include <cassert>
 
 namespace opengl_wrapper {
+
 VertexArrays::VertexArrays(int size) {
     assert(size > 0);
 
@@ -29,4 +30,5 @@ void VertexArrays::bind(int index) {
 
     glBindVertexArray(ids_[index]);
 }
+
 } // namespace opengl_wrapper

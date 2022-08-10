@@ -5,9 +5,10 @@
 
 namespace opengl_wrapper {
 std::string Formatter::formatGlfwErrorCode(int error_code) {
+    constexpr auto glfw_error_str_length = 8;
+
     std::stringstream stream;
-    stream << "0x" << std::internal << std::hex << std::setw(8)
-           << std::setfill('0') << error_code;
+    stream << "0x" << std::internal << std::hex << std::setw(glfw_error_str_length) << std::setfill('0') << error_code;
     return stream.str();
 }
 

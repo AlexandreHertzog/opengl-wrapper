@@ -5,11 +5,17 @@
 #include "exceptions/gl_error.h"
 
 namespace opengl_wrapper {
-Program::Program() { id_ = glCreateProgram(); }
 
-Program::Program(Program &&other) noexcept { std::swap(this->id_, other.id_); }
+Program::Program() : id_(glCreateProgram()) {
+}
 
-Program::~Program() { glDeleteProgram(id_); }
+Program::Program(Program &&other) noexcept {
+    std::swap(this->id_, other.id_);
+}
+
+Program::~Program() {
+    glDeleteProgram(id_);
+}
 
 Program &Program::operator=(Program &&other) noexcept {
     this->id_ = other.id_;
@@ -25,15 +31,17 @@ void Program::addShader(Shader shader) {
 }
 
 void Program::link() {
+    constexpr auto error_string_length = 512;
+
     glLinkProgram(id_);
 
     int success = 0;
-    char infoLog[512] = {'\0'};
+    std::array<char, error_string_length> message = {'\0'};
 
     glGetProgramiv(id_, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(id_, 512, nullptr, infoLog);
-        throw GlError(infoLog);
+    if (GL_FALSE == success) {
+        glGetProgramInfoLog(id_, message.size(), nullptr, message.data());
+        throw GlError(message.data());
     }
 
     shaders_.clear();
@@ -42,4 +50,5 @@ void Program::link() {
 void Program::use() { // NOLINT(readability-make-member-function-const)
     glUseProgram(id_);
 }
+
 } // namespace opengl_wrapper

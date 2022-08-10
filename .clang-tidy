@@ -1,0 +1,6 @@
+Checks: 'clang-analyzer*,cert*,cppcore*,misc*,performance*,portability*,readability*,
+        bugprone*,-bugprone-easily-swappable-parameters
+        google*,
+        hicpp*,
+        llvm-*,
+        modernize-*,-modernize-use-trailing-return-type'

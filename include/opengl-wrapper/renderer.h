@@ -24,8 +24,7 @@ class Renderer {
      * @param vertices Vertices array.
      * @param indices Indices for element drawing.
      */
-    void addVertices(const std::vector<float> &vertices,
-                     const std::vector<unsigned int> &indices);
+    void addVertices(const std::vector<float> &vertices, const std::vector<unsigned int> &indices);
 
     /**
      * @brief Adds a shader to the renderer.

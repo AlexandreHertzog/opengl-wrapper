@@ -10,7 +10,9 @@ Buffer::Buffer(int size) {
     glGenBuffers(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
-Buffer::Buffer(Buffer &&other) noexcept { std::swap(this->ids_, other.ids_); }
+Buffer::Buffer(Buffer &&other) noexcept {
+    std::swap(this->ids_, other.ids_);
+}
 
 Buffer::~Buffer() {
     glDeleteBuffers(static_cast<GLsizei>(ids_.size()), ids_.data());
@@ -34,4 +36,5 @@ void Buffer::buffer( // NOLINT(readability-make-member-function-const)
 
     glBufferData(target_, size, data, usage);
 }
+
 } // namespace opengl_wrapper

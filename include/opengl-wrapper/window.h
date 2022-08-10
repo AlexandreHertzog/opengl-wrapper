@@ -22,6 +22,7 @@ class Window {
      */
     using Action = std::function<void(int)>;
 
+    ~Window();
     Window(const Window &) = delete;
     Window(Window &&) = delete;
     Window &operator=(const Window &) = delete;
@@ -85,7 +86,7 @@ class Window {
     GLFWwindow *glfw_window_{};
     std::map<int, Action> action_map_;
     bool initialized_{};
-    double frame_time_ms_{};
+    double frame_time_us_{};
 
     std::unique_ptr<Renderer> renderer_;
 

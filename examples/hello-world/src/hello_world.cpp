@@ -3,44 +3,41 @@
 
 #include <iostream>
 
-const char *vshader_source =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
+const char *const vshader_source = "#version 330 core\n"
+                                   "layout (location = 0) in vec3 aPos;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                   "}\0";
 
-const char *fshader_source = "#version 330 core\n"
-                             "out vec4 FragColor;\n"
-                             "void main()\n"
-                             "{\n"
-                             "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                             "}\0";
+const char *const fshader_source = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "}\0";
 
-const std::vector<float> vertices = {0.5f,  0.5f,  0.0f, 0.5f,  -0.5f, 0.0f,
-                                     -0.5f, -0.5f, 0.0f, -0.5f, 0.5f,  0.0f};
+const std::vector<float> vertices = {0.5f,  0.5f,  0.0f, 0.5f,  -0.5f, 0.0f,  // NOLINT
+                                     -0.5f, -0.5f, 0.0f, -0.5f, 0.5f,  0.0f}; // NOLINT
 
-const std::vector<unsigned int> indices = {0, 1, 3, 1, 2, 3};
+const std::vector<unsigned int> indices = {0, 1, 3, 1, 2, 3}; // NOLINT
 
-int main(int, char **) {
+int main() {
     try {
         auto &gl_manager = opengl_wrapper::GlManager::instance();
         auto &window = opengl_wrapper::Window::instance();
-        window.init(800, 600, "Hello world!");
+        window.init(800, 600, "Hello world!"); // NOLINT(*-magic-numbers)
 
         window.setKeyAction(GLFW_KEY_ESCAPE, [&](int action) {
             if (GLFW_PRESS == action) {
-                window.setWindowShouldClose(true);
+                window.setWindowShouldClose(1);
             }
         });
 
         window.getRenderer().addVertices(vertices, indices);
 
-        window.getRenderer().addShader(
-            opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));
-        window.getRenderer().addShader(
-            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, fshader_source));
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_FRAGMENT_SHADER, fshader_source));
 
         window.getRenderer().useProgram();
         window.getRenderer().draw(GL_TRIANGLES);

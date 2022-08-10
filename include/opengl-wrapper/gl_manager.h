@@ -1,5 +1,5 @@
-#ifndef gl_manager_H
-#define gl_manager_H
+#ifndef OPENGL_WRAPPER_GL_MANAGER_H
+#define OPENGL_WRAPPER_GL_MANAGER_H
 
 #include <glad/glad.h>
 
@@ -34,7 +34,7 @@ class GlManager {
      */
     GlManager();
 
-    static GLFWerrorfun error_handler_;
+    static const GLFWerrorfun error_handler_;
 };
 
 } // namespace opengl_wrapper

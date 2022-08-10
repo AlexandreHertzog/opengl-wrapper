@@ -5,8 +5,7 @@
 
 namespace opengl_wrapper {
 
-Exception::Exception(const std::string &description)
-    : std::runtime_error(description) {
+Exception::Exception(const std::string &description) : std::runtime_error(description) {
     BOOST_LOG_TRIVIAL(warning) << boost::stacktrace::stacktrace();
 }
 
