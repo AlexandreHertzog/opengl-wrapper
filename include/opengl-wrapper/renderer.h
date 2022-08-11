@@ -4,6 +4,8 @@
 #include "opengl-wrapper/wraps/buffer.h"
 #include "opengl-wrapper/wraps/program.h"
 #include "opengl-wrapper/wraps/vertex_arrays.h"
+#include <map>
+#include <memory>
 
 namespace opengl_wrapper {
 
@@ -14,17 +16,7 @@ class Renderer {
     /**
      * @brief Constructs a renderer.
      */
-    Renderer();
-
-    /**
-     * @brief Adds vertices to the renderer. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml,
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
-     *
-     * @param vertices Vertices array.
-     * @param indices Indices for element drawing.
-     */
-    void addVertices(const std::vector<float> &vertices, const std::vector<unsigned int> &indices);
+    Renderer() = default;
 
     /**
      * @brief Adds a shader to the renderer.
@@ -33,22 +25,45 @@ class Renderer {
     void addShader(Shader shader);
 
     /**
-     * @brief Orders the renderer to compile and use the program.
+     * @brief Links the program with the previously passed shaders.
+     * @return The program index in the renderer.
      */
-    void useProgram();
+    unsigned int linkProgram();
 
     /**
-     * @brief Draws the given vertices with the given shaders. See
+     * @brief Adds first_vertices to the renderer ca cache.
+     *
+     * @param vertices Vertices array.
+     * @param indices Indices for element drawing.
+     * @param program_index Previously linked program index to be applied to the first_vertices.
+     */
+    void addVertices(std::vector<float> vertices, std::vector<unsigned int> indices, unsigned int program_index);
+
+    /**
+     * @brief Loads first_vertices into OpenGL. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml,
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
+     */
+    void loadVertices();
+
+    /**
+     * @brief Draws the given vertices with the given shaders with the associated program. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml
      *
      * @param mode Mode bypass to the OpenGL draw function.
      */
-    void draw(GLenum mode);
+    void draw();
 
   private:
-    Program program_;
-    VertexArrays vertex_arrays_;
-    Buffer vertex_buffer_;
+    std::vector<std::vector<float>> vertices_;
+    std::vector<std::vector<unsigned int>> indices_;
+
+    Program current_program_;
+    std::vector<Program> linked_programs_;
+    std::map<unsigned int, int> program_vertices_map_;
+
+    std::unique_ptr<VertexArrays> vertex_arrays_;
+    std::unique_ptr<Buffer> vertex_buffer_;
     GLsizei vertex_count_{};
     GLsizei indices_count_{};
 };

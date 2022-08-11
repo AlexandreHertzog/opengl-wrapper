@@ -20,7 +20,7 @@ Window::Window() {
 
         glViewport(0, 0, width, height);
 
-        Window::instance().getRenderer().draw(GL_TRIANGLES);
+        Window::instance().getRenderer().draw();
 
         BOOST_LOG_TRIVIAL(trace) << "Window::resize_handler_(window=" << window << ", width=" << width
                                  << ", height=" << height << ") end";

@@ -50,12 +50,24 @@ class Program {
     void addShader(Shader shader);
 
     /**
+     * @brief Returns the amount of shaders associated with this program.
+     * @return Amount of shaders.
+     */
+    [[nodiscard]] unsigned int getShaderCount() const;
+
+    /**
      * @brief Links the program with the previously defined shaders. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml
      *
      * @throws GlError When the link fails.
      */
     void link();
+
+    /**
+     * @brief Returns whether or not the program is linked.
+     * @return Whether the program is linked or not.
+     */
+    [[nodiscard]] bool underConstruction() const;
 
     /**
      * @brief Uses this Program. See
@@ -66,7 +78,9 @@ class Program {
 
   private:
     std::vector<Shader> shaders_;
+    unsigned int shader_count_{};
     GLuint id_{};
+    bool linked_{};
 };
 } // namespace opengl_wrapper
 

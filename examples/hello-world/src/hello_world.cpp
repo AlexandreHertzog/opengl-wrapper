@@ -1,3 +1,6 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err58-cpp" // No need to validate allocation problems here, it is a test program.
+
 #include "opengl-wrapper/gl_manager.h"
 #include "opengl-wrapper/window.h"
 
@@ -10,17 +13,25 @@ const char *const vshader_source = "#version 330 core\n"
                                    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                    "}\0";
 
-const char *const fshader_source = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "}\0";
+const char *const first_fshader_source = "#version 330 core\n"
+                                         "out vec4 FragColor;\n"
+                                         "void main()\n"
+                                         "{\n"
+                                         "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                         "}\0";
 
-const std::vector<float> vertices = {0.5f,  0.5f,  0.0f, 0.5f,  -0.5f, 0.0f,  // NOLINT
-                                     -0.5f, -0.5f, 0.0f, -0.5f, 0.5f,  0.0f}; // NOLINT
+const char *const second_fshader_source = "#version 330 core\n"
+                                          "out vec4 FragColor;\n"
+                                          "void main()\n"
+                                          "{\n"
+                                          "    FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                          "}\0";
 
-const std::vector<unsigned int> indices = {0, 1, 3, 1, 2, 3}; // NOLINT
+const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, -0.0F, -0.5F, 0.0F, -0.45F, 0.5F, 0.0F};
+
+const std::vector<float> second_vertices = {0.0F, -0.5F, 0.0F, 0.9F, -0.5F, 0.0F, 0.45F, 0.5F, 0.0F};
+
+const std::vector<unsigned int> indices = {0, 1, 2};
 
 int main() {
     try {
@@ -34,13 +45,21 @@ int main() {
             }
         });
 
-        window.getRenderer().addVertices(vertices, indices);
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_FRAGMENT_SHADER, first_fshader_source));
+
+        const auto first_program_id = window.getRenderer().linkProgram();
 
         window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_FRAGMENT_SHADER, fshader_source));
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_FRAGMENT_SHADER, second_fshader_source));
 
-        window.getRenderer().useProgram();
-        window.getRenderer().draw(GL_TRIANGLES);
+        const auto second_program_id = window.getRenderer().linkProgram();
+
+        window.getRenderer().addVertices(first_vertices, indices, first_program_id);
+        window.getRenderer().addVertices(second_vertices, indices, second_program_id);
+        window.getRenderer().loadVertices();
+
+        window.getRenderer().draw();
 
         window.renderLoop();
         return 0;
@@ -49,3 +68,5 @@ int main() {
         return 1;
     }
 }
+
+#pragma clang diagnostic pop
