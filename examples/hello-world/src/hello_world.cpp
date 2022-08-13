@@ -2,7 +2,7 @@
 #pragma ide diagnostic ignored "cert-err58-cpp" // No need to validate allocation problems here, it is a test program.
 
 #include "opengl-wrapper/gl_manager.h"
-#include "opengl-wrapper/window.h"
+#include "opengl-wrapper/window_manager.h"
 
 #include <iostream>
 
@@ -36,7 +36,7 @@ const std::vector<unsigned int> indices = {0, 1, 2};
 int main() {
     try {
         auto &gl_manager = opengl_wrapper::GlManager::instance();
-        auto &window = opengl_wrapper::Window::instance();
+        auto &window = opengl_wrapper::WindowManager::instance();
         window.init(800, 600, "Hello world!"); // NOLINT(*-magic-numbers)
 
         window.setKeyAction(GLFW_KEY_ESCAPE, [&](int action) {

@@ -9,7 +9,7 @@
 
 namespace opengl_wrapper {
 
-class Window;
+class WindowManager;
 
 class Renderer {
   public:

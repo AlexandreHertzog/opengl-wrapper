@@ -35,6 +35,7 @@ add_library(opengl-wrapper-wraps
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/program.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/shader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/vertex_arrays.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/window.cpp
 )
 
 target_include_directories(opengl-wrapper-wraps
@@ -51,7 +52,7 @@ target_link_libraries(opengl-wrapper-wraps
 add_library(opengl-wrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/window_manager.cpp
 )
 
 target_include_directories(opengl-wrapper

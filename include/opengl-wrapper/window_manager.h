@@ -1,5 +1,5 @@
-#ifndef OPENGL_WRAPPER_WINDOW_H
-#define OPENGL_WRAPPER_WINDOW_H
+#ifndef OPENGL_WRAPPER_WINDOW_MANAGER_H
+#define OPENGL_WRAPPER_WINDOW_MANAGER_H
 
 #include <glad/glad.h>
 
@@ -8,11 +8,12 @@
 #include <map>
 #include <memory>
 
+#include "opengl-wrapper/wraps/window.h"
 #include "renderer.h"
 
 namespace opengl_wrapper {
 
-class Window {
+class WindowManager {
   public:
     /**
      * @brief The action to be ran on a given keypress
@@ -22,18 +23,18 @@ class Window {
      */
     using Action = std::function<void(int)>;
 
-    ~Window();
-    Window(const Window &) = delete;
-    Window(Window &&) = delete;
-    Window &operator=(const Window &) = delete;
-    Window &operator=(Window &&) = delete;
+    ~WindowManager() = default;
+    WindowManager(const WindowManager &) = delete;
+    WindowManager(WindowManager &&) = delete;
+    WindowManager &operator=(const WindowManager &) = delete;
+    WindowManager &operator=(WindowManager &&) = delete;
 
     /**
      * @brief Returns the static window instance.
      *
-     * @return Window& Static window instance.
+     * @return WindowManager& Static window instance.
      */
-    static Window &instance();
+    static WindowManager &instance();
 
     /**
      * @brief Returns the renderer associated with this window.
@@ -45,9 +46,9 @@ class Window {
     /**
      * @brief Initializes the static window.
      *
-     * @param width Window width.
-     * @param height Window height.
-     * @param title Window title.
+     * @param width WindowManager width.
+     * @param height WindowManager height.
+     * @param title WindowManager title.
      */
     void init(int width, int height, const char *title);
 
@@ -60,7 +61,7 @@ class Window {
     void setKeyAction(int key, Action action) noexcept;
 
     /**
-     * @brief Set the Window Should Close object. Requires init() to be called
+     * @brief Set the WindowManager Should Close object. Requires init() to be called
      * beforehand.
      *
      * @param value
@@ -75,7 +76,7 @@ class Window {
     void setRefreshRate(int refresh_rate) noexcept;
 
     /**
-     * @brief Engages the Window render loop. Requires init() to be called
+     * @brief Engages the WindowManager render loop. Requires init() to be called
      * beforehand.
      */
     void renderLoop() noexcept;
@@ -83,14 +84,14 @@ class Window {
   private:
     GLFWframebuffersizefun resize_handler_;
     GLFWkeyfun key_handler_;
-    GLFWwindow *glfw_window_{};
     std::map<int, Action> action_map_;
     bool initialized_{};
     double frame_time_us_{};
 
+    std::unique_ptr<Window> window_;
     std::unique_ptr<Renderer> renderer_;
 
-    Window();
+    WindowManager();
 };
 
 } // namespace opengl_wrapper
