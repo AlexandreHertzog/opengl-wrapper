@@ -29,6 +29,7 @@ Window::~Window() {
 Window &Window::operator=(Window &&other) noexcept {
     this->window_ = other.window_;
     other.window_ = nullptr;
+    return *this;
 }
 
 bool Window::operator==(GLFWwindow *other) const {

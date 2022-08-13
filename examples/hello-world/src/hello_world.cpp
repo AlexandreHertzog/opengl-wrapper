@@ -6,27 +6,6 @@
 
 #include <iostream>
 
-const char *const vshader_source = "#version 330 core\n"
-                                   "layout (location = 0) in vec3 aPos;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                   "}\0";
-
-const char *const first_fshader_source = "#version 330 core\n"
-                                         "out vec4 FragColor;\n"
-                                         "void main()\n"
-                                         "{\n"
-                                         "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                         "}\0";
-
-const char *const second_fshader_source = "#version 330 core\n"
-                                          "out vec4 FragColor;\n"
-                                          "void main()\n"
-                                          "{\n"
-                                          "    FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-                                          "}\0";
-
 const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, -0.0F, -0.5F, 0.0F, -0.45F, 0.5F, 0.0F};
 
 const std::vector<float> second_vertices = {0.0F, -0.5F, 0.0F, 0.9F, -0.5F, 0.0F, 0.45F, 0.5F, 0.0F};
@@ -45,13 +24,15 @@ int main() {
             }
         });
 
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_FRAGMENT_SHADER, first_fshader_source));
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shader.vert")));
+        window.getRenderer().addShader(
+            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("triangle1.frag")));
 
         const auto first_program_id = window.getRenderer().linkProgram();
 
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, vshader_source));
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_FRAGMENT_SHADER, second_fshader_source));
+        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shader.vert")));
+        window.getRenderer().addShader(
+            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("triangle2.frag")));
 
         const auto second_program_id = window.getRenderer().linkProgram();
 

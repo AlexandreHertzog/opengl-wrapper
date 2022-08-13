@@ -46,11 +46,12 @@ target_include_directories(opengl-wrapper-wraps
 )
 
 target_link_libraries(opengl-wrapper-wraps
-    PUBLIC glad opengl-wrapper-exceptions
-)
+        PUBLIC glad opengl-wrapper-exceptions
+        PRIVATE Boost::log
+        )
 
 add_library(opengl-wrapper
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/window_manager.cpp
 )

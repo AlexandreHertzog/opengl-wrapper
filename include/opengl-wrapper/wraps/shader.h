@@ -1,6 +1,7 @@
 #ifndef OPENGL_WRAPPER_WRAPS_SHADER_H
 #define OPENGL_WRAPPER_WRAPS_SHADER_H
 
+#include <filesystem>
 #include <glad/glad.h>
 #include <string>
 
@@ -16,7 +17,16 @@ class Shader {
      * @param source Source-code for the shader.
      * @throws GlError When the shader compilation fails.
      */
-    Shader(GLenum type, const char *source);
+    explicit Shader(GLenum type, const char *source = nullptr);
+
+    /**
+     * @brief Construct a new Shader object, reads its source from the filesystem then compiles it. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml
+     *
+     * @param type
+     * @param shader_path
+     */
+    Shader(GLenum type, const std::filesystem::path &shader_path);
 
     /**
      * @brief Shader move-constructor.
@@ -52,6 +62,8 @@ class Shader {
 
   private:
     GLuint id_;
+
+    void compile(const char *source);
 };
 
 } // namespace opengl_wrapper
