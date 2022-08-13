@@ -26,18 +26,18 @@ class Renderer {
 
     /**
      * @brief Links the program with the previously passed shaders.
-     * @return The program index in the renderer.
+     * @return The program pointer in the renderer.
      */
-    unsigned int linkProgram();
+    std::shared_ptr<Program> linkProgram();
 
     /**
      * @brief Adds first_vertices to the renderer ca cache.
      *
      * @param vertices Vertices array.
      * @param indices Indices for element drawing.
-     * @param program_index Previously linked program index to be applied to the first_vertices.
+     * @param program Previously linked program index to be applied to the first_vertices.
      */
-    void addVertices(std::vector<float> vertices, std::vector<unsigned int> indices, unsigned int program_index);
+    void addVertices(std::vector<float> vertices, std::vector<unsigned int> indices, std::shared_ptr<Program> program);
 
     /**
      * @brief Loads first_vertices into OpenGL. See
@@ -58,9 +58,9 @@ class Renderer {
     std::vector<std::vector<float>> vertices_;
     std::vector<std::vector<unsigned int>> indices_;
 
-    Program current_program_;
-    std::vector<Program> linked_programs_;
-    std::map<unsigned int, int> program_vertices_map_;
+    std::shared_ptr<Program> current_program_;
+    std::vector<std::shared_ptr<Program>> linked_programs_;
+    std::map<int, std::shared_ptr<Program>> vertices_program_map_;
 
     std::unique_ptr<VertexArrays> vertex_arrays_;
     std::unique_ptr<Buffer> vertex_buffer_;

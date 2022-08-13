@@ -39,6 +39,10 @@ Program &Program::operator=(Program &&other) noexcept {
     return *this;
 }
 
+bool Program::operator==(const opengl_wrapper::Program &other) const {
+    return this->id_ == other.id_;
+}
+
 void Program::addShader(Shader shader) {
     if (0 == id_) {
         id_ = glCreateProgram();
@@ -77,8 +81,19 @@ bool Program::underConstruction() const {
     return 0 != id_ && !linked_;
 }
 
+void Program::setUseCallback(opengl_wrapper::Program::UseCallback callback) {
+    use_callback_ = std::move(callback);
+}
+
+int Program::getUniformLocation(const char *var_name) const {
+    return glGetUniformLocation(id_, var_name);
+}
+
 void Program::use() { // NOLINT(readability-make-member-function-const)
     glUseProgram(id_);
+    if (use_callback_) {
+        use_callback_(*this);
+    }
 }
 
 } // namespace opengl_wrapper

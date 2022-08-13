@@ -3,7 +3,8 @@
 
 #include "opengl-wrapper/gl_manager.h"
 #include "opengl-wrapper/window_manager.h"
-
+#include <boost/log/trivial.hpp>
+#include <complex>
 #include <iostream>
 
 const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, -0.0F, -0.5F, 0.0F, -0.45F, 0.5F, 0.0F};
@@ -28,19 +29,24 @@ int main() {
         window.getRenderer().addShader(
             opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("triangle1.frag")));
 
-        const auto first_program_id = window.getRenderer().linkProgram();
+        auto first_program_id = window.getRenderer().linkProgram();
+
+        first_program_id->setUseCallback([](opengl_wrapper::Program &program) {
+            auto time_value = glfwGetTime();
+            auto green_value = sin(time_value) / 2.0F + 0.5F; // NOLINT(*-magic-numbers)
+            int runtime_color = program.getUniformLocation("runtime_color");
+            glUniform4f(runtime_color, 0.0F, static_cast<float>(green_value), 0.0F, 1.0F);
+        });
 
         window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shader.vert")));
         window.getRenderer().addShader(
             opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("triangle2.frag")));
 
-        const auto second_program_id = window.getRenderer().linkProgram();
+        auto second_program_id = window.getRenderer().linkProgram();
 
         window.getRenderer().addVertices(first_vertices, indices, first_program_id);
         window.getRenderer().addVertices(second_vertices, indices, second_program_id);
         window.getRenderer().loadVertices();
-
-        window.getRenderer().draw();
 
         window.renderLoop();
         return 0;

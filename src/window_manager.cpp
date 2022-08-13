@@ -87,6 +87,10 @@ void WindowManager::init(int width, int height, const char *title) {
 
     initialized_ = true;
 
+    int num_vertex_attributes = 0;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &num_vertex_attributes);
+    BOOST_LOG_TRIVIAL(info) << "GL_MAX_VERTEX_ATTRIBS = " << num_vertex_attributes;
+
     BOOST_LOG_TRIVIAL(trace) << "WindowManager::init(width=" << width << ", height=" << height << ", title=" << title
                              << ") end";
 }
@@ -99,8 +103,12 @@ void WindowManager::renderLoop() noexcept {
     while (1 != window_->shouldClose()) {
         auto start_time = std::chrono::high_resolution_clock::now();
 
-        window_->swapBuffers();
+        glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+        glClear(GL_COLOR_BUFFER_BIT);
 
+        renderer_->draw();
+
+        window_->swapBuffers();
         glfwPollEvents();
 
         std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
