@@ -78,9 +78,9 @@ class Program {
 
   private:
     std::vector<Shader> shaders_;
-    unsigned int shader_count_{};
-    GLuint id_{};
-    bool linked_{};
+    unsigned int shader_count_;
+    GLuint id_;
+    bool linked_;
 };
 } // namespace opengl_wrapper
 

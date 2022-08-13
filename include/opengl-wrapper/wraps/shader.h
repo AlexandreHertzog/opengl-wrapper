@@ -51,7 +51,7 @@ class Shader {
     [[nodiscard]] GLuint getId() const;
 
   private:
-    GLuint id_{};
+    GLuint id_;
 };
 
 } // namespace opengl_wrapper

@@ -85,8 +85,8 @@ class WindowManager {
     GLFWframebuffersizefun resize_handler_;
     GLFWkeyfun key_handler_;
     std::map<int, Action> action_map_;
-    bool initialized_{};
-    double frame_time_us_{};
+    bool initialized_;
+    double frame_time_us_;
 
     std::unique_ptr<Window> window_;
     std::unique_ptr<Renderer> renderer_;

@@ -16,7 +16,7 @@ class Renderer {
     /**
      * @brief Constructs a renderer.
      */
-    Renderer() = default;
+    Renderer();
 
     /**
      * @brief Adds a shader to the renderer.
@@ -64,8 +64,8 @@ class Renderer {
 
     std::unique_ptr<VertexArrays> vertex_arrays_;
     std::unique_ptr<Buffer> vertex_buffer_;
-    GLsizei vertex_count_{};
-    GLsizei indices_count_{};
+    GLsizei vertex_count_;
+    GLsizei indices_count_;
 };
 
 } // namespace opengl_wrapper

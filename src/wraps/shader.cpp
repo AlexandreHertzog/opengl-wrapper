@@ -21,8 +21,8 @@ Shader::Shader(GLenum type, const char *source) : id_(glCreateShader(type)) {
     }
 }
 
-Shader::Shader(Shader &&other) noexcept {
-    std::swap(this->id_, other.id_);
+Shader::Shader(Shader &&other) noexcept : id_(other.id_) {
+    other.id_ = 0;
 }
 
 Shader::~Shader() {

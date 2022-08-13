@@ -61,7 +61,7 @@ class Buffer {
 
   private:
     std::vector<GLuint> ids_;
-    GLenum target_{};
+    GLenum target_;
 };
 } // namespace opengl_wrapper
 

@@ -4,6 +4,9 @@
 
 namespace opengl_wrapper {
 
+Renderer::Renderer() : vertex_count_(0), indices_count_(0) {
+}
+
 void Renderer::addVertices(std::vector<float> vertices, std::vector<unsigned int> indices, unsigned int program_index) {
     vertices_.emplace_back(std::move(vertices));
     indices_.emplace_back(std::move(indices));

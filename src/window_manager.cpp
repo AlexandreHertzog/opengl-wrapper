@@ -10,46 +10,45 @@
 
 namespace opengl_wrapper {
 
-WindowManager::WindowManager() {
+WindowManager::WindowManager()
+    : resize_handler_([](GLFWwindow *window, int width, int height) {
+          BOOST_LOG_TRIVIAL(debug) << "WindowManager::resize_handler_(window=" << window << ", width=" << width
+                                   << ", height=" << height << ")";
+
+          auto &window_manager = WindowManager::instance();
+          if (*window_manager.window_ != window) {
+              BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
+              return;
+          }
+
+          glViewport(0, 0, width, height);
+
+          WindowManager::instance().getRenderer().draw();
+
+          BOOST_LOG_TRIVIAL(trace) << "WindowManager::resize_handler_(window=" << window << ", width=" << width
+                                   << ", height=" << height << ") end";
+      }),
+      key_handler_([](GLFWwindow *window, int key, int scancode, int action, int mods) {
+          BOOST_LOG_TRIVIAL(debug) << "window_manager::key_handler_(window=" << window << ", key=" << key
+                                   << ", scancode=" << scancode << ", mods=" << mods << ")";
+
+          auto &window_manager = WindowManager::instance();
+          if (*window_manager.window_ != window) {
+              BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
+              return;
+          }
+
+          const auto existing_action = window_manager.action_map_.find(key);
+          if (window_manager.action_map_.end() != existing_action) {
+              existing_action->second(action);
+          }
+
+          BOOST_LOG_TRIVIAL(trace) << "window_manager::key_handler_(window=" << window << ", key=" << key
+                                   << ", scancode=" << scancode << ", mods=" << mods << ") end";
+      }),
+      initialized_(false), frame_time_us_(0.0) {
+
     BOOST_LOG_TRIVIAL(debug) << "WindowManager::WindowManager()";
-
-    resize_handler_ = [](GLFWwindow *window, int width, int height) {
-        BOOST_LOG_TRIVIAL(debug) << "WindowManager::resize_handler_(window=" << window << ", width=" << width
-                                 << ", height=" << height << ")";
-
-        auto &window_manager = WindowManager::instance();
-        if (*window_manager.window_ != window) {
-            BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
-            return;
-        }
-
-        glViewport(0, 0, width, height);
-
-        WindowManager::instance().getRenderer().draw();
-
-        BOOST_LOG_TRIVIAL(trace) << "WindowManager::resize_handler_(window=" << window << ", width=" << width
-                                 << ", height=" << height << ") end";
-    };
-
-    key_handler_ = [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-        BOOST_LOG_TRIVIAL(debug) << "window_manager::key_handler_(window=" << window << ", key=" << key
-                                 << ", scancode=" << scancode << ", mods=" << mods << ")";
-
-        auto &window_manager = WindowManager::instance();
-        if (*window_manager.window_ != window) {
-            BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
-            return;
-        }
-
-        const auto existing_action = window_manager.action_map_.find(key);
-        if (window_manager.action_map_.end() != existing_action) {
-            existing_action->second(action);
-        }
-
-        BOOST_LOG_TRIVIAL(trace) << "window_manager::key_handler_(window=" << window << ", key=" << key
-                                 << ", scancode=" << scancode << ", mods=" << mods << ") end";
-    };
-
     setRefreshRate(60); // NOLINT(*-magic-numbers)
     BOOST_LOG_TRIVIAL(trace) << "WindowManager::WindowManager() end";
 }

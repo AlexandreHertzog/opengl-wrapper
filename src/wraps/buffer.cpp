@@ -4,13 +4,13 @@
 
 namespace opengl_wrapper {
 
-Buffer::Buffer(int size) {
+Buffer::Buffer(int size) : target_(0) {
     assert(size > 0);
     ids_.resize(size);
     glGenBuffers(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
-Buffer::Buffer(Buffer &&other) noexcept {
+Buffer::Buffer(Buffer &&other) noexcept : target_(0) {
     std::swap(this->ids_, other.ids_);
 }
 

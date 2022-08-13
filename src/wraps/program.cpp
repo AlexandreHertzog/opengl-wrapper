@@ -7,14 +7,15 @@
 
 namespace opengl_wrapper {
 
-Program::Program() : id_(glCreateProgram()) {
+Program::Program() : shader_count_(0), id_(glCreateProgram()), linked_(false) {
 }
 
-Program::Program(Program &&other) noexcept {
-    std::swap(this->shaders_, other.shaders_);
-    std::swap(this->shader_count_, other.shader_count_);
-    std::swap(this->id_, other.id_);
-    std::swap(this->linked_, other.linked_);
+Program::Program(Program &&other) noexcept
+    : shaders_(std::move(other.shaders_)), shader_count_(other.shader_count_), id_(other.id_), linked_(other.linked_) {
+
+    other.shader_count_ = 0;
+    other.id_ = 0;
+    other.linked_ = false;
 }
 
 Program::~Program() {
