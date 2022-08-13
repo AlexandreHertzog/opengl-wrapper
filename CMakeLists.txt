@@ -7,14 +7,16 @@ find_package(Boost COMPONENTS log REQUIRED)
 
 option(INCLUDE_EXAMPLES "Build the examples contained on ./examples/" ON)
 
+add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
+
 add_subdirectory(lib)
 
 add_library(opengl-wrapper-exceptions
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/exception.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/gl_error.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glad_error.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glfw_error.cpp
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/exception.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/gl_error.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glad_error.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/exceptions/glfw_error.cpp
+        )
 
 target_include_directories(opengl-wrapper-exceptions
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -23,8 +25,8 @@ target_include_directories(opengl-wrapper-exceptions
 )
 
 target_link_libraries(opengl-wrapper-exceptions
-    PRIVATE Boost::log
-)
+        PRIVATE Boost::log backtrace
+        )
 
 add_library(opengl-wrapper-utils
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/formatter.cpp

@@ -7,9 +7,11 @@
 #include <complex>
 #include <iostream>
 
-const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, -0.0F, -0.5F, 0.0F, -0.45F, 0.5F, 0.0F};
+const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, 1.0F,   1.0F, 1.0F, -0.0F, -0.5F, 0.0F,
+                                           1.0F,  1.0F,  1.0F, -0.45F, 0.5F, 0.0F, 1.0F,  1.0F,  1.0F};
 
-const std::vector<float> second_vertices = {0.0F, -0.5F, 0.0F, 0.9F, -0.5F, 0.0F, 0.45F, 0.5F, 0.0F};
+const std::vector<float> second_vertices = {0.0F, -0.5F, 0.0F, 1.0F,  0.0F, 0.0F, 0.9F, -0.5F, 0.0F,
+                                            0.0F, 0.1F,  0.0F, 0.45F, 0.5F, 0.0F, 0.0F, 0.0F,  1.0F};
 
 const std::vector<unsigned int> indices = {0, 1, 2};
 
@@ -25,9 +27,10 @@ int main() {
             }
         });
 
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shader.vert")));
         window.getRenderer().addShader(
-            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("triangle1.frag")));
+            opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
+        window.getRenderer().addShader(
+            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle1.frag")));
 
         auto first_program_id = window.getRenderer().linkProgram();
 
@@ -38,9 +41,10 @@ int main() {
             glUniform4f(runtime_color, 0.0F, static_cast<float>(green_value), 0.0F, 1.0F);
         });
 
-        window.getRenderer().addShader(opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shader.vert")));
         window.getRenderer().addShader(
-            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("triangle2.frag")));
+            opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
+        window.getRenderer().addShader(
+            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle2.frag")));
 
         auto second_program_id = window.getRenderer().linkProgram();
 

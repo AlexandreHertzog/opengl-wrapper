@@ -40,8 +40,12 @@ void Renderer::loadVertices() {
         vertex_count_ += static_cast<GLsizei>(vertices_[i].size());
         indices_count_ += static_cast<GLsizei>(indices_[i].size());
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr); // NOLINT
         glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),  // NOLINT
+                              reinterpret_cast<void *>(3 * sizeof(float))); // NOLINT
+        glEnableVertexAttribArray(1);
     }
 }
 

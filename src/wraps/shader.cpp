@@ -59,7 +59,7 @@ void Shader::compile(const char *source) { // NOLINT(readability-make-member-fun
 
     glGetShaderiv(id_, GL_COMPILE_STATUS, &success);
     if (GL_FALSE == success) {
-        glGetProgramInfoLog(id_, message.size(), nullptr, message.data());
+        glGetShaderInfoLog(id_, message.size(), nullptr, message.data());
         throw GlError(message.data());
     }
 }
