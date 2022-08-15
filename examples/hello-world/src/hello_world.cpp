@@ -27,29 +27,35 @@ int main() {
             }
         });
 
-        window.getRenderer().addShader(
+        auto first_program = std::make_shared<opengl_wrapper::Program>();
+
+        first_program->addShader(
             opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
-        window.getRenderer().addShader(
+
+        first_program->addShader(
             opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle1.frag")));
 
-        auto first_program_id = window.getRenderer().linkProgram();
+        first_program->link();
 
-        first_program_id->setUseCallback([](opengl_wrapper::Program &program) {
+        first_program->setUseCallback([](opengl_wrapper::Program &program) {
             auto time_value = glfwGetTime();
             auto green_value = sin(time_value) / 2.0F + 0.5F; // NOLINT(*-magic-numbers)
             int runtime_color = program.getUniformLocation("runtime_color");
             glUniform4f(runtime_color, 0.0F, static_cast<float>(green_value), 0.0F, 1.0F);
         });
 
-        window.getRenderer().addShader(
+        auto second_program = std::make_shared<opengl_wrapper::Program>();
+
+        second_program->addShader(
             opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
-        window.getRenderer().addShader(
+
+        second_program->addShader(
             opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle2.frag")));
 
-        auto second_program_id = window.getRenderer().linkProgram();
+        second_program->link();
 
-        window.getRenderer().addVertices(first_vertices, indices, first_program_id);
-        window.getRenderer().addVertices(second_vertices, indices, second_program_id);
+        window.getRenderer().addVertices(first_vertices, indices, first_program);
+        window.getRenderer().addVertices(second_vertices, indices, second_program);
         window.getRenderer().loadVertices();
 
         window.renderLoop();

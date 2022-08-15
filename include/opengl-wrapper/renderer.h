@@ -19,18 +19,6 @@ class Renderer {
     Renderer();
 
     /**
-     * @brief Adds a shader to the renderer.
-     * @param shader Shader to be added.
-     */
-    void addShader(Shader shader);
-
-    /**
-     * @brief Links the program with the previously passed shaders.
-     * @return The program pointer in the renderer.
-     */
-    std::shared_ptr<Program> linkProgram();
-
-    /**
      * @brief Adds first_vertices to the renderer ca cache.
      *
      * @param vertices Vertices array.
@@ -58,8 +46,6 @@ class Renderer {
     std::vector<std::vector<float>> vertices_;
     std::vector<std::vector<unsigned int>> indices_;
 
-    std::shared_ptr<Program> current_program_;
-    std::vector<std::shared_ptr<Program>> linked_programs_;
     std::map<int, std::shared_ptr<Program>> vertices_program_map_;
 
     std::unique_ptr<VertexArrays> vertex_arrays_;

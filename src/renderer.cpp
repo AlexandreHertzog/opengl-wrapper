@@ -12,8 +12,6 @@ void Renderer::addVertices(std::vector<float> vertices, std::vector<unsigned int
 
     vertices_.emplace_back(std::move(vertices));
     indices_.emplace_back(std::move(indices));
-
-    assert(std::find(linked_programs_.begin(), linked_programs_.end(), program) != linked_programs_.end());
     vertices_program_map_[static_cast<int>(vertices_.size() - 1)] = std::move(program);
 }
 
@@ -49,27 +47,7 @@ void Renderer::loadVertices() {
     }
 }
 
-void Renderer::addShader(Shader shader) {
-    if (!current_program_) {
-        current_program_ = std::make_shared<Program>();
-    }
-    current_program_->addShader(std::move(shader));
-}
-
-std::shared_ptr<Program> Renderer::linkProgram() {
-    assert(current_program_);
-    assert(current_program_->getShaderCount() > 0);
-
-    current_program_->link();
-    linked_programs_.emplace_back(std::move(current_program_));
-    return linked_programs_.back();
-}
-
 void Renderer::draw() {
-    if (current_program_ && current_program_->underConstruction()) {
-        BOOST_LOG_TRIVIAL(warning) << "Entering drawing loop while a program is under construction";
-    }
-
     for (const auto &program_index : vertices_program_map_) {
         program_index.second->use();
         vertex_arrays_->bind(program_index.first);
