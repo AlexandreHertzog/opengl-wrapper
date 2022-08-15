@@ -1,13 +1,13 @@
-#ifndef GLAD_ERROR_H
-#define GLAD_ERROR_H
+#ifndef OPENGL_WRAPPER_EXCEPTIONS_GLAD_ERROR_H
+#define OPENGL_WRAPPER_EXCEPTIONS_GLAD_ERROR_H
 
 #include "exception.h"
 
 namespace opengl_wrapper {
 
-class GladError : public Exception {
+class glad_error : public exception {
   public:
-    explicit GladError(const std::string &description);
+    explicit glad_error(const std::string &description);
 };
 
 } // namespace opengl_wrapper

@@ -17,48 +17,48 @@ const std::vector<unsigned int> indices = {0, 1, 2};
 
 int main() {
     try {
-        auto &gl_manager = opengl_wrapper::GlManager::instance();
-        auto &window = opengl_wrapper::WindowManager::instance();
+        auto &gl_manager = opengl_wrapper::gl_manager::instance();
+        auto &window = opengl_wrapper::window_manager::instance();
         window.init(800, 600, "Hello world!"); // NOLINT(*-magic-numbers)
 
-        window.setKeyAction(GLFW_KEY_ESCAPE, [&](int action) {
+        window.set_key_action(GLFW_KEY_ESCAPE, [&](int action) {
             if (GLFW_PRESS == action) {
-                window.setWindowShouldClose(1);
+                window.set_window_should_close(1);
             }
         });
 
-        auto first_program = std::make_shared<opengl_wrapper::Program>();
+        auto first_program = std::make_shared<opengl_wrapper::program>();
 
-        first_program->addShader(
-            opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
+        first_program->add_shader(
+            opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
 
-        first_program->addShader(
-            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle1.frag")));
+        first_program->add_shader(
+            opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle1.frag")));
 
         first_program->link();
 
-        first_program->setUseCallback([](opengl_wrapper::Program &program) {
+        first_program->set_use_callback([](opengl_wrapper::program &program) {
             auto time_value = glfwGetTime();
             auto green_value = sin(time_value) / 2.0F + 0.5F; // NOLINT(*-magic-numbers)
-            int runtime_color = program.getUniformLocation("runtime_color");
+            int runtime_color = program.get_uniform_location("runtime_color");
             glUniform4f(runtime_color, 0.0F, static_cast<float>(green_value), 0.0F, 1.0F);
         });
 
-        auto second_program = std::make_shared<opengl_wrapper::Program>();
+        auto second_program = std::make_shared<opengl_wrapper::program>();
 
-        second_program->addShader(
-            opengl_wrapper::Shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
+        second_program->add_shader(
+            opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/shader.vert")));
 
-        second_program->addShader(
-            opengl_wrapper::Shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle2.frag")));
+        second_program->add_shader(
+            opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/triangle2.frag")));
 
         second_program->link();
 
-        window.getRenderer().addVertices(first_vertices, indices, first_program);
-        window.getRenderer().addVertices(second_vertices, indices, second_program);
-        window.getRenderer().loadVertices();
+        window.get_renderer().add_vertices(first_vertices, indices, first_program);
+        window.get_renderer().add_vertices(second_vertices, indices, second_program);
+        window.get_renderer().load_vertices();
 
-        window.renderLoop();
+        window.render_loop();
         return 0;
     } catch (const std::runtime_error &e) {
         std::cerr << e.what();

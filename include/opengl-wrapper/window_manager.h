@@ -13,7 +13,7 @@
 
 namespace opengl_wrapper {
 
-class WindowManager {
+class window_manager {
   public:
     /**
      * @brief The action to be ran on a given keypress
@@ -23,32 +23,32 @@ class WindowManager {
      */
     using Action = std::function<void(int)>;
 
-    ~WindowManager() = default;
-    WindowManager(const WindowManager &) = delete;
-    WindowManager(WindowManager &&) = delete;
-    WindowManager &operator=(const WindowManager &) = delete;
-    WindowManager &operator=(WindowManager &&) = delete;
+    ~window_manager() = default;
+    window_manager(const window_manager &) = delete;
+    window_manager(window_manager &&) = delete;
+    window_manager &operator=(const window_manager &) = delete;
+    window_manager &operator=(window_manager &&) = delete;
 
     /**
      * @brief Returns the static window instance.
      *
-     * @return WindowManager& Static window instance.
+     * @return window_manager& Static window instance.
      */
-    static WindowManager &instance();
+    static window_manager &instance();
 
     /**
      * @brief Returns the renderer associated with this window.
      *
-     * @return Renderer reference.
+     * @return renderer reference.
      */
-    Renderer &getRenderer();
+    renderer &get_renderer();
 
     /**
      * @brief Initializes the static window.
      *
-     * @param width WindowManager width.
-     * @param height WindowManager height.
-     * @param title WindowManager title.
+     * @param width window_manager width.
+     * @param height window_manager height.
+     * @param title window_manager title.
      */
     void init(int width, int height, const char *title);
 
@@ -58,28 +58,28 @@ class WindowManager {
      * @param key GLFW respective key
      * @param action Action to be ran upon key
      */
-    void setKeyAction(int key, Action action) noexcept;
+    void set_key_action(int key, Action action) noexcept;
 
     /**
-     * @brief Set the WindowManager Should Close object. Requires init() to be called
+     * @brief Set the window_manager Should Close object. Requires init() to be called
      * beforehand.
      *
      * @param value
      */
-    void setWindowShouldClose(int value) noexcept;
+    void set_window_should_close(int value) noexcept;
 
     /**
      * @brief Sets the window refresh rate, in hertz.
      *
      * @param refresh_rate Refresh rate in hertz.
      */
-    void setRefreshRate(int refresh_rate) noexcept;
+    void set_refresh_rate(int refresh_rate) noexcept;
 
     /**
-     * @brief Engages the WindowManager render loop. Requires init() to be called
+     * @brief Engages the window_manager render loop. Requires init() to be called
      * beforehand.
      */
-    void renderLoop() noexcept;
+    void render_loop() noexcept;
 
   private:
     GLFWframebuffersizefun resize_handler_;
@@ -88,10 +88,10 @@ class WindowManager {
     bool initialized_;
     double frame_time_us_;
 
-    std::unique_ptr<Window> window_;
-    std::unique_ptr<Renderer> renderer_;
+    std::unique_ptr<window> window_;
+    std::unique_ptr<renderer> renderer_;
 
-    WindowManager();
+    window_manager();
 };
 
 } // namespace opengl_wrapper

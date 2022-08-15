@@ -1,13 +1,13 @@
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#ifndef OPENGL_WRAPPER_EXCEPTIONS_EXCEPTION_H
+#define OPENGL_WRAPPER_EXCEPTIONS_EXCEPTION_H
 
 #include <stdexcept>
 
 namespace opengl_wrapper {
 
-class Exception : public std::runtime_error {
+class exception : public std::runtime_error {
   public:
-    explicit Exception(const std::string &description);
+    explicit exception(const std::string &description);
 };
 
 } // namespace opengl_wrapper

@@ -7,16 +7,16 @@
 
 namespace opengl_wrapper {
 
-Shader::Shader(GLenum type, const char *source) : id_(glCreateShader(type)) {
+shader::shader(GLenum type, const char *source) : id_(glCreateShader(type)) {
     if (source != nullptr) {
         compile(source);
     }
 }
 
-Shader::Shader(GLenum type, const std::filesystem::path &shader_path) : id_(0) {
+shader::shader(GLenum type, const std::filesystem::path &shader_path) : id_(0) {
     std::ifstream shader_file(shader_path);
     if (!shader_file.is_open()) {
-        throw Exception("Shader file not found: " + shader_path.string());
+        throw exception("shader file not found: " + shader_path.string());
     }
 
     std::stringstream shader_stream;
@@ -28,25 +28,25 @@ Shader::Shader(GLenum type, const std::filesystem::path &shader_path) : id_(0) {
     compile(code.c_str());
 }
 
-Shader::Shader(Shader &&other) noexcept : id_(other.id_) {
+shader::shader(shader &&other) noexcept : id_(other.id_) {
     other.id_ = 0;
 }
 
-Shader::~Shader() {
+shader::~shader() {
     glDeleteShader(id_);
 }
 
-Shader &Shader::operator=(Shader &&other) noexcept {
+shader &shader::operator=(shader &&other) noexcept {
     this->id_ = other.id_;
     other.id_ = 0;
     return *this;
 }
 
-GLuint Shader::getId() const {
+GLuint shader::get_id() const {
     return id_;
 }
 
-void Shader::compile(const char *source) { // NOLINT(readability-make-member-function-const)
+void shader::compile(const char *source) { // NOLINT(readability-make-member-function-const)
     assert(nullptr != source);
 
     constexpr auto error_string_length = 512;
@@ -60,7 +60,7 @@ void Shader::compile(const char *source) { // NOLINT(readability-make-member-fun
     glGetShaderiv(id_, GL_COMPILE_STATUS, &success);
     if (GL_FALSE == success) {
         glGetShaderInfoLog(id_, message.size(), nullptr, message.data());
-        throw GlError(message.data());
+        throw gl_error(message.data());
     }
 }
 

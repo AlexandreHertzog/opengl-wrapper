@@ -7,10 +7,10 @@
 
 namespace opengl_wrapper {
 
-Program::Program() : shader_count_(0), id_(glCreateProgram()), linked_(false) {
+program::program() : shader_count_(0), id_(glCreateProgram()), linked_(false) {
 }
 
-Program::Program(Program &&other) noexcept
+program::program(program &&other) noexcept
     : shaders_(std::move(other.shaders_)), shader_count_(other.shader_count_), id_(other.id_), linked_(other.linked_) {
 
     other.shader_count_ = 0;
@@ -18,13 +18,13 @@ Program::Program(Program &&other) noexcept
     other.linked_ = false;
 }
 
-Program::~Program() {
+program::~program() {
     if (0 != id_) {
         glDeleteProgram(id_);
     }
 }
 
-Program &Program::operator=(Program &&other) noexcept {
+program &program::operator=(program &&other) noexcept {
     this->shaders_ = std::move(other.shaders_);
 
     this->shader_count_ = other.shader_count_;
@@ -39,26 +39,22 @@ Program &Program::operator=(Program &&other) noexcept {
     return *this;
 }
 
-bool Program::operator==(const opengl_wrapper::Program &other) const {
+bool program::operator==(const opengl_wrapper::program &other) const {
     return this->id_ == other.id_;
 }
 
-void Program::addShader(Shader shader) {
+void program::add_shader(shader shader) {
     if (0 == id_) {
         id_ = glCreateProgram();
         assert(0 == shader_count_);
     }
 
-    glAttachShader(id_, shader.getId());
+    glAttachShader(id_, shader.get_id());
     shaders_.emplace_back(std::move(shader));
     shader_count_++;
 }
 
-unsigned int Program::getShaderCount() const {
-    return shader_count_;
-}
-
-void Program::link() {
+void program::link() {
     constexpr auto error_string_length = 512;
 
     assert(0 != id_);
@@ -71,25 +67,21 @@ void Program::link() {
     glGetProgramiv(id_, GL_LINK_STATUS, &success);
     if (GL_FALSE == success) {
         glGetProgramInfoLog(id_, message.size(), nullptr, message.data());
-        throw GlError(message.data());
+        throw gl_error(message.data());
     }
 
     shaders_.clear();
 }
 
-bool Program::underConstruction() const {
-    return 0 != id_ && !linked_;
-}
-
-void Program::setUseCallback(opengl_wrapper::Program::UseCallback callback) {
+void program::set_use_callback(opengl_wrapper::program::usa_callback callback) {
     use_callback_ = std::move(callback);
 }
 
-int Program::getUniformLocation(const char *var_name) const {
+int program::get_uniform_location(const char *var_name) const {
     return glGetUniformLocation(id_, var_name);
 }
 
-void Program::use() { // NOLINT(readability-make-member-function-const)
+void program::use() { // NOLINT(readability-make-member-function-const)
     glUseProgram(id_);
     if (use_callback_) {
         use_callback_(*this);

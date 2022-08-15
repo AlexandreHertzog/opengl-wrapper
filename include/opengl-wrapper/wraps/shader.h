@@ -7,58 +7,58 @@
 
 namespace opengl_wrapper {
 
-class Shader {
+class shader {
   public:
     /**
-     * @brief Construct a new Shader object then compiles it. See
+     * @brief Construct a new shader object then compiles it. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml
      *
-     * @param type Type of Shader to be created.
+     * @param type Type of shader to be created.
      * @param source Source-code for the shader.
      * @throws GlError When the shader compilation fails.
      */
-    explicit Shader(GLenum type, const char *source = nullptr);
+    explicit shader(GLenum type, const char *source = nullptr);
 
     /**
-     * @brief Construct a new Shader object, reads its source from the filesystem then compiles it. See
+     * @brief Construct a new shader object, reads its source from the filesystem then compiles it. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml
      *
      * @param type
      * @param shader_path
      */
-    Shader(GLenum type, const std::filesystem::path &shader_path);
+    shader(GLenum type, const std::filesystem::path &shader_path);
 
     /**
-     * @brief Shader move-constructor.
+     * @brief shader move-constructor.
      *
-     * @param other Shader to be emptied.
+     * @param other shader to be emptied.
      */
-    Shader(Shader &&other) noexcept;
+    shader(shader &&other) noexcept;
 
-    Shader(const Shader &) = delete;
-    Shader &operator=(const Shader &) = delete;
+    shader(const shader &) = delete;
+    shader &operator=(const shader &) = delete;
 
     /**
-     * @brief Destroy the Shader object. See
+     * @brief Destroy the shader object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml
      *
      */
-    ~Shader();
+    ~shader();
 
     /**
-     * @brief Shader move-assignment operator.
+     * @brief shader move-assignment operator.
      *
-     * @param other Shader to be emptied.
-     * @return Shader& Reference to this.
+     * @param other shader to be emptied.
+     * @return shader& Reference to this.
      */
-    Shader &operator=(Shader &&other) noexcept;
+    shader &operator=(shader &&other) noexcept;
 
     /**
      * @brief Gets the internal OpenGL shader ID.
      *
-     * @return GLuint Shader ID.
+     * @return GLuint shader ID.
      */
-    [[nodiscard]] GLuint getId() const;
+    [[nodiscard]] GLuint get_id() const;
 
   private:
     GLuint id_;

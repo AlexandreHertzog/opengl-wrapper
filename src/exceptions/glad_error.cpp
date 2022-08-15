@@ -2,7 +2,7 @@
 
 namespace opengl_wrapper {
 
-GladError::GladError(const std::string &description) : Exception(description) {
+glad_error::glad_error(const std::string &description) : exception(description) {
 }
 
 } // namespace opengl_wrapper

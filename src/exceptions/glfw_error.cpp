@@ -2,7 +2,7 @@
 
 namespace opengl_wrapper {
 
-GlfwError::GlfwError(const std::string &description) : Exception(description) {
+glfw_error::glfw_error(const std::string &description) : exception(description) {
 }
 
 } // namespace opengl_wrapper

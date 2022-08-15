@@ -5,47 +5,48 @@
 #include <vector>
 
 namespace opengl_wrapper {
-class Buffer {
+
+class buffer {
   public:
     /**
-     * @brief Construct a new Buffer object. See
+     * @brief Construct a new buffer object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml
      *
      * @param size The number of buffer names to be generated.
      */
-    explicit Buffer(int size);
+    explicit buffer(int size);
 
     /**
-     * @brief Buffer move-constructor.
+     * @brief buffer move-constructor.
      *
-     * @param other Buffer to be emptied.
+     * @param other buffer to be emptied.
      */
-    Buffer(Buffer &&other) noexcept;
+    buffer(buffer &&other) noexcept;
 
-    Buffer(const Buffer &) = delete;
-    Buffer &operator=(const Buffer &) = delete;
+    buffer(const buffer &) = delete;
+    buffer &operator=(const buffer &) = delete;
 
     /**
-     * @brief Destroy the Buffer object. See
+     * @brief Destroy the buffer object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteBuffers.xhtml
      *
      */
-    ~Buffer();
+    ~buffer();
 
     /**
-     * @brief Buffer move-assignment operator.
+     * @brief buffer move-assignment operator.
      *
-     * @param other Buffer to be emptied.
-     * @return Buffer& Reference to this.
+     * @param other buffer to be emptied.
+     * @return buffer& Reference to this.
      */
-    Buffer &operator=(Buffer &&other) noexcept;
+    buffer &operator=(buffer &&other) noexcept;
 
     /**
      * @brief Binds the indicated buffer object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml
      *
-     * @param index Index of the Buffer to be bound.
-     * @param target Target to which the buffer object is bound.
+     * @param index Index of the buffer to be bound.
+     * @param target Target to which the load object is bound.
      */
     void bind(int index, GLenum target);
 
@@ -57,12 +58,13 @@ class Buffer {
      * @param data Pointer to the data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    void buffer(GLsizeiptr size, const void *data, GLenum usage);
+    void load(GLsizeiptr size, const void *data, GLenum usage);
 
   private:
     std::vector<GLuint> ids_;
     GLenum target_;
 };
+
 } // namespace opengl_wrapper
 
 #endif

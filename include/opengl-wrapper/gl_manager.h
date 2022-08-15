@@ -8,7 +8,7 @@
 
 namespace opengl_wrapper {
 
-class GlManager {
+class gl_manager {
   public:
     /**
      * @brief Returns the global MainManager instance. Makes sure it is
@@ -18,13 +18,13 @@ class GlManager {
      *
      * @throws GlfwError When the initialization of GLFW fails
      */
-    static GlManager &instance();
+    static gl_manager &instance();
 
-    GlManager(const GlManager &) = delete;
-    GlManager(GlManager &&) = delete;
-    GlManager &operator=(const GlManager &) = delete;
-    GlManager &operator=(GlManager &&) = delete;
-    ~GlManager();
+    gl_manager(const gl_manager &) = delete;
+    gl_manager(gl_manager &&) = delete;
+    gl_manager &operator=(const gl_manager &) = delete;
+    gl_manager &operator=(gl_manager &&) = delete;
+    ~gl_manager();
 
   private:
     /**
@@ -32,7 +32,7 @@ class GlManager {
      * @throws GlfwError When the initialization of GLFW fails
      *
      */
-    GlManager();
+    gl_manager();
 
     static const GLFWerrorfun error_handler_;
 };

@@ -5,40 +5,41 @@
 #include <vector>
 
 namespace opengl_wrapper {
-class VertexArrays {
+
+class vertex_arrays {
   public:
     /**
-     * @brief Construct a new VertexArrays object. See
+     * @brief Construct a new vertex_arrays object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenVertexArrays.xhtml
      *
      * @param size Number of vertex arrays to be generated.
      */
-    explicit VertexArrays(int size);
+    explicit vertex_arrays(int size);
 
     /**
-     * @brief VertexArrays move-constructor.
+     * @brief vertex_arrays move-constructor.
      *
      * @param other VectorArrays to be emptied.
      */
-    VertexArrays(VertexArrays &&other) noexcept;
+    vertex_arrays(vertex_arrays &&other) noexcept;
 
-    VertexArrays(const VertexArrays &) = delete;
-    VertexArrays &operator=(const VertexArrays &) = delete;
+    vertex_arrays(const vertex_arrays &) = delete;
+    vertex_arrays &operator=(const vertex_arrays &) = delete;
 
     /**
      * @brief Destroy the Vertex Arrays object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteVertexArrays.xhtml
      *
      */
-    ~VertexArrays();
+    ~vertex_arrays();
 
     /**
-     * @brief VertexArrays move-assignment operator.
+     * @brief vertex_arrays move-assignment operator.
      *
-     * @param other VertexArrays to be emptied.
-     * @return VertexArrays& Reference to this.
+     * @param other vertex_arrays to be emptied.
+     * @return vertex_arrays& Reference to this.
      */
-    VertexArrays &operator=(VertexArrays &&other) noexcept;
+    vertex_arrays &operator=(vertex_arrays &&other) noexcept;
 
     /**
      * @brief Binds the VertexArray object. See
@@ -51,6 +52,7 @@ class VertexArrays {
   private:
     std::vector<GLuint> ids_;
 };
+
 } // namespace opengl_wrapper
 
 #endif

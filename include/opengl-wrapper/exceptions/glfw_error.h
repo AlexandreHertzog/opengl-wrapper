@@ -1,13 +1,13 @@
-#ifndef GLFW_ERROR_H
-#define GLFW_ERROR_H
+#ifndef OPENGL_WRAPPER_EXCEPTIONS_GLFW_ERROR_H
+#define OPENGL_WRAPPER_EXCEPTIONS_GLFW_ERROR_H
 
 #include "exception.h"
 
 namespace opengl_wrapper {
 
-class GlfwError : public Exception {
+class glfw_error : public exception {
   public:
-    explicit GlfwError(const std::string &description);
+    explicit glfw_error(const std::string &description);
 };
 
 } // namespace opengl_wrapper

@@ -9,14 +9,12 @@
 
 namespace opengl_wrapper {
 
-class WindowManager;
-
-class Renderer {
+class renderer {
   public:
     /**
      * @brief Constructs a renderer.
      */
-    Renderer();
+    renderer();
 
     /**
      * @brief Adds first_vertices to the renderer ca cache.
@@ -25,14 +23,14 @@ class Renderer {
      * @param indices Indices for element drawing.
      * @param program Previously linked program index to be applied to the first_vertices.
      */
-    void addVertices(std::vector<float> vertices, std::vector<unsigned int> indices, std::shared_ptr<Program> program);
+    void add_vertices(std::vector<float> vertices, std::vector<unsigned int> indices, std::shared_ptr<program> program);
 
     /**
      * @brief Loads first_vertices into OpenGL. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml,
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
      */
-    void loadVertices();
+    void load_vertices();
 
     /**
      * @brief Draws the given vertices with the given shaders with the associated program. See
@@ -46,10 +44,10 @@ class Renderer {
     std::vector<std::vector<float>> vertices_;
     std::vector<std::vector<unsigned int>> indices_;
 
-    std::map<int, std::shared_ptr<Program>> vertices_program_map_;
+    std::map<int, std::shared_ptr<program>> vertices_program_map_;
 
-    std::unique_ptr<VertexArrays> vertex_arrays_;
-    std::unique_ptr<Buffer> vertex_buffer_;
+    std::unique_ptr<vertex_arrays> vertex_arrays_;
+    std::unique_ptr<buffer> vertex_buffer_;
     GLsizei vertex_count_;
     GLsizei indices_count_;
 };

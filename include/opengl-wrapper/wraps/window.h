@@ -5,94 +5,96 @@
 #include <functional>
 
 namespace opengl_wrapper {
-class Window {
+
+class window {
   public:
     /**
-     * @brief Constructs a Window object.
-     * @param width Window width.
-     * @param height Window height.
-     * @param title Window title.
+     * @brief Constructs a window object.
+     * @param width window width.
+     * @param height window height.
+     * @param title window title.
      */
-    Window(int width, int height, const char *title);
+    window(int width, int height, const char *title);
 
     /**
-     * @brief Window move-constructor.
-     * @param other Window to be moved.
+     * @brief window move-constructor.
+     * @param other window to be moved.
      */
-    Window(Window &&other) noexcept;
+    window(window &&other) noexcept;
 
     /**
-     * @brief Window destructor.
+     * @brief window destructor.
      */
-    ~Window();
+    ~window();
 
     /**
-     * @brief Window move-assignment operator.
-     * @param other Window to be moved.
+     * @brief window move-assignment operator.
+     * @param other window to be moved.
      * @return Reference to lhs.
      */
-    Window &operator=(Window &&other) noexcept;
+    window &operator=(window &&other) noexcept;
 
-    Window(const Window &) = delete;
-    Window &operator=(const Window &) = delete;
+    window(const window &) = delete;
+    window &operator=(const window &) = delete;
 
     /**
-     * @brief Window equality operator with GLFWwindow instances.
+     * @brief window equality operator with GLFWwindow instances.
      * @param other GLFWwindow to test the object against.
      * @return Whether the GLFWwindow refers to this object.
      */
     bool operator==(GLFWwindow *other) const;
 
     /**
-     * @brief Window difference operator with GLFWwindow instances.
+     * @brief window difference operator with GLFWwindow instances.
      * @param other GLFWwindow to test the object against.
      * @return Whether the GLFWwindow does not refer to this object.
      */
     bool operator!=(GLFWwindow *other) const;
 
     /**
-     * @brief Makes the Window context the one being referenced by OpenGL. See
+     * @brief Makes the window context the one being referenced by OpenGL. See
      * https://www.glfw.org/docs/3.3/group__context.html#ga1c04dc242268f827290fe40aa1c91157
      */
-    void makeCurrentContext();
+    void set_as_context();
 
     /**
      * @brief Sets the window-resizing callback function. See
      * https://www.glfw.org/docs/3.0/group__window.html#ga3203461a5303bf289f2e05f854b2f7cf
      * @param fun Function to be called whenever the window is resized.
      */
-    void setFramebufferSizeCallback(GLFWframebuffersizefun fun);
+    void set_framebuffer_callback(GLFWframebuffersizefun fun);
 
     /**
      * @brief Sets the key-pressed callback function. See
      * https://www.glfw.org/docs/3.0/group__input.html#ga7e496507126f35ea72f01b2e6ef6d155
      * @param fun Function to be called whenever a key is pressed.
      */
-    void setKeyCallback(GLFWkeyfun fun);
+    void set_key_callback(GLFWkeyfun fun);
 
     /**
      * @brief Sets the close flag for the window. See
      * https://www.glfw.org/docs/3.3/group__window.html#ga49c449dde2a6f87d996f4daaa09d6708
      * @param should_close 1 if the window should be closed, 0 otherwise.
      */
-    void setShouldClose(int should_close);
+    void set_should_close(int should_close);
 
     /**
      * @brief Gets the close flag for the window. See
      * https://www.glfw.org/docs/3.3/group__window.html#ga24e02fbfefbb81fc45320989f8140ab5
      * @return 1 if the window should be closed, 0 otherwise.
      */
-    [[nodiscard]] int shouldClose() const;
+    [[nodiscard]] int get_should_close() const;
 
     /**
      * Swaps the front and the back buffers for the window. See
      * https://www.glfw.org/docs/3.3/group__window.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
      */
-    void swapBuffers();
+    void swap_buffers();
 
   private:
     GLFWwindow *window_;
 };
+
 } // namespace opengl_wrapper
 
 #endif // OPENGL_WRAPPER_WRAPS_WINDOW_H

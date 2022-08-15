@@ -4,26 +4,26 @@
 
 namespace opengl_wrapper {
 
-Buffer::Buffer(int size) : target_(0) {
+buffer::buffer(int size) : target_(0) {
     assert(size > 0);
     ids_.resize(size);
     glGenBuffers(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
-Buffer::Buffer(Buffer &&other) noexcept : target_(0) {
+buffer::buffer(buffer &&other) noexcept : target_(0) {
     std::swap(this->ids_, other.ids_);
 }
 
-Buffer::~Buffer() {
+buffer::~buffer() {
     glDeleteBuffers(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
-Buffer &Buffer::operator=(Buffer &&other) noexcept {
+buffer &buffer::operator=(buffer &&other) noexcept {
     this->ids_ = std::move(other.ids_);
     return *this;
 }
 
-void Buffer::bind(int index, GLenum target) {
+void buffer::bind(int index, GLenum target) {
     assert(index >= 0);
     assert(index < ids_.size());
 
@@ -31,9 +31,7 @@ void Buffer::bind(int index, GLenum target) {
     glBindBuffer(target_, ids_[index]);
 }
 
-void Buffer::buffer( // NOLINT(readability-make-member-function-const)
-    GLsizeiptr size, const void *data, GLenum usage) {
-
+void buffer::load(GLsizeiptr size, const void *data, GLenum usage) { // NOLINT(*-function-const)
     glBufferData(target_, size, data, usage);
 }
 
