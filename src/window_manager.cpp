@@ -3,6 +3,7 @@
 #include "exceptions/glad_error.h"
 #include "models/shape.h"
 #include "renderer.h"
+#include "wraps/api.h"
 #include "wraps/window.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
@@ -22,7 +23,7 @@ window_manager::window_manager()
               return;
           }
 
-          glViewport(0, 0, width, height);
+          api::instance().gl_viewport(0, 0, width, height);
 
           window_manager::instance().get_renderer().draw();
 
@@ -82,14 +83,14 @@ void window_manager::init(int width, int height, const char *title) {
     window_->set_framebuffer_callback(resize_handler_);
     window_->set_key_callback(key_handler_);
 
-    glViewport(0, 0, width, height);
+    api::instance().gl_viewport(0, 0, width, height);
 
     renderer_ = std::make_unique<renderer>();
 
     initialized_ = true;
 
     int num_vertex_attributes = 0;
-    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &num_vertex_attributes);
+    api::instance().gl_get_integerv(GL_MAX_VERTEX_ATTRIBS, &num_vertex_attributes);
     BOOST_LOG_TRIVIAL(info) << "GL_MAX_VERTEX_ATTRIBS = " << num_vertex_attributes;
 
     BOOST_LOG_TRIVIAL(trace) << "window_manager::init(width=" << width << ", height=" << height << ", title=" << title
@@ -104,13 +105,13 @@ void window_manager::render_loop() noexcept {
     while (1 != window_->get_should_close()) {
         auto start_time = std::chrono::high_resolution_clock::now();
 
-        glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
-        glClear(GL_COLOR_BUFFER_BIT);
+        api::instance().gl_clear_color(0.0F, 0.0F, 0.0F, 1.0F);
+        api::instance().gl_clear(GL_COLOR_BUFFER_BIT);
 
         renderer_->draw();
 
         window_->swap_buffers();
-        glfwPollEvents();
+        api::instance().glfw_poll_events();
 
         std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
 

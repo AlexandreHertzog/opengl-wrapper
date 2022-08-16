@@ -1,8 +1,8 @@
 #ifndef OPENGL_WRAPPER_WRAPS_SHADER_H
 #define OPENGL_WRAPPER_WRAPS_SHADER_H
 
+#include "opengl-wrapper/wraps/api.h"
 #include <filesystem>
-#include <glad/glad.h>
 #include <ostream>
 #include <string>
 

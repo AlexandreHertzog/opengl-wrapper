@@ -1,9 +1,7 @@
 #ifndef OPENGL_WRAPPER_WRAPS_WINDOW_H
 #define OPENGL_WRAPPER_WRAPS_WINDOW_H
 
-#include <glad/glad.h>
-
-#include <GLFW/glfw3.h>
+#include "opengl-wrapper/wraps/api.h"
 #include <functional>
 #include <ostream>
 

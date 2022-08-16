@@ -1,7 +1,7 @@
 #ifndef OPENGL_WRAPPER_WRAPS_VERTEX_ARRAYS_H
 #define OPENGL_WRAPPER_WRAPS_VERTEX_ARRAYS_H
 
-#include <glad/glad.h>
+#include "opengl-wrapper/wraps/api.h"
 #include <ostream>
 #include <vector>
 

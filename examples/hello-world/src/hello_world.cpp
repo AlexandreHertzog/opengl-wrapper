@@ -5,6 +5,7 @@
 #include "opengl-wrapper/models/shape.h"
 #include "opengl-wrapper/renderer.h"
 #include "opengl-wrapper/window_manager.h"
+#include "opengl-wrapper/wraps/api.h"
 #include "opengl-wrapper/wraps/program.h"
 #include "opengl-wrapper/wraps/shader.h"
 #include <boost/log/trivial.hpp>
@@ -38,7 +39,9 @@ int main() {
             auto time_value = glfwGetTime();
             auto green_value = sin(time_value) / 2.0F + 0.5F; // NOLINT(*-magic-numbers)
             int runtime_color = program.get_uniform_location("runtime_color");
-            glUniform4f(runtime_color, 0.0F, static_cast<float>(green_value), 0.0F, 1.0F);
+
+            opengl_wrapper::api::instance().gl_uniform4f(runtime_color, 0.0F, static_cast<float>(green_value), 0.0F,
+                                                         1.0F);
         });
 
         auto second_program = std::make_shared<opengl_wrapper::program>();

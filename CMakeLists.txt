@@ -43,6 +43,7 @@ add_library(opengl-wrapper-wraps
         src/wraps/shader.cpp
         src/wraps/vertex_arrays.cpp
         src/wraps/window.cpp
+        src/wraps/api.cpp
         )
 
 target_include_directories(opengl-wrapper-wraps

@@ -1,5 +1,6 @@
 #include "window.h"
 
+#include "api.h"
 #include "exceptions/glfw_error.h"
 #include "utils/utils.h"
 #include <boost/log/trivial.hpp>
@@ -8,7 +9,7 @@
 
 namespace opengl_wrapper {
 window::window(int width, int height, const char *title)
-    : window_(glfwCreateWindow(width, height, title, nullptr, nullptr)) {
+    : window_(api::instance().glfw_create_window(width, height, title, nullptr, nullptr)) {
 
     BOOST_LOG_TRIVIAL(trace) << "window::window " << *this << " width=" << width << " height=" << height
                              << " title=" << std::quoted(title);
@@ -27,7 +28,7 @@ window::window(window &&other) noexcept : window_(other.window_) {
 window::~window() {
     BOOST_LOG_TRIVIAL(trace) << "window::~window " << *this;
     if (nullptr != window_) {
-        glfwDestroyWindow(window_);
+        api::instance().glfw_destroy_window(window_);
     }
 }
 
@@ -51,13 +52,13 @@ bool window::operator!=(GLFWwindow *other) const {
 void window::set_as_context() {
     BOOST_LOG_TRIVIAL(trace) << "window::set_as_context " << *this;
     assert(window_ != nullptr);
-    glfwMakeContextCurrent(window_);
+    api::instance().glfw_make_context_current(window_);
 }
 
 void window::set_framebuffer_callback(GLFWframebuffersizefun fun) {
     BOOST_LOG_TRIVIAL(trace) << "window::set_framebuffer_callback " << *this << " fun=" << &fun;
     assert(window_ != nullptr);
-    if (nullptr != glfwSetFramebufferSizeCallback(window_, fun)) {
+    if (nullptr != api::instance().glfw_set_framebuffer_size_callback(window_, fun)) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting previous resize callback";
     }
 }
@@ -65,7 +66,7 @@ void window::set_framebuffer_callback(GLFWframebuffersizefun fun) {
 void window::set_key_callback(GLFWkeyfun fun) {
     BOOST_LOG_TRIVIAL(trace) << "window::set_key_callback " << *this << " fun=" << &fun;
     assert(window_ != nullptr);
-    if (nullptr != glfwSetKeyCallback(window_, fun)) {
+    if (nullptr != api::instance().glfw_set_key_callback(window_, fun)) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting previous key callback";
     }
 }
@@ -73,19 +74,19 @@ void window::set_key_callback(GLFWkeyfun fun) {
 void window::set_should_close(int should_close) {
     BOOST_LOG_TRIVIAL(trace) << "window::set_should_close " << *this << " should_close=" << should_close;
     assert(window_ != nullptr);
-    glfwSetWindowShouldClose(window_, should_close);
+    api::instance().glfw_set_window_should_close(window_, should_close);
 }
 
 int window::get_should_close() const {
     BOOST_LOG_TRIVIAL(trace) << "window::get_should_close " << *this;
     assert(window_ != nullptr);
-    return glfwWindowShouldClose(window_);
+    return api::instance().glfw_window_should_close(window_);
 }
 
 void window::swap_buffers() {
     BOOST_LOG_TRIVIAL(trace) << "window::swap_buffers " << *this;
     assert(window_ != nullptr);
-    glfwSwapBuffers(window_);
+    api::instance().glfw_swap_buffers(window_);
 }
 
 const GLFWwindow *window::get_window() const {
