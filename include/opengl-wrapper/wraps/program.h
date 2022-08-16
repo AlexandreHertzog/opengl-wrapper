@@ -3,15 +3,16 @@
 
 #include <functional>
 #include <glad/glad.h>
+#include <ostream>
 #include <vector>
-
-#include "shader.h"
 
 namespace opengl_wrapper {
 
+class shader;
+
 class program {
   public:
-    using usa_callback = std::function<void(program &program)>;
+    using use_callback = std::function<void(program &program)>;
 
     /**
      * @brief Construct a new program object. See
@@ -72,7 +73,7 @@ class program {
      * @brief Sets the callback to be used after each time the program is activated.
      * @param callback Callback function.
      */
-    void set_use_callback(usa_callback callback);
+    void set_use_callback(use_callback callback);
 
     /**
      * @brief Gets the reference for a Uniform variable in OpenGL. See
@@ -89,13 +90,41 @@ class program {
      */
     void use();
 
+    /**
+     * @brief Gets the shaders associated with the program. Only valid before linking, after that it returns an empty
+     * vector.
+     * @return Program shaders.
+     */
+    [[nodiscard]] const std::vector<shader> &get_shaders() const;
+
+    /**
+     * @brief Gets the program id.
+     * @return Program id.
+     */
+    [[nodiscard]] GLuint get_id() const;
+
+    /**
+     * @brief Gets whether or not the program has been linked already.
+     * @return Program link status.
+     */
+    [[nodiscard]] bool get_linked() const;
+
+    /**
+     * @brief Gets the program callback whenever use() is called.
+     * @return Program use callback.
+     */
+    [[nodiscard]] const use_callback &get_use_callback() const;
+
   private:
     std::vector<shader> shaders_;
     unsigned int shader_count_;
     GLuint id_;
     bool linked_;
-    usa_callback use_callback_;
+    use_callback use_callback_;
 };
+
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p);
+
 } // namespace opengl_wrapper
 
 #endif

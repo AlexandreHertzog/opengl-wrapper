@@ -2,6 +2,7 @@
 #define OPENGL_WRAPPER_WRAPS_BUFFER_H
 
 #include <glad/glad.h>
+#include <ostream>
 #include <vector>
 
 namespace opengl_wrapper {
@@ -60,10 +61,24 @@ class buffer {
      */
     void load(GLsizeiptr size, const void *data, GLenum usage);
 
+    /**
+     * @brief Get the buffer ids associated with this object.
+     * @return Buffer ids.
+     */
+    [[nodiscard]] const std::vector<GLuint> &get_ids() const;
+
+    /**
+     * @brief Gets the buffer target associated with this object.
+     * @return Buffer target.
+     */
+    [[nodiscard]] GLenum get_target() const;
+
   private:
     std::vector<GLuint> ids_;
     GLenum target_;
 };
+
+std::ostream &operator<<(std::ostream &s, const opengl_wrapper::buffer &b);
 
 } // namespace opengl_wrapper
 

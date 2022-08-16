@@ -2,6 +2,7 @@
 #define OPENGL_WRAPPER_WRAPS_VERTEX_ARRAYS_H
 
 #include <glad/glad.h>
+#include <ostream>
 #include <vector>
 
 namespace opengl_wrapper {
@@ -49,9 +50,17 @@ class vertex_arrays {
      */
     void bind(int index);
 
+    /**
+     * @brief Gets the ids associated with this vertex_array.
+     * @return Vertex array ids.
+     */
+    [[nodiscard]] const std::vector<GLuint> &get_ids() const;
+
   private:
     std::vector<GLuint> ids_;
 };
+
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_arrays &va);
 
 } // namespace opengl_wrapper
 

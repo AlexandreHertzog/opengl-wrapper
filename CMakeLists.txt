@@ -28,10 +28,6 @@ target_link_libraries(opengl-wrapper-exceptions
         PRIVATE Boost::log backtrace
         )
 
-add_library(opengl-wrapper-utils
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/formatter.cpp
-)
-
 add_library(opengl-wrapper-wraps
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/buffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/wraps/program.cpp
@@ -41,28 +37,42 @@ add_library(opengl-wrapper-wraps
 )
 
 target_include_directories(opengl-wrapper-wraps
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper/wraps
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper
-            ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper/wraps
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        )
 
 target_link_libraries(opengl-wrapper-wraps
         PUBLIC glad opengl-wrapper-exceptions
         PRIVATE Boost::log
         )
 
+add_library(opengl-wrapper-utils
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/formatter.cpp
+        )
+
+target_include_directories(opengl-wrapper-utils
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper/utils
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        )
+
+target_link_libraries(opengl-wrapper-utils
+        PRIVATE Boost::log opengl-wrapper-wraps
+        )
+
 add_library(opengl-wrapper
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gl_manager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/renderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/window_manager.cpp
-)
+        )
 
 target_include_directories(opengl-wrapper
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper
-            ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/opengl-wrapper
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        )
 
 target_link_libraries(opengl-wrapper
     PUBLIC glad glfw opengl-wrapper-exceptions opengl-wrapper-wraps

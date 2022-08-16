@@ -1,8 +1,11 @@
 #ifndef OPENGL_WRAPPER_WRAPS_WINDOW_H
 #define OPENGL_WRAPPER_WRAPS_WINDOW_H
 
+#include <glad/glad.h>
+
 #include <GLFW/glfw3.h>
 #include <functional>
+#include <ostream>
 
 namespace opengl_wrapper {
 
@@ -91,9 +94,13 @@ class window {
      */
     void swap_buffers();
 
+    [[nodiscard]] const GLFWwindow *get_window() const;
+
   private:
     GLFWwindow *window_;
 };
+
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window &w);
 
 } // namespace opengl_wrapper
 

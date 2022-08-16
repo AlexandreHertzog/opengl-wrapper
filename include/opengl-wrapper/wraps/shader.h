@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <glad/glad.h>
+#include <ostream>
 #include <string>
 
 namespace opengl_wrapper {
@@ -65,6 +66,8 @@ class shader {
 
     void compile(const char *source);
 };
+
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::shader &s);
 
 } // namespace opengl_wrapper
 

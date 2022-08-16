@@ -3,8 +3,10 @@
 
 #include "opengl-wrapper/gl_manager.h"
 #include "opengl-wrapper/window_manager.h"
+#include "opengl-wrapper/wraps/shader.h"
 #include <boost/log/trivial.hpp>
 #include <complex>
+#include <filesystem>
 #include <iostream>
 
 const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, 1.0F,   1.0F, 1.0F, -0.0F, -0.5F, 0.0F,
