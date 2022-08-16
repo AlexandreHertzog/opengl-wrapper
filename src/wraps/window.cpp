@@ -10,7 +10,7 @@ namespace opengl_wrapper {
 window::window(int width, int height, const char *title)
     : window_(glfwCreateWindow(width, height, title, nullptr, nullptr)) {
 
-    BOOST_LOG_TRIVIAL(trace) << "window::window " << *this << " width=" << width << "height=" << height
+    BOOST_LOG_TRIVIAL(trace) << "window::window " << *this << " width=" << width << " height=" << height
                              << " title=" << std::quoted(title);
 
     if (nullptr == window_) {

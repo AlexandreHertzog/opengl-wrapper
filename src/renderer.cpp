@@ -1,58 +1,51 @@
 #include "renderer.h"
+#include "models/shape.h"
 #include <boost/log/trivial.hpp>
-#include <cassert>
 
 namespace opengl_wrapper {
 
-renderer::renderer() : vertex_count_(0), indices_count_(0) {
-}
-
-void renderer::add_vertices(std::vector<float> vertices, std::vector<unsigned int> indices,
-                            std::shared_ptr<program> program) {
-
-    vertices_.emplace_back(std::move(vertices));
-    indices_.emplace_back(std::move(indices));
-    vertices_program_map_[static_cast<int>(vertices_.size() - 1)] = std::move(program);
+void renderer::add_shape(shape s) {
+    shapes_.emplace_back(std::move(s));
 }
 
 void renderer::load_vertices() {
-    assert(vertices_.size() == indices_.size());
+    vertex_arrays_ = std::make_unique<vertex_arrays>(shapes_.size());
+    vertex_buffer_ = std::make_unique<buffer>(shapes_.size() * 2);
 
-    vertex_arrays_ = std::make_unique<vertex_arrays>(vertices_.size());
-    vertex_buffer_ = std::make_unique<buffer>(vertices_.size() * 2);
-
-    for (int i = 0; i < vertices_.size(); i++) {
+    for (int i = 0; i < shapes_.size(); i++) {
         vertex_arrays_->bind(i);
         vertex_buffer_->bind(2 * i, GL_ARRAY_BUFFER);
+        shapes_[i].set_vertex_array(i);
 
-        vertex_buffer_->load(static_cast<GLsizeiptr>(vertices_[i].size() * sizeof(float)), vertices_[i].data(),
+        const auto &vertices = shapes_[i].get_vertices();
+
+        vertex_buffer_->load(static_cast<GLsizeiptr>(vertices.size() * sizeof(vertex)), vertices.data(),
                              GL_STATIC_DRAW);
 
-        if (!indices_[i].empty()) {
+        const auto &indices = shapes_[i].get_draw_order();
+        if (!indices.empty()) {
             vertex_buffer_->bind(2 * i + 1, GL_ELEMENT_ARRAY_BUFFER);
 
-            vertex_buffer_->load(static_cast<GLsizeiptr>(indices_[i].size() * sizeof(unsigned int)), indices_[i].data(),
+            vertex_buffer_->load(static_cast<GLsizeiptr>(indices.size() * sizeof(unsigned int)), indices.data(),
                                  GL_STATIC_DRAW);
         }
 
-        vertex_count_ += static_cast<GLsizei>(vertices_[i].size());
-        indices_count_ += static_cast<GLsizei>(indices_[i].size());
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr); // NOLINT
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),  // NOLINT
-                              reinterpret_cast<void *>(3 * sizeof(float))); // NOLINT
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),
+                              reinterpret_cast<void *>(sizeof(vertex::pos_))); // NOLINT
         glEnableVertexAttribArray(1);
     }
 }
 
 void renderer::draw() {
-    for (const auto &program_index : vertices_program_map_) {
-        program_index.second->use();
-        vertex_arrays_->bind(program_index.first);
+    for (auto &shape : shapes_) {
+        assert(shape.get_program());
+        shape.get_program()->use();
+        vertex_arrays_->bind(shape.get_vertex_array());
 
-        glDrawElements(GL_TRIANGLES, indices_count_, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT, nullptr);
     }
 }
 

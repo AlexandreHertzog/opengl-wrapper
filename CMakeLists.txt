@@ -27,6 +27,16 @@ target_link_libraries(opengl-wrapper-exceptions
         PRIVATE Boost::log backtrace
         )
 
+add_library(opengl-wrapper-models
+        src/models/vertex.cpp
+        src/models/shape.cpp
+        )
+
+target_include_directories(opengl-wrapper-models
+        PUBLIC include
+        PRIVATE include/opengl-wrapper/models src
+        )
+
 add_library(opengl-wrapper-wraps
         src/wraps/buffer.cpp
         src/wraps/program.cpp
@@ -70,7 +80,7 @@ target_include_directories(opengl-wrapper
         )
 
 target_link_libraries(opengl-wrapper
-        PUBLIC glad glfw opengl-wrapper-exceptions opengl-wrapper-wraps
+        PUBLIC glad glfw opengl-wrapper-exceptions opengl-wrapper-wraps opengl-wrapper-models
         PRIVATE opengl-wrapper-utils Boost::log
         )
 

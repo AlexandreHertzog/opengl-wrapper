@@ -2,20 +2,15 @@
 #pragma ide diagnostic ignored "cert-err58-cpp" // No need to validate allocation problems here, it is a test program.
 
 #include "opengl-wrapper/gl_manager.h"
+#include "opengl-wrapper/models/shape.h"
+#include "opengl-wrapper/renderer.h"
 #include "opengl-wrapper/window_manager.h"
+#include "opengl-wrapper/wraps/program.h"
 #include "opengl-wrapper/wraps/shader.h"
 #include <boost/log/trivial.hpp>
 #include <complex>
 #include <filesystem>
 #include <iostream>
-
-const std::vector<float> first_vertices = {-0.9F, -0.5F, 0.0F, 1.0F,   1.0F, 1.0F, -0.0F, -0.5F, 0.0F,
-                                           1.0F,  1.0F,  1.0F, -0.45F, 0.5F, 0.0F, 1.0F,  1.0F,  1.0F};
-
-const std::vector<float> second_vertices = {0.0F, -0.5F, 0.0F, 1.0F,  0.0F, 0.0F, 0.9F, -0.5F, 0.0F,
-                                            0.0F, 0.1F,  0.0F, 0.45F, 0.5F, 0.0F, 0.0F, 0.0F,  1.0F};
-
-const std::vector<unsigned int> indices = {0, 1, 2};
 
 int main() {
     try {
@@ -56,8 +51,26 @@ int main() {
 
         second_program->link();
 
-        window.get_renderer().add_vertices(first_vertices, indices, first_program);
-        window.get_renderer().add_vertices(second_vertices, indices, second_program);
+        opengl_wrapper::shape triangle1;
+        std::vector<unsigned> triangle1_vert_order(3);
+        triangle1_vert_order[0] = triangle1.add_vertex({{-0.9F, -0.5F, 0.0F}, {1.0F, 1.0F, 1.0F}});
+        triangle1_vert_order[1] = triangle1.add_vertex({{-0.0F, -0.5F, 0.0F}, {1.0F, 1.0F, 1.0F}});
+        triangle1_vert_order[2] = triangle1.add_vertex({{-0.45F, 0.5F, 0.0F}, {1.0F, 1.0F, 1.0F}});
+        triangle1.set_draw_order(std::move(triangle1_vert_order));
+        triangle1.set_program(first_program);
+
+        opengl_wrapper::shape triangle2;
+        std::vector<unsigned> triangle2_vert_order(3);
+        triangle2_vert_order[0] = triangle2.add_vertex({{0.0F, -0.5F, 0.0F}, {1.0F, 0.0F, 0.0F}});
+        triangle2_vert_order[1] = triangle2.add_vertex({{0.9F, -0.5F, 0.0F}, {0.0F, 0.1F, 0.0F}});
+        triangle2_vert_order[2] = triangle2.add_vertex({{0.45F, 0.5F, 0.0F}, {0.0F, 0.0F, 1.0F}});
+        triangle2.set_draw_order(std::move(triangle2_vert_order));
+        triangle2.set_program(second_program);
+
+        const std::vector<unsigned int> indices = {0, 1, 2};
+
+        window.get_renderer().add_shape(std::move(triangle1));
+        window.get_renderer().add_shape(std::move(triangle2));
         window.get_renderer().load_vertices();
 
         window.render_loop();

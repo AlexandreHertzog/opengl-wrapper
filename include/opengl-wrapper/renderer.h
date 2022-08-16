@@ -9,13 +9,10 @@
 
 namespace opengl_wrapper {
 
+class shape;
+
 class renderer {
   public:
-    /**
-     * @brief Constructs a renderer.
-     */
-    renderer();
-
     /**
      * @brief Adds first_vertices to the renderer ca cache.
      *
@@ -23,7 +20,7 @@ class renderer {
      * @param indices Indices for element drawing.
      * @param program Previously linked program index to be applied to the first_vertices.
      */
-    void add_vertices(std::vector<float> vertices, std::vector<unsigned int> indices, std::shared_ptr<program> program);
+    void add_shape(shape s);
 
     /**
      * @brief Loads first_vertices into OpenGL. See
@@ -41,15 +38,10 @@ class renderer {
     void draw();
 
   private:
-    std::vector<std::vector<float>> vertices_;
-    std::vector<std::vector<unsigned int>> indices_;
-
-    std::map<int, std::shared_ptr<program>> vertices_program_map_;
+    std::vector<shape> shapes_;
 
     std::unique_ptr<vertex_arrays> vertex_arrays_;
     std::unique_ptr<buffer> vertex_buffer_;
-    GLsizei vertex_count_;
-    GLsizei indices_count_;
 };
 
 } // namespace opengl_wrapper

@@ -1,12 +1,13 @@
 #include "window_manager.h"
 
+#include "exceptions/glad_error.h"
+#include "models/shape.h"
+#include "renderer.h"
+#include "wraps/window.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
 #include <chrono>
 #include <unistd.h>
-
-#include "exceptions/glad_error.h"
-#include "wraps/buffer.h"
 
 namespace opengl_wrapper {
 

@@ -8,10 +8,10 @@
 #include <map>
 #include <memory>
 
-#include "opengl-wrapper/wraps/window.h"
-#include "renderer.h"
-
 namespace opengl_wrapper {
+
+class window;
+class renderer;
 
 class window_manager {
   public:
