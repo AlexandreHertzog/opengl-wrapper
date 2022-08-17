@@ -1,6 +1,6 @@
 #include "shader.h"
 
-#include "api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include "opengl-wrapper/utils/gl_error.h"
 #include "utils/utils.h"
 #include <array>
@@ -10,7 +10,7 @@
 
 namespace opengl_wrapper {
 
-shader::shader(GLenum type, const char *source) : id_(api::instance().gl_create_shader(type)) {
+shader::shader(GLenum type, const char *source) : id_(graphics::instance().gl_create_shader(type)) {
     BOOST_LOG_TRIVIAL(trace) << "shader::shader " << *this << " type=" << type << " source=" << std::quoted(source);
     if (source != nullptr) {
         compile(source);
@@ -31,7 +31,7 @@ shader::shader(GLenum type, const std::filesystem::path &shader_path) : id_(0) {
 
     std::string code = shader_stream.str();
 
-    id_ = api::instance().gl_create_shader(type);
+    id_ = graphics::instance().gl_create_shader(type);
     compile(code.c_str());
 }
 
@@ -42,7 +42,7 @@ shader::shader(shader &&other) noexcept : id_(other.id_) {
 
 shader::~shader() {
     BOOST_LOG_TRIVIAL(trace) << "shader::~shader " << *this;
-    api::instance().gl_delete_shader(id_);
+    graphics::instance().gl_delete_shader(id_);
 }
 
 shader &shader::operator=(shader &&other) noexcept {
@@ -62,15 +62,15 @@ void shader::compile(const char *source) { // NOLINT(readability-make-member-fun
 
     constexpr auto error_string_length = 512;
 
-    api::instance().gl_shader_source(id_, 1, &source, nullptr);
-    api::instance().gl_compile_shader(id_);
+    graphics::instance().gl_shader_source(id_, 1, &source, nullptr);
+    graphics::instance().gl_compile_shader(id_);
 
     int success = 0;
     std::array<char, error_string_length> message = {'\0'};
 
-    api::instance().gl_get_shaderiv(id_, GL_COMPILE_STATUS, &success);
+    graphics::instance().gl_get_shaderiv(id_, GL_COMPILE_STATUS, &success);
     if (GL_FALSE == success) {
-        api::instance().gl_get_shader_info_log(id_, message.size(), nullptr, message.data());
+        graphics::instance().gl_get_shader_info_log(id_, message.size(), nullptr, message.data());
         throw gl_error(message.data());
     }
 }

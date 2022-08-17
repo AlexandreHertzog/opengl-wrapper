@@ -1,7 +1,7 @@
 #ifndef OPENGL_WRAPPER_GL_MANAGER_H
 #define OPENGL_WRAPPER_GL_MANAGER_H
 
-#include "opengl-wrapper/wraps/api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include <stdexcept>
 
 namespace opengl_wrapper {

@@ -1,24 +1,24 @@
-#ifndef OPENGL_WRAPPER_API_H
-#define OPENGL_WRAPPER_API_H
+#ifndef OPENGL_WRAPPER_GRAPHICS_H
+#define OPENGL_WRAPPER_GRAPHICS_H
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 #include <GLFW/glfw3.h>
 #include <memory>
 
 namespace opengl_wrapper {
 
-class api {
+class graphics {
   public:
-    api(const api &) = delete;
-    api(api &&) = delete;
-    virtual ~api() = default;
+    graphics(const graphics &) = delete;
+    graphics(graphics &&) = delete;
+    virtual ~graphics() = default;
 
-    api &operator=(api &&) = delete;
-    api &operator=(const api &) = delete;
+    graphics &operator=(graphics &&) = delete;
+    graphics &operator=(const graphics &) = delete;
 
-    static api &instance();
-    static void set_api(api *a);
+    static graphics &instance();
+    static void set_api(graphics *a);
 
     /**
      * @brief Attaches a shader object to a program object
@@ -418,11 +418,11 @@ class api {
     virtual int glfw_window_should_close(GLFWwindow *window);
 
   protected:
-    static std::unique_ptr<api> api_;
+    static std::unique_ptr<graphics> api_;
 
-    api() = default;
+    graphics() = default;
 };
 
 } // namespace opengl_wrapper
 
-#endif // OPENGL_WRAPPER_API_H
+#endif // OPENGL_WRAPPER_GRAPHICS_H

@@ -1,6 +1,6 @@
 #include "renderer.h"
 #include "models/shape.h"
-#include "wraps/api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include <boost/log/trivial.hpp>
 
 namespace opengl_wrapper {
@@ -31,12 +31,12 @@ void renderer::load_vertices() {
                                  GL_STATIC_DRAW);
         }
 
-        api::instance().gl_vertex_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr);
-        api::instance().gl_enable_vertex_attrib_array(0);
+        graphics::instance().gl_vertex_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr);
+        graphics::instance().gl_enable_vertex_attrib_array(0);
 
-        api::instance().gl_vertex_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),
-                                                 reinterpret_cast<void *>(sizeof(vertex::pos_))); // NOLINT
-        api::instance().gl_enable_vertex_attrib_array(1);
+        graphics::instance().gl_vertex_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),
+                                                      reinterpret_cast<void *>(sizeof(vertex::pos_))); // NOLINT
+        graphics::instance().gl_enable_vertex_attrib_array(1);
     }
 }
 
@@ -46,7 +46,7 @@ void renderer::draw() {
         shape.get_program()->use();
         vertex_arrays_->bind(shape.get_vertex_array());
 
-        api::instance().gl_draw_elements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT, nullptr);
+        graphics::instance().gl_draw_elements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT, nullptr);
     }
 }
 

@@ -1,6 +1,6 @@
 #include "vertex_arrays.h"
 
-#include "api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include "utils/utils.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
@@ -12,7 +12,7 @@ vertex_arrays::vertex_arrays(int size) {
     assert(size > 0);
 
     ids_.resize(size);
-    api::instance().gl_gen_vertex_arrays(static_cast<GLsizei>(ids_.size()), ids_.data());
+    graphics::instance().gl_gen_vertex_arrays(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
 vertex_arrays::vertex_arrays(vertex_arrays &&other) noexcept {
@@ -22,7 +22,7 @@ vertex_arrays::vertex_arrays(vertex_arrays &&other) noexcept {
 
 vertex_arrays::~vertex_arrays() {
     BOOST_LOG_TRIVIAL(trace) << "vertex_arrays::~vertex_arrays " << *this;
-    api::instance().gl_delete_vertex_arrays(static_cast<GLsizei>(ids_.size()), ids_.data());
+    graphics::instance().gl_delete_vertex_arrays(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
 vertex_arrays &vertex_arrays::operator=(vertex_arrays &&other) noexcept {
@@ -36,7 +36,7 @@ void vertex_arrays::bind(int index) {
     assert(index >= 0);
     assert(index < ids_.size());
 
-    api::instance().gl_bind_vertex_array(ids_[index]);
+    graphics::instance().gl_bind_vertex_array(ids_[index]);
 }
 
 const std::vector<GLuint> &vertex_arrays::get_ids() const {

@@ -21,11 +21,24 @@ add_library(opengl-wrapper-utils
 
 target_include_directories(opengl-wrapper-utils
         PUBLIC include
-        PRIVATE include/opengl-wrapper/utils src
+        PRIVATE include/opengl-wrapper/utils
         )
 
 target_link_libraries(opengl-wrapper-utils
         PRIVATE Boost::log backtrace
+        )
+
+add_library(opengl-wrapper-graphics
+        src/graphics/graphics.cpp
+        )
+
+target_include_directories(opengl-wrapper-graphics
+        PUBLIC include
+        PRIVATE include/opengl-wrapper/graphics
+        )
+
+target_link_libraries(opengl-wrapper-graphics
+        PRIVATE Boost::log glad glfw
         )
 
 add_library(opengl-wrapper-models
@@ -35,7 +48,7 @@ add_library(opengl-wrapper-models
 
 target_include_directories(opengl-wrapper-models
         PUBLIC include
-        PRIVATE include/opengl-wrapper/models src
+        PRIVATE include/opengl-wrapper/models
         )
 
 add_library(opengl-wrapper-wraps
@@ -44,12 +57,11 @@ add_library(opengl-wrapper-wraps
         src/wraps/shader.cpp
         src/wraps/vertex_arrays.cpp
         src/wraps/window.cpp
-        src/wraps/api.cpp
         )
 
 target_include_directories(opengl-wrapper-wraps
         PUBLIC include
-        PRIVATE include/opengl-wrapper/wraps include/opengl-wrapper src
+        PRIVATE include/opengl-wrapper/wraps include/opengl-wrapper
         )
 
 target_link_libraries(opengl-wrapper-wraps
@@ -65,7 +77,7 @@ add_library(opengl-wrapper
 
 target_include_directories(opengl-wrapper
         PUBLIC include
-        PRIVATE include/opengl-wrapper src
+        PRIVATE include/opengl-wrapper
         )
 
 target_link_libraries(opengl-wrapper

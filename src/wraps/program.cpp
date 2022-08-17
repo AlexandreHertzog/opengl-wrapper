@@ -1,6 +1,6 @@
 #include "program.h"
 
-#include "api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include "opengl-wrapper/utils/gl_error.h"
 #include "shader.h"
 #include "utils/utils.h"
@@ -10,7 +10,7 @@
 
 namespace opengl_wrapper {
 
-program::program() : shader_count_(0), id_(api::instance().gl_create_program()), linked_(false) {
+program::program() : shader_count_(0), id_(graphics::instance().gl_create_program()), linked_(false) {
     BOOST_LOG_TRIVIAL(trace) << "program::program " << *this;
 }
 
@@ -27,7 +27,7 @@ program::program(program &&other) noexcept
 program::~program() {
     BOOST_LOG_TRIVIAL(trace) << "program::~program " << *this;
     if (0 != id_) {
-        api::instance().gl_delete_program(id_);
+        graphics::instance().gl_delete_program(id_);
     }
 }
 
@@ -56,11 +56,11 @@ bool program::operator==(const opengl_wrapper::program &other) const {
 void program::add_shader(shader shader) {
     BOOST_LOG_TRIVIAL(trace) << "program::add_shader " << *this << " shader= " << shader;
     if (0 == id_) {
-        id_ = api::instance().gl_create_program();
+        id_ = graphics::instance().gl_create_program();
         assert(0 == shader_count_);
     }
 
-    api::instance().gl_attach_shader(id_, shader.get_id());
+    graphics::instance().gl_attach_shader(id_, shader.get_id());
     shaders_.emplace_back(std::move(shader));
     shader_count_++;
 }
@@ -71,14 +71,14 @@ void program::link() {
 
     assert(0 != id_);
 
-    api::instance().gl_link_program(id_);
+    graphics::instance().gl_link_program(id_);
 
     int success = 0;
     std::array<char, error_string_length> message = {'\0'};
 
-    api::instance().gl_get_programiv(id_, GL_LINK_STATUS, &success);
+    graphics::instance().gl_get_programiv(id_, GL_LINK_STATUS, &success);
     if (GL_FALSE == success) {
-        api::instance().gl_get_program_info_log(id_, message.size(), nullptr, message.data());
+        graphics::instance().gl_get_program_info_log(id_, message.size(), nullptr, message.data());
         throw gl_error(message.data());
     }
 
@@ -92,12 +92,12 @@ void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
 
 int program::get_uniform_location(const char *var_name) const {
     BOOST_LOG_TRIVIAL(trace) << "program::get_uniform_location " << *this << " var_name=" << std::quoted(var_name);
-    return api::instance().gl_get_uniform_location(id_, var_name);
+    return graphics::instance().gl_get_uniform_location(id_, var_name);
 }
 
 void program::use() { // NOLINT(readability-make-member-function-const)
     BOOST_LOG_TRIVIAL(trace) << "program::use " << *this;
-    api::instance().gl_use_program(id_);
+    graphics::instance().gl_use_program(id_);
     if (use_callback_) {
         use_callback_(*this);
     }

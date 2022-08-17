@@ -1,6 +1,6 @@
 #include "buffer.h"
 
-#include "api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include "utils/utils.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
@@ -11,7 +11,7 @@ buffer::buffer(int size) : target_(0) {
     BOOST_LOG_TRIVIAL(trace) << "buffer::buffer " << *this << " size=" << size;
     assert(size > 0);
     ids_.resize(size);
-    api::instance().gl_gen_buffers(static_cast<GLsizei>(ids_.size()), ids_.data());
+    graphics::instance().gl_gen_buffers(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
 buffer::buffer(buffer &&other) noexcept : target_(0) {
@@ -21,7 +21,7 @@ buffer::buffer(buffer &&other) noexcept : target_(0) {
 
 buffer::~buffer() {
     BOOST_LOG_TRIVIAL(trace) << "buffer::~buffer " << *this;
-    api::instance().gl_delete_buffers(static_cast<GLsizei>(ids_.size()), ids_.data());
+    graphics::instance().gl_delete_buffers(static_cast<GLsizei>(ids_.size()), ids_.data());
 }
 
 buffer &buffer::operator=(buffer &&other) noexcept {
@@ -36,13 +36,13 @@ void buffer::bind(int index, GLenum target) {
     assert(index < ids_.size());
 
     target_ = target;
-    api::instance().gl_bind_buffer(target_, ids_[index]);
+    graphics::instance().gl_bind_buffer(target_, ids_[index]);
 }
 
 void buffer::load(GLsizeiptr size, const void *data, GLenum usage) { // NOLINT(*-function-const)
     BOOST_LOG_TRIVIAL(trace) << "buffer::load " << *this << " size=" << size << ", data=" << data
                              << ", usage=" << usage;
-    api::instance().gl_buffer_data(target_, size, data, usage);
+    graphics::instance().gl_buffer_data(target_, size, data, usage);
 }
 
 const std::vector<GLuint> &buffer::get_ids() const {

@@ -1,7 +1,7 @@
 #ifndef OPENGL_WRAPPER_WRAPS_SHADER_H
 #define OPENGL_WRAPPER_WRAPS_SHADER_H
 
-#include "opengl-wrapper/wraps/api.h"
+#include "opengl-wrapper/graphics/graphics.h"
 #include <filesystem>
 #include <ostream>
 #include <string>
