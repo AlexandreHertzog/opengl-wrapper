@@ -1,4 +1,4 @@
-#include "glfw_error.h"
+#include "opengl-wrapper/utils/glfw_error.h"
 
 namespace opengl_wrapper {
 

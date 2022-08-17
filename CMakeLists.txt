@@ -11,19 +11,20 @@ add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
 
 add_subdirectory(lib)
 
-add_library(opengl-wrapper-exceptions
-        src/exceptions/exception.cpp
-        src/exceptions/gl_error.cpp
-        src/exceptions/glad_error.cpp
-        src/exceptions/glfw_error.cpp
+add_library(opengl-wrapper-utils
+        src/utils/exception.cpp
+        src/utils/formatter.cpp
+        src/utils/gl_error.cpp
+        src/utils/glad_error.cpp
+        src/utils/glfw_error.cpp
         )
 
-target_include_directories(opengl-wrapper-exceptions
+target_include_directories(opengl-wrapper-utils
         PUBLIC include
-        PRIVATE include/opengl-wrapper/exceptions src
+        PRIVATE include/opengl-wrapper/utils src
         )
 
-target_link_libraries(opengl-wrapper-exceptions
+target_link_libraries(opengl-wrapper-utils
         PRIVATE Boost::log backtrace
         )
 
@@ -52,21 +53,8 @@ target_include_directories(opengl-wrapper-wraps
         )
 
 target_link_libraries(opengl-wrapper-wraps
-        PUBLIC glad opengl-wrapper-exceptions
+        PUBLIC glad opengl-wrapper-utils
         PRIVATE Boost::log
-        )
-
-add_library(opengl-wrapper-utils
-        src/utils/formatter.cpp
-        )
-
-target_include_directories(opengl-wrapper-utils
-        PUBLIC include
-        PRIVATE include/opengl-wrapper/utils src
-        )
-
-target_link_libraries(opengl-wrapper-utils
-        PRIVATE Boost::log opengl-wrapper-wraps
         )
 
 add_library(opengl-wrapper
@@ -81,7 +69,7 @@ target_include_directories(opengl-wrapper
         )
 
 target_link_libraries(opengl-wrapper
-        PUBLIC glad glfw opengl-wrapper-exceptions opengl-wrapper-wraps opengl-wrapper-models
+        PUBLIC glad glfw opengl-wrapper-wraps opengl-wrapper-models
         PRIVATE opengl-wrapper-utils Boost::log
         )
 

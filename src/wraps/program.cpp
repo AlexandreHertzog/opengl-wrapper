@@ -1,7 +1,7 @@
 #include "program.h"
 
 #include "api.h"
-#include "exceptions/gl_error.h"
+#include "opengl-wrapper/utils/gl_error.h"
 #include "shader.h"
 #include "utils/utils.h"
 #include <algorithm>

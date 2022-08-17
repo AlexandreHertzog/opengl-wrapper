@@ -1,7 +1,7 @@
 #include "shader.h"
 
 #include "api.h"
-#include "exceptions/gl_error.h"
+#include "opengl-wrapper/utils/gl_error.h"
 #include "utils/utils.h"
 #include <array>
 #include <boost/log/trivial.hpp>

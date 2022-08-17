@@ -1,7 +1,7 @@
 #include "window_manager.h"
 
-#include "exceptions/glad_error.h"
 #include "models/shape.h"
+#include "opengl-wrapper/utils/glad_error.h"
 #include "renderer.h"
 #include "wraps/api.h"
 #include "wraps/window.h"

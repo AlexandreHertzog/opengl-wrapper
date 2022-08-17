@@ -2,7 +2,7 @@
 
 #include <boost/log/trivial.hpp>
 
-#include "exceptions/glfw_error.h"
+#include "opengl-wrapper/utils/glfw_error.h"
 #include "utils/formatter.h"
 #include "wraps/api.h"
 

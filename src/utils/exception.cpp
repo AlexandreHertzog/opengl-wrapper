@@ -1,4 +1,4 @@
-#include "exception.h"
+#include "opengl-wrapper/utils/exception.h"
 
 #include <boost/log/trivial.hpp>
 #include <boost/stacktrace.hpp>
