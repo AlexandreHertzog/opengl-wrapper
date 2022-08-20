@@ -21,6 +21,14 @@ class graphics {
     static void set_api(graphics *a);
 
     /**
+     * @brief select active texture unit
+     * @param texture Specifies which texture unit to make active. The number of texture units is implementation
+     * dependent, but must be at least 80. texture must be one of GL_TEXTUREi, where i ranges from zero to the value of
+     * GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS minus one. The initial value is GL_TEXTURE0.
+     */
+    virtual void gl_activate_texture(GLenum texture);
+
+    /**
      * @brief Attaches a shader object to a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glAttachShader.xhtml
      * @param program Specifies the program object to which a shader object will be attached.
@@ -36,6 +44,17 @@ class graphics {
      * @param buffer Specifies the name of a buffer object.
      */
     virtual void gl_bind_buffer(GLenum target, GLuint buffer);
+
+    /**
+     * @brief bind a named texture_coord to a texturing target
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindTexture.xhtml
+     * @param target Specifies the target to which the texture_coord is bound. Must be one of GL_TEXTURE_1D,
+     * GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_RECTANGLE,
+     * GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BUFFER, GL_TEXTURE_2D_MULTISAMPLE or
+     * GL_TEXTURE_2D_MULTISAMPLE_ARRAY.
+     * @param texture Specifies the name of a texture_coord.
+     */
+    virtual void gl_bind_texture(GLenum target, GLuint texture);
 
     /**
      * @brief bind a vertex array object.
@@ -101,10 +120,10 @@ class graphics {
     /**
      * @brief Creates a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml
-     * @param shaderType Specifies the type of shader to be created. Must be one of GL_COMPUTE_SHADER, GL_VERTEX_SHADER,
-     * GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER, or GL_FRAGMENT_SHADER.
+     * @param shader_type Specifies the type of shader to be created. Must be one of GL_COMPUTE_SHADER,
+     * GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER, or GL_FRAGMENT_SHADER.
      * @return creates an empty shader object and returns a non-zero value by which it can be referenced. A shader
-     * object is used to maintain the source code strings that define a shader. shaderType indicates the type of shader
+     * object is used to maintain the source code strings that define a shader. shader_type indicates the type of shader
      * to be created. Five types of shader are supported. A shader of type GL_COMPUTE_SHADER is a shader that is
      * intended to run on the programmable compute processor. A shader of type GL_VERTEX_SHADER is a shader that is
      * intended to run on the programmable vertex processor. A shader of type GL_TESS_CONTROL_SHADER is a shader that is
@@ -114,7 +133,7 @@ class graphics {
      * geometry processor. A shader of type GL_FRAGMENT_SHADER is a shader that is intended to run on the programmable
      * fragment processor.
      */
-    virtual GLuint gl_create_shader(GLenum shaderType);
+    virtual GLuint gl_create_shader(GLenum shader_type);
 
     /**
      * @brief delete named buffer objects.
@@ -137,6 +156,14 @@ class graphics {
      * @param shader Specifies the shader object to be deleted.
      */
     virtual void gl_delete_shader(GLuint shader);
+
+    /**
+     * @brief delete named textures
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteTextures.xhtml
+     * @param n Specifies the number of textures to be deleted.
+     * @param textures Specifies an array of textures to be deleted.
+     */
+    virtual void gl_delete_textures(GLsizei n, const GLuint *textures);
 
     /**
      * @brief delete vertex array objects.
@@ -175,12 +202,29 @@ class graphics {
     virtual void gl_gen_buffers(GLsizei n, GLuint *buffers);
 
     /**
+     * @brief generate texture_coord names
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenTextures.xhtml
+     * @param n Specifies the number of texture_coord names to be generated.
+     * @param textures Specifies an array in which the generated texture_coord names are stored.
+     */
+    virtual void gl_gen_textures(GLsizei n, GLuint *textures);
+
+    /**
      * @brief generate vertex array object names
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenVertexArrays.xhtml
      * @param n Specifies the number of vertex array object names to generate.
      * @param arrays Specifies an array in which the generated vertex array object names are stored.
      */
     virtual void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays);
+
+    /**
+     * @brief generate mipmaps for a specified texture_coord object
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenerateMipmap.xhtml
+     * @param target Specifies the target to which the texture_coord object is bound for glGenerateMipmap. Must be one
+     * of GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_CUBE_MAP, or
+     * GL_TEXTURE_CUBE_MAP_ARRAY.
+     */
+    virtual void gl_generate_mipmap(GLenum target);
 
     /**
      * @brief return the value or values of a selected parameter.
@@ -195,11 +239,11 @@ class graphics {
      * @brief Returns the information log for a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgramInfoLog.xhtml
      * @param program Specifies the program object whose information log is to be queried.
-     * @param maxLength Specifies the size of the character buffer for storing the returned information log.
-     * @param length Returns the length of the string returned in infoLog (excluding the null terminator).
-     * @param infoLog Specifies an array of characters that is used to return the information log.
+     * @param max_lenght Specifies the size of the character buffer for storing the returned information log.
+     * @param length Returns the length of the string returned in info_log (excluding the null terminator).
+     * @param info_log Specifies an array of characters that is used to return the information log.
      */
-    virtual void gl_get_program_info_log(GLuint program, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
+    virtual void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log);
 
     /**
      * @brief Returns a parameter from a program object
@@ -220,11 +264,11 @@ class graphics {
      * @brief Returns the information log for a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml
      * @param shader Specifies the shader object whose information log is to be queried.
-     * @param maxLength Specifies the size of the character buffer for storing the returned information log.
-     * @param length Returns the length of the string returned in infoLog (excluding the null terminator).
-     * @param infoLog Specifies an array of characters that is used to return the information log.
+     * @param max_length Specifies the size of the character buffer for storing the returned information log.
+     * @param length Returns the length of the string returned in info_log (excluding the null terminator).
+     * @param info_log Specifies an array of characters that is used to return the information log.
      */
-    virtual void gl_get_shader_info_log(GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
+    virtual void gl_get_shader_info_log(GLuint shader, GLsizei max_length, GLsizei *length, GLchar *info_log);
 
     /**
      * @brief Returns a parameter from a shader object
@@ -261,6 +305,54 @@ class graphics {
      * @param length Specifies an array of string lengths.
      */
     virtual void gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
+
+    /**
+     * @brief specify a two-dimensional texture_coord image
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
+     * @param target Specifies the target texture_coord. Must be GL_TEXTURE_2D, GL_PROXY_TEXTURE_2D,
+     * GL_TEXTURE_1D_ARRAY, GL_PROXY_TEXTURE_1D_ARRAY, GL_TEXTURE_RECTANGLE, GL_PROXY_TEXTURE_RECTANGLE,
+     * GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+     * GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, or
+     * GL_PROXY_TEXTURE_CUBE_MAP.
+     * @param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap
+     * reduction image. If target is GL_TEXTURE_RECTANGLE or GL_PROXY_TEXTURE_RECTANGLE, level must be 0.
+     * @param internalformat Specifies the number of color components in the texture_coord. Must be one of base internal
+     * formats given in Table 1, one of the sized internal formats given in Table 2, or one of the compressed internal
+     * formats given in Table 3, below.
+     * @param width Specifies the width of the texture_coord image. All implementations support texture_coord images
+     * that are at least 1024 texels wide.
+     * @param height Specifies the height of the texture_coord image, or the number of layers in a texture_coord array,
+     * in the case of the GL_TEXTURE_1D_ARRAY and GL_PROXY_TEXTURE_1D_ARRAY targets. All implementations support 2D
+     * texture_coord images that are at least 1024 texels high, and texture_coord arrays that are at least 256 layers
+     * deep.
+     * @param border This value must be 0.
+     * @param format Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG,
+     * GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER,
+     * GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL.
+     * @param type Specifies the data type of the pixel data. The following symbolic values are accepted:
+     * GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT,
+     * GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV,
+     * GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, GL_UNSIGNED_SHORT_5_5_5_1,
+     * GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, GL_UNSIGNED_INT_10_10_10_2,
+     * and GL_UNSIGNED_INT_2_10_10_10_REV.
+     * @param data Specifies a pointer to the image data in memory.
+     */
+    virtual void gl_tex_image_2d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height,
+                                 GLint border, GLenum format, GLenum type, const void *data);
+
+    /**
+     * @brief set texture_coord parameters
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
+     * @param texture Specifies the texture_coord object name for glTextureParameter functions.
+     * @param pname Specifies the symbolic name of a single-valued texture_coord parameter. pname can be one of the
+following: GL_DEPTH_STENCIL_TEXTURE_MODE, GL_TEXTURE_BASE_LEVEL, GL_TEXTURE_COMPARE_FUNC, GL_TEXTURE_COMPARE_MODE,
+GL_TEXTURE_LOD_BIAS, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_LOD, GL_TEXTURE_MAX_LOD,
+GL_TEXTURE_MAX_LEVEL, GL_TEXTURE_SWIZZLE_R, GL_TEXTURE_SWIZZLE_G, GL_TEXTURE_SWIZZLE_B, GL_TEXTURE_SWIZZLE_A,
+GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, or GL_TEXTURE_WRAP_R. For the vector commands (glTexParameter*v), pname can also
+be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
+     * @param param For the scalar commands, specifies the value of pname.
+     */
+    virtual void gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param);
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
