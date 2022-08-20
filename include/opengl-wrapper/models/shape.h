@@ -23,11 +23,15 @@ class shape {
     void set_program(std::shared_ptr<program> p);
     [[nodiscard]] std::shared_ptr<program> get_program() const;
 
+    void set_texture(int t);
+    [[nodiscard]] int get_texture() const;
+
   private:
     std::vector<vertex> vertices_;
     std::vector<unsigned> indices_;
     int vertex_array_{};
     std::shared_ptr<program> program_;
+    int m_texture{};
 };
 
 } // namespace opengl_wrapper

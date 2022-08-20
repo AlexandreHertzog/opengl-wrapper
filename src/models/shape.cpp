@@ -1,7 +1,3 @@
-//
-// Created by alex on 16-08-2022.
-//
-
 #include "shape.h"
 
 namespace opengl_wrapper {
@@ -37,6 +33,14 @@ void shape::set_program(std::shared_ptr<program> p) {
 
 std::shared_ptr<program> shape::get_program() const {
     return program_;
+}
+
+void shape::set_texture(int t) {
+    m_texture = t;
+}
+
+int shape::get_texture() const {
+    return m_texture;
 }
 
 } // namespace opengl_wrapper

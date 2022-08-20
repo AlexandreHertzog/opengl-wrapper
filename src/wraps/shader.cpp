@@ -42,7 +42,9 @@ shader::shader(shader &&other) noexcept : id_(other.id_) {
 
 shader::~shader() {
     BOOST_LOG_TRIVIAL(trace) << "shader::~shader " << *this;
-    graphics::instance().gl_delete_shader(id_);
+    if (0 != id_) {
+        graphics::instance().gl_delete_shader(id_);
+    }
 }
 
 shader &shader::operator=(shader &&other) noexcept {

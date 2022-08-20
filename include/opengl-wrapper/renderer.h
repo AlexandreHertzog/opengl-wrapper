@@ -1,9 +1,11 @@
 #ifndef OPENGL_WRAPPER_RENDERER_H
 #define OPENGL_WRAPPER_RENDERER_H
 
+#include "opengl-wrapper/textures/texture_controller.h"
 #include "opengl-wrapper/wraps/buffer.h"
 #include "opengl-wrapper/wraps/program.h"
 #include "opengl-wrapper/wraps/vertex_arrays.h"
+#include <filesystem>
 #include <map>
 #include <memory>
 
@@ -37,11 +39,19 @@ class renderer {
      */
     void draw();
 
+    /**
+     * @brief Loads a texture from the filesystem into the renderer.
+     * @param path Path to texture.
+     * @return Index of the new texture.
+     */
+    int add_texture(const std::filesystem::path &path);
+
   private:
     std::vector<shape> shapes_;
 
     std::unique_ptr<vertex_arrays> vertex_arrays_;
     std::unique_ptr<buffer> vertex_buffer_;
+    texture_controller m_textures;
 };
 
 } // namespace opengl_wrapper

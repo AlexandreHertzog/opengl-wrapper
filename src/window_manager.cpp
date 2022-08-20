@@ -73,17 +73,14 @@ void window_manager::init(int width, int height, const char *title) {
 
     window_ = std::make_unique<window>(width, height, title);
     window_->set_as_context();
+    window_->set_framebuffer_callback(resize_handler_);
+    window_->set_key_callback(key_handler_);
 
     if (0 == gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) { //  NOLINT(*-reinterpret-cast)
         BOOST_LOG_TRIVIAL(trace) << "window_manager::init(width=" << width << ", height=" << height
                                  << ", title=" << title << ") glad_error";
         throw glad_error("gladLoadGLLoader() failed");
     }
-
-    window_->set_framebuffer_callback(resize_handler_);
-    window_->set_key_callback(key_handler_);
-
-    graphics::instance().gl_viewport(0, 0, width, height);
 
     renderer_ = std::make_unique<renderer>();
 
@@ -105,7 +102,7 @@ void window_manager::render_loop() noexcept {
     while (1 != window_->get_should_close()) {
         auto start_time = std::chrono::high_resolution_clock::now();
 
-        graphics::instance().gl_clear_color(0.0F, 0.0F, 0.0F, 1.0F);
+        graphics::instance().gl_clear_color(0.2F, 0.2F, 0.2F, 1.0F);
         graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT);
 
         renderer_->draw();
