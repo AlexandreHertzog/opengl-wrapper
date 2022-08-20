@@ -9,7 +9,6 @@
 #include "opengl-wrapper/window_manager.h"
 #include "opengl-wrapper/wraps/program.h"
 #include "opengl-wrapper/wraps/shader.h"
-#include <boost/log/trivial.hpp>
 #include <filesystem>
 #include <iostream>
 
@@ -43,10 +42,15 @@ int main() {
         square.set_draw_order({0, 1, 3, 1, 2, 3});
         square.set_program(square_program);
 
-        square.set_texture(window.get_renderer().add_texture("textures/container.jpg"));
+        auto container_texture = window.get_renderer().add_texture("textures/container.jpg", GL_TEXTURE0);
+        auto awesomeface_texture = window.get_renderer().add_texture("textures/awesomeface.png", GL_TEXTURE1);
+
+        square.get_program()->use();
+        square.get_program()->set_uniform("texture1", 0);
+        square.get_program()->set_uniform("texture2", 1);
+        square.set_textures({std::move(container_texture), std::move(awesomeface_texture)});
 
         window.get_renderer().add_shape(std::move(square));
-        window.get_renderer().load_vertices();
 
         window.render_loop();
         return 0;

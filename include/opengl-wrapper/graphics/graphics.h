@@ -359,6 +359,14 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
      * @param location Specifies the location of the uniform variable to be modified.
      * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
+     */
+    virtual void gl_uniform1i(GLint location, GLint v0);
+
+    /**
+     * @brief Specify the value of a uniform variable for the current program object.
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param location Specifies the location of the uniform variable to be modified.
+     * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      * @param v1 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      * @param v2 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      * @param v3 For the scalar commands, specifies the new values to be used for the specified uniform variable.

@@ -99,6 +99,8 @@ void window_manager::render_loop() noexcept {
 
     assert(initialized_);
 
+    renderer_->load_vertices();
+
     while (1 != window_->get_should_close()) {
         auto start_time = std::chrono::high_resolution_clock::now();
 

@@ -46,7 +46,7 @@ class renderer {
      * @param path Path to texture.
      * @return Pointer of the new texture.
      */
-    std::shared_ptr<texture> add_texture(const std::filesystem::path &path);
+    std::shared_ptr<texture> add_texture(const std::filesystem::path &path, int unit);
 
   private:
     std::vector<shape> m_shapes;

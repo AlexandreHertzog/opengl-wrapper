@@ -21,11 +21,15 @@ void renderer::load_vertices() {
 
 void renderer::draw() {
     for (auto &shape : m_shapes) {
-        assert(shape.get_texture());
+        assert(!shape.get_textures().empty());
         assert(shape.get_program());
         assert(shape.get_vertex_array());
 
-        shape.get_texture()->bind();
+        for (auto &t : shape.get_textures()) {
+            assert(t);
+            t->bind();
+        }
+
         shape.get_program()->use();
         shape.get_vertex_array()->bind();
 
@@ -33,8 +37,8 @@ void renderer::draw() {
     }
 }
 
-std::shared_ptr<texture> renderer::add_texture(const std::filesystem::path &path) {
-    return m_textures.add_texture(path);
+std::shared_ptr<texture> renderer::add_texture(const std::filesystem::path &path, int unit) {
+    return m_textures.add_texture(path, unit);
 }
 
 } // namespace opengl_wrapper

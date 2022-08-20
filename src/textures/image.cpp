@@ -8,6 +8,7 @@
 namespace opengl_wrapper {
 
 image::image(const std::filesystem::path &path) {
+    stbi_set_flip_vertically_on_load(true);
     m_data = stbi_load(path.c_str(), &m_width, &m_height, &m_num_channels, 0);
     if (nullptr == m_data) {
         throw exception("failed to open image: " + path.string());
@@ -52,5 +53,9 @@ int image::get_height() const {
 
 const unsigned char *image::get_data() const {
     return m_data;
+}
+
+bool image::has_alpha() const {
+    return m_num_channels == 4;
 }
 } // namespace opengl_wrapper

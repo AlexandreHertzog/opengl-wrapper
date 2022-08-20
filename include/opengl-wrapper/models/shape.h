@@ -3,6 +3,7 @@
 
 #include "opengl-wrapper/wraps/vertex_array.h"
 #include "vertex.h"
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -13,6 +14,9 @@ class texture;
 
 class shape {
   public:
+    using texture_pointer_t = std::shared_ptr<texture>;
+    using textures_t = std::vector<texture_pointer_t>;
+
     unsigned add_vertex(vertex v);
     [[nodiscard]] const std::vector<vertex> &get_vertices() const;
 
@@ -25,15 +29,15 @@ class shape {
     void set_program(std::shared_ptr<program> p);
     [[nodiscard]] std::shared_ptr<program> get_program() const;
 
-    void set_texture(std::shared_ptr<texture> t);
-    [[nodiscard]] std::shared_ptr<texture> get_texture() const;
+    void set_textures(textures_t t);
+    [[nodiscard]] const textures_t &get_textures() const;
 
   private:
     std::vector<vertex> vertices_;
     std::vector<unsigned> indices_;
     std::shared_ptr<vertex_array> m_vertex_array;
     std::shared_ptr<program> program_;
-    std::shared_ptr<texture> m_texture;
+    textures_t m_textures;
 };
 
 } // namespace opengl_wrapper

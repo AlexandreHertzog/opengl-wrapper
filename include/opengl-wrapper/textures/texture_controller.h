@@ -22,7 +22,7 @@ class texture_controller {
      * @param path Path to texture.
      * @return Pointer of the laoded texture.
      */
-    std::shared_ptr<texture> add_texture(const std::filesystem::path &path);
+    std::shared_ptr<texture> add_texture(const std::filesystem::path &path, int unit);
 
   private:
     std::vector<std::shared_ptr<texture>> m_textures;

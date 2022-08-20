@@ -4,7 +4,7 @@
 
 namespace opengl_wrapper {
 
-texture::texture(GLenum target, GLuint id) : m_id(id), m_target(target) {
+texture::texture(GLenum target, GLuint id, int unit) : m_id(id), m_target(target), m_unit(unit) {
     graphics::instance().gl_gen_textures(1, &m_id);
 }
 
@@ -29,8 +29,11 @@ texture &texture::operator=(opengl_wrapper::texture &&other) noexcept {
 }
 
 void texture::bind() { // NOLINT(readability-make-member-function-const)
-    assert(m_id != 0);
-    assert(m_target != 0);
+    assert(0 != m_id);
+    assert(0 != m_target);
+    assert(0 != m_unit);
+
+    graphics::instance().gl_activate_texture(m_unit);
     graphics::instance().gl_bind_texture(m_target, m_id);
 }
 
@@ -56,4 +59,5 @@ void texture::generate_mipmap() { // NOLINT(readability-make-member-function-con
     assert(m_target != 0);
     graphics::instance().gl_generate_mipmap(m_target);
 }
+
 } // namespace opengl_wrapper

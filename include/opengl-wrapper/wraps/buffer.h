@@ -67,8 +67,6 @@ class buffer {
      */
     [[nodiscard]] GLuint get_id() const;
 
-    void set_id(GLuint id);
-
     /**
      * @brief Gets the buffer target associated with this object.
      * @return Buffer target.

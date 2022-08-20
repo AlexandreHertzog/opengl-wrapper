@@ -14,7 +14,7 @@ class texture {
      * @param target OpenGL texture target.
      * @param id Texture ID.
      */
-    explicit texture(GLenum target = 0, GLuint id = 0);
+    explicit texture(GLenum target = 0, GLuint id = 0, int unit = 0);
 
     /**
      * @brief Texture destructor. See
@@ -76,6 +76,7 @@ class texture {
   private:
     GLuint m_id{};
     GLenum m_target{};
+    int m_unit{};
 };
 
 } // namespace opengl_wrapper

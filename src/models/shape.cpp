@@ -37,12 +37,12 @@ std::shared_ptr<program> shape::get_program() const {
     return program_;
 }
 
-void shape::set_texture(std::shared_ptr<texture> t) {
-    m_texture = std::move(t);
+void shape::set_textures(textures_t t) {
+    m_textures = std::move(t);
 }
 
-std::shared_ptr<texture> shape::get_texture() const {
-    return m_texture;
+const shape::textures_t &shape::get_textures() const {
+    return m_textures;
 }
 
 } // namespace opengl_wrapper

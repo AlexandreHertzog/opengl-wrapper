@@ -48,10 +48,6 @@ GLuint buffer::get_id() const {
     return m_id;
 }
 
-void buffer::set_id(GLuint id) {
-    m_id = id;
-}
-
 GLenum buffer::get_target() const {
     return m_target;
 }

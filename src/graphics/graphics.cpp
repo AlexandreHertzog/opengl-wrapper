@@ -188,6 +188,11 @@ void graphics::gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param) {
     glTexParameteri(texture, pname, param);
 }
 
+void graphics::gl_uniform1i(GLint location, GLint v0) {
+    BOOST_LOG_TRIVIAL(trace) << "gl_uniform4f location=" << location << " v0=" << v0;
+    glUniform1i(location, v0);
+}
+
 void graphics::gl_uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) {
     BOOST_LOG_TRIVIAL(trace) << "gl_uniform4f location=" << location << " v0=" << v0 << " v1=" << v1 << " v2=" << v2
                              << " v3=" << v3;

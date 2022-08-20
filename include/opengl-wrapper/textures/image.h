@@ -2,6 +2,7 @@
 #define OPENGL_WRAPPER_IMAGE_H
 
 #include <filesystem>
+
 namespace opengl_wrapper {
 
 class image {
@@ -50,6 +51,12 @@ class image {
      * @return Image data.
      */
     [[nodiscard]] const unsigned char *get_data() const;
+
+    /**
+     * @brief Informs whether or not the image has an alpha channel.
+     * @return true if it has an alpha channel.
+     */
+    [[nodiscard]] bool has_alpha() const;
 
   private:
     int m_width{};

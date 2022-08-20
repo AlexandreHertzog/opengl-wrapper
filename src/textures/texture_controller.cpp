@@ -12,8 +12,8 @@ std::shared_ptr<texture> &texture_controller::operator[](int index) {
     return m_textures[index];
 }
 
-std::shared_ptr<texture> texture_controller::add_texture(const std::filesystem::path &path) {
-    auto t = std::make_shared<texture>(GL_TEXTURE_2D);
+std::shared_ptr<texture> texture_controller::add_texture(const std::filesystem::path &path, int unit) {
+    auto t = std::make_shared<texture>(GL_TEXTURE_2D, 0, unit);
     t->bind();
 
     t->set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -22,7 +22,8 @@ std::shared_ptr<texture> texture_controller::add_texture(const std::filesystem::
     t->set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     image i(path);
-    t->set_image(0, GL_RGB, i.get_width(), i.get_height(), 0, GL_RGB, GL_UNSIGNED_BYTE, i.get_data());
+    t->set_image(0, GL_RGB, i.get_width(), i.get_height(), 0, i.has_alpha() ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
+                 i.get_data());
     t->generate_mipmap();
 
     m_textures.emplace_back(t);

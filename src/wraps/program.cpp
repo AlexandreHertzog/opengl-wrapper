@@ -83,6 +83,7 @@ void program::link() {
     }
 
     shaders_.clear();
+    linked_ = true;
 }
 
 void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
@@ -93,6 +94,10 @@ void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
 int program::get_uniform_location(const char *var_name) const {
     BOOST_LOG_TRIVIAL(trace) << "program::get_uniform_location " << *this << " var_name=" << std::quoted(var_name);
     return graphics::instance().gl_get_uniform_location(id_, var_name);
+}
+
+void program::set_uniform(const char *var_name, int value) {
+    graphics::instance().gl_uniform1i(get_uniform_location(var_name), value);
 }
 
 void program::use() { // NOLINT(readability-make-member-function-const)
