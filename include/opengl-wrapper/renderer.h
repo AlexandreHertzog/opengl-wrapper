@@ -2,9 +2,9 @@
 #define OPENGL_WRAPPER_RENDERER_H
 
 #include "opengl-wrapper/textures/texture_controller.h"
-#include "opengl-wrapper/wraps/buffer.h"
+#include "opengl-wrapper/wraps/buffer_controller.h"
 #include "opengl-wrapper/wraps/program.h"
-#include "opengl-wrapper/wraps/vertex_arrays.h"
+#include "opengl-wrapper/wraps/vertex_array_controller.h"
 #include <filesystem>
 #include <map>
 #include <memory>
@@ -15,6 +15,8 @@ class shape;
 
 class renderer {
   public:
+    renderer();
+
     /**
      * @brief Adds first_vertices to the renderer ca cache.
      *
@@ -47,10 +49,9 @@ class renderer {
     std::shared_ptr<texture> add_texture(const std::filesystem::path &path);
 
   private:
-    std::vector<shape> shapes_;
-
-    std::unique_ptr<vertex_arrays> vertex_arrays_;
-    std::unique_ptr<buffer> vertex_buffer_;
+    std::vector<shape> m_shapes;
+    buffer_controller m_buffer_controller;
+    vertex_array_controller m_vertex_arrays;
     texture_controller m_textures;
 };
 

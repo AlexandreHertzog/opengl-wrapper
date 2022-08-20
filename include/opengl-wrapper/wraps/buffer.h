@@ -2,6 +2,7 @@
 #define OPENGL_WRAPPER_WRAPS_BUFFER_H
 
 #include "opengl-wrapper/graphics/graphics.h"
+#include <boost/log/trivial.hpp>
 #include <ostream>
 #include <vector>
 
@@ -10,12 +11,12 @@ namespace opengl_wrapper {
 class buffer {
   public:
     /**
-     * @brief Construct a new buffer object. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml
+     * @brief Construct a new buffer object.
      *
-     * @param size The number of buffer names to be generated.
+     * @param id The buffer id.
+     * @param target The buffer target.
      */
-    explicit buffer(int size);
+    explicit buffer(GLuint id = 0, GLenum target = 0);
 
     /**
      * @brief buffer move-constructor.
@@ -45,27 +46,28 @@ class buffer {
     /**
      * @brief Binds the indicated buffer object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml
-     *
-     * @param index Index of the buffer to be bound.
-     * @param target Target to which the load object is bound.
      */
-    void bind(int index, GLenum target);
+    void bind();
 
     /**
      * @brief Creates and initializes a buffer object data storage. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml
      *
-     * @param size Size of bytes of the buffer to be stored.
-     * @param data Pointer to the data to be stored.
+     * @param data Data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    void load(GLsizeiptr size, const void *data, GLenum usage);
+    template <class TYPE> void load(const std::vector<TYPE> &data, GLenum usage) {
+        BOOST_LOG_TRIVIAL(trace) << "buffer::load " << *this << " data=" << data.size() << ", usage=" << usage;
+        graphics::instance().gl_buffer_data(m_target, data.size() * sizeof(TYPE), data.data(), usage);
+    }
 
     /**
      * @brief Get the buffer ids associated with this object.
      * @return Buffer ids.
      */
-    [[nodiscard]] const std::vector<GLuint> &get_ids() const;
+    [[nodiscard]] GLuint get_id() const;
+
+    void set_id(GLuint id);
 
     /**
      * @brief Gets the buffer target associated with this object.
@@ -73,9 +75,15 @@ class buffer {
      */
     [[nodiscard]] GLenum get_target() const;
 
+    /**
+     * @brief Sets the buffer target.
+     * @param target Buffer target.
+     */
+    void set_target(GLenum target);
+
   private:
-    std::vector<GLuint> ids_;
-    GLenum target_;
+    GLuint m_id;
+    GLenum m_target;
 };
 
 std::ostream &operator<<(std::ostream &s, const opengl_wrapper::buffer &b);

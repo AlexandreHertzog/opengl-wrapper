@@ -75,8 +75,10 @@ add_library(opengl-wrapper-wraps
         src/wraps/buffer.cpp
         src/wraps/program.cpp
         src/wraps/shader.cpp
-        src/wraps/vertex_arrays.cpp
+        src/wraps/vertex_array.cpp
         src/wraps/window.cpp
+        src/wraps/buffer_controller.cpp
+        src/wraps/vertex_array_controller.cpp
         )
 
 target_include_directories(opengl-wrapper-wraps

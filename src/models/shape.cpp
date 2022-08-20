@@ -21,12 +21,12 @@ const std::vector<unsigned> &shape::get_draw_order() const {
     return indices_;
 }
 
-void shape::set_vertex_array(int va) {
-    vertex_array_ = va;
+void shape::set_vertex_array(std::shared_ptr<vertex_array> va) {
+    m_vertex_array = std::move(va);
 }
 
-int shape::get_vertex_array() const {
-    return vertex_array_;
+std::shared_ptr<vertex_array> shape::get_vertex_array() const {
+    return m_vertex_array;
 }
 
 void shape::set_program(std::shared_ptr<program> p) {
