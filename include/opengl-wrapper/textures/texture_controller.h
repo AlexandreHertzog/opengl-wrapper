@@ -3,6 +3,7 @@
 
 #include "texture.h"
 #include <filesystem>
+#include <memory>
 #include <vector>
 
 namespace opengl_wrapper {
@@ -12,19 +13,19 @@ class texture_controller {
     /**
      * @brief Gets texture at index.
      * @param index Index of the texture.
-     * @return Texture.
+     * @return Texture pointer.
      */
-    texture &operator[](int index);
+    std::shared_ptr<texture> &operator[](int index);
 
     /**
      * @brief Loads a texture from the filesystem.
      * @param path Path to texture.
-     * @return Index of the laoded texture.
+     * @return Pointer of the laoded texture.
      */
-    int add_texture(const std::filesystem::path &path);
+    std::shared_ptr<texture> add_texture(const std::filesystem::path &path);
 
   private:
-    std::vector<texture> m_textures;
+    std::vector<std::shared_ptr<texture>> m_textures;
 };
 
 } // namespace opengl_wrapper

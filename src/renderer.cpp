@@ -46,8 +46,7 @@ void renderer::draw() {
     for (auto &shape : shapes_) {
         assert(shape.get_program());
 
-        m_textures[shape.get_texture()].bind();
-
+        shape.get_texture()->bind();
         shape.get_program()->use();
         vertex_arrays_->bind(shape.get_vertex_array());
 
@@ -55,7 +54,7 @@ void renderer::draw() {
     }
 }
 
-int renderer::add_texture(const std::filesystem::path &path) {
+std::shared_ptr<texture> renderer::add_texture(const std::filesystem::path &path) {
     return m_textures.add_texture(path);
 }
 

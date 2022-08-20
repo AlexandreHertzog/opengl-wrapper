@@ -42,9 +42,9 @@ class renderer {
     /**
      * @brief Loads a texture from the filesystem into the renderer.
      * @param path Path to texture.
-     * @return Index of the new texture.
+     * @return Pointer of the new texture.
      */
-    int add_texture(const std::filesystem::path &path);
+    std::shared_ptr<texture> add_texture(const std::filesystem::path &path);
 
   private:
     std::vector<shape> shapes_;

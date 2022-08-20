@@ -8,6 +8,7 @@
 namespace opengl_wrapper {
 
 class program;
+class texture;
 
 class shape {
   public:
@@ -23,15 +24,15 @@ class shape {
     void set_program(std::shared_ptr<program> p);
     [[nodiscard]] std::shared_ptr<program> get_program() const;
 
-    void set_texture(int t);
-    [[nodiscard]] int get_texture() const;
+    void set_texture(std::shared_ptr<texture> t);
+    [[nodiscard]] std::shared_ptr<texture> get_texture() const;
 
   private:
     std::vector<vertex> vertices_;
     std::vector<unsigned> indices_;
     int vertex_array_{};
     std::shared_ptr<program> program_;
-    int m_texture{};
+    std::shared_ptr<texture> m_texture;
 };
 
 } // namespace opengl_wrapper

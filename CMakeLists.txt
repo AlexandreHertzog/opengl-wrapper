@@ -67,6 +67,10 @@ target_include_directories(opengl-wrapper-models
         PRIVATE include/opengl-wrapper/models
         )
 
+target_link_libraries(opengl-wrapper-models
+        PRIVATE opengl-wrapper-graphics
+        )
+
 add_library(opengl-wrapper-wraps
         src/wraps/buffer.cpp
         src/wraps/program.cpp
