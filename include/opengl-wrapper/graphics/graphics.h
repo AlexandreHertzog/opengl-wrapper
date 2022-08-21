@@ -11,13 +11,12 @@ class graphics {
   public:
     graphics(const graphics &) = delete;
     graphics(graphics &&) = delete;
-    virtual ~graphics() = default;
+    virtual ~graphics();
 
     graphics &operator=(graphics &&) = delete;
     graphics &operator=(const graphics &) = delete;
 
     static graphics &instance();
-    static void set_api(graphics *a);
 
     /**
      * @brief select active texture unit
@@ -560,9 +559,9 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
     virtual int glfw_window_should_close(GLFWwindow *window);
 
   protected:
-    static std::unique_ptr<graphics> m_api;
+    GLFWerrorfun m_error_handler;
 
-    graphics() = default;
+    graphics();
 };
 
 } // namespace opengl_wrapper

@@ -34,7 +34,7 @@ add_library(opengl-wrapper-graphics
 
 target_include_directories(opengl-wrapper-graphics
         PUBLIC include
-        PRIVATE include/opengl-wrapper/graphics
+        PRIVATE include/opengl-wrapper/graphics include/opengl-wrapper
         )
 
 target_link_libraries(opengl-wrapper-graphics
@@ -65,7 +65,6 @@ target_link_libraries(opengl-wrapper-data-types
         )
 
 add_library(opengl-wrapper
-        src/gl_manager.cpp
         src/renderer.cpp
         src/texture_controller.cpp
         src/window_manager.cpp

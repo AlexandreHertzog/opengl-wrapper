@@ -1,4 +1,5 @@
 #include "renderer.h"
+
 #include "opengl-wrapper/data_types/shape.h"
 #include "opengl-wrapper/graphics/graphics.h"
 #include <boost/log/trivial.hpp>

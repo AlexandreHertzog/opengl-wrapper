@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opengl-wrapper/data_types/window.h"
 #include "opengl-wrapper/graphics/graphics.h"
 #include <functional>
 #include <map>
@@ -7,7 +8,6 @@
 
 namespace opengl_wrapper {
 
-class window;
 class renderer;
 
 class window_manager {
@@ -20,18 +20,12 @@ class window_manager {
      */
     using Action = std::function<void(int)>;
 
+    window_manager();
     ~window_manager() = default;
     window_manager(const window_manager &) = delete;
     window_manager(window_manager &&) = delete;
     window_manager &operator=(const window_manager &) = delete;
     window_manager &operator=(window_manager &&) = delete;
-
-    /**
-     * @brief Returns the static window instance.
-     *
-     * @return window_manager& Static window instance.
-     */
-    static window_manager &instance();
 
     /**
      * @brief Returns the renderer associated with this window.
@@ -81,6 +75,7 @@ class window_manager {
     void set_wireframe_mode(bool wireframe);
 
   private:
+    static std::map<const void *, window_manager *> m_windows_map;
     GLFWframebuffersizefun m_resize_handler;
     GLFWkeyfun m_key_handler;
     std::map<int, Action> m_action_map;
@@ -89,8 +84,6 @@ class window_manager {
 
     std::unique_ptr<window> m_window;
     std::unique_ptr<renderer> m_renderer;
-
-    window_manager();
 };
 
 } // namespace opengl_wrapper

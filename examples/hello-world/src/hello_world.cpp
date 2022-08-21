@@ -4,7 +4,6 @@
 #include "opengl-wrapper/data_types/program.h"
 #include "opengl-wrapper/data_types/shader.h"
 #include "opengl-wrapper/data_types/shape.h"
-#include "opengl-wrapper/gl_manager.h"
 #include "opengl-wrapper/graphics/graphics.h"
 #include "opengl-wrapper/renderer.h"
 #include "opengl-wrapper/texture_controller.h"
@@ -17,8 +16,7 @@
 
 int main() {
     try {
-        auto &gl_manager = opengl_wrapper::gl_manager::instance();
-        auto &window = opengl_wrapper::window_manager::instance();
+        auto window = opengl_wrapper::window_manager();
         window.init(800, 600, "Hello world!"); // NOLINT(*-magic-numbers)
 
         window.set_key_action(GLFW_KEY_ESCAPE, [&](int action) {

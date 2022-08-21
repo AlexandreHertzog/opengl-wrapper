@@ -12,20 +12,22 @@
 
 namespace opengl_wrapper {
 
+std::map<const void *, window_manager *> window_manager::m_windows_map;
+
 window_manager::window_manager()
     : m_resize_handler([](GLFWwindow *window, int width, int height) {
           BOOST_LOG_TRIVIAL(debug) << "window_manager::resize_handler_(window=" << window << ", width=" << width
                                    << ", height=" << height << ")";
 
-          auto &window_manager = window_manager::instance();
-          if (*window_manager.m_window != window) {
+          auto window_manager = m_windows_map.find(window);
+          if (m_windows_map.end() == window_manager) {
               BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
               return;
           }
 
           graphics::instance().gl_viewport(0, 0, width, height);
 
-          window_manager::instance().get_renderer().draw();
+          window_manager->second->get_renderer().draw();
 
           BOOST_LOG_TRIVIAL(trace) << "window_manager::resize_handler_(window=" << window << ", width=" << width
                                    << ", height=" << height << ") end";
@@ -34,14 +36,14 @@ window_manager::window_manager()
           BOOST_LOG_TRIVIAL(debug) << "window_manager::key_handler_(window=" << window << ", key=" << key
                                    << ", scancode=" << scancode << ", mods=" << mods << ")";
 
-          auto &window_manager = window_manager::instance();
-          if (*window_manager.m_window != window) {
+          auto window_manager = m_windows_map.find(window);
+          if (m_windows_map.end() == window_manager) {
               BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
               return;
           }
 
-          const auto existing_action = window_manager.m_action_map.find(key);
-          if (window_manager.m_action_map.end() != existing_action) {
+          const auto existing_action = window_manager->second->m_action_map.find(key);
+          if (window_manager->second->m_action_map.end() != existing_action) {
               existing_action->second(action);
           }
 
@@ -53,11 +55,6 @@ window_manager::window_manager()
     BOOST_LOG_TRIVIAL(debug) << "window_manager::window_manager()";
     set_refresh_rate(60); // NOLINT(*-magic-numbers)
     BOOST_LOG_TRIVIAL(trace) << "window_manager::window_manager() end";
-}
-
-window_manager &window_manager::instance() {
-    static window_manager static_instance;
-    return static_instance;
 }
 
 renderer &window_manager::get_renderer() {
@@ -72,6 +69,8 @@ void window_manager::init(int width, int height, const char *title) {
     assert(!m_initialized);
 
     m_window = std::make_unique<window>(width, height, title);
+    m_windows_map[m_window->get_window()] = this;
+
     m_window->set_as_context();
     m_window->set_framebuffer_callback(m_resize_handler);
     m_window->set_key_callback(m_key_handler);
