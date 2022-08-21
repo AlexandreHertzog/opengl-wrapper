@@ -132,11 +132,11 @@ class program {
     [[nodiscard]] const use_callback &get_use_callback() const;
 
   private:
-    std::vector<shader> shaders_;
-    unsigned int shader_count_;
-    GLuint id_;
-    bool linked_;
-    use_callback use_callback_;
+    std::vector<shader> m_shaders;
+    unsigned int m_shader_count;
+    GLuint m_id;
+    bool m_linked;
+    use_callback m_use_callback;
 };
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p);

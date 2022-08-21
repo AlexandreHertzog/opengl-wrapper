@@ -4,9 +4,9 @@
 #include <string>
 
 namespace opengl_wrapper {
-class Formatter {
+class formatter {
   public:
-    static std::string formatGlfwErrorCode(int error_code);
+    static std::string format_glfw_error_code(int error_code);
 };
 } // namespace opengl_wrapper
 

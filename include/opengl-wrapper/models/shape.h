@@ -33,10 +33,10 @@ class shape {
     [[nodiscard]] const textures_t &get_textures() const;
 
   private:
-    std::vector<vertex> vertices_;
-    std::vector<unsigned> indices_;
+    std::vector<vertex> m_vertices;
+    std::vector<unsigned> m_indices;
     std::shared_ptr<vertex_array> m_vertex_array;
-    std::shared_ptr<program> program_;
+    std::shared_ptr<program> m_program;
     textures_t m_textures;
 };
 

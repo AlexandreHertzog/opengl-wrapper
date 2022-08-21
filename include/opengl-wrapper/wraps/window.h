@@ -95,7 +95,7 @@ class window {
     [[nodiscard]] const GLFWwindow *get_window() const;
 
   private:
-    GLFWwindow *window_;
+    GLFWwindow *m_window;
 };
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window &w);

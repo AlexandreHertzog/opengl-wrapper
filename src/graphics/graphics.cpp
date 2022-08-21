@@ -4,17 +4,17 @@
 
 namespace opengl_wrapper {
 
-std::unique_ptr<graphics> graphics::api_;
+std::unique_ptr<graphics> graphics::m_api;
 
 graphics &graphics::instance() {
-    if (nullptr == api_) {
-        api_ = std::unique_ptr<graphics>(new graphics());
+    if (nullptr == m_api) {
+        m_api = std::unique_ptr<graphics>(new graphics());
     }
-    return *api_;
+    return *m_api;
 }
 
 void graphics::set_api(graphics *a) {
-    api_.reset(a);
+    m_api.reset(a);
 }
 
 void graphics::gl_activate_texture(GLenum texture) {

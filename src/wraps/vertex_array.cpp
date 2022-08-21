@@ -69,12 +69,12 @@ void vertex_array::load(const std::vector<vertex> &vertices, const std::vector<u
     graphics::instance().gl_enable_vertex_attrib_array(0);
 
     graphics::instance().gl_vertex_attrib_pointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),
-                                                  reinterpret_cast<void *>(sizeof(vertex::pos_))); // NOLINT
+                                                  reinterpret_cast<void *>(sizeof(vertex::m_pos))); // NOLINT
     graphics::instance().gl_enable_vertex_attrib_array(1);
 
     graphics::instance().gl_vertex_attrib_pointer(
         2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex),
-        reinterpret_cast<void *>(sizeof(vertex::pos_) + sizeof(vertex::col_))); // NOLINT
+        reinterpret_cast<void *>(sizeof(vertex::m_pos) + sizeof(vertex::m_col))); // NOLINT
 
     graphics::instance().gl_enable_vertex_attrib_array(2);
 }

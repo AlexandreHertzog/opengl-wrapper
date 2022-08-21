@@ -8,15 +8,15 @@
 
 namespace opengl_wrapper {
 
-const GLFWerrorfun gl_manager::error_handler_ = [](int error_code, // NOLINT(cert-err58-cpp)
-                                                   const char *description) {
-    BOOST_LOG_TRIVIAL(error) << "GLFW error: error_code=" << Formatter::formatGlfwErrorCode(error_code)
+const GLFWerrorfun gl_manager::m_error_handler = [](int error_code, // NOLINT(cert-err58-cpp)
+                                                    const char *description) {
+    BOOST_LOG_TRIVIAL(error) << "GLFW error: error_code=" << formatter::format_glfw_error_code(error_code)
                              << ", description=\"" << description << "\"";
 };
 
 gl_manager::gl_manager() {
     BOOST_LOG_TRIVIAL(debug) << "gl_manager::gl_manager()";
-    if (nullptr != graphics::instance().glfw_set_error_callback(gl_manager::error_handler_)) {
+    if (nullptr != graphics::instance().glfw_set_error_callback(gl_manager::m_error_handler)) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting previous error callback";
     }
 

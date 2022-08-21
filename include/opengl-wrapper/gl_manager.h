@@ -32,7 +32,7 @@ class gl_manager {
      */
     gl_manager();
 
-    static const GLFWerrorfun error_handler_;
+    static const GLFWerrorfun m_error_handler;
 };
 
 } // namespace opengl_wrapper

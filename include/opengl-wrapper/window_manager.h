@@ -82,14 +82,14 @@ class window_manager {
     void set_wireframe_mode(bool wireframe);
 
   private:
-    GLFWframebuffersizefun resize_handler_;
-    GLFWkeyfun key_handler_;
-    std::map<int, Action> action_map_;
-    bool initialized_;
-    double frame_time_us_;
+    GLFWframebuffersizefun m_resize_handler;
+    GLFWkeyfun m_key_handler;
+    std::map<int, Action> m_action_map;
+    bool m_initialized;
+    double m_frame_time_us;
 
-    std::unique_ptr<window> window_;
-    std::unique_ptr<renderer> renderer_;
+    std::unique_ptr<window> m_window;
+    std::unique_ptr<renderer> m_renderer;
 
     window_manager();
 };

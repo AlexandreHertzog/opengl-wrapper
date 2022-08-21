@@ -10,90 +10,91 @@
 
 namespace opengl_wrapper {
 
-program::program() : shader_count_(0), id_(graphics::instance().gl_create_program()), linked_(false) {
+program::program() : m_shader_count(0), m_id(graphics::instance().gl_create_program()), m_linked(false) {
     BOOST_LOG_TRIVIAL(trace) << "program::program " << *this;
 }
 
 program::program(program &&other) noexcept
-    : shaders_(std::move(other.shaders_)), shader_count_(other.shader_count_), id_(other.id_), linked_(other.linked_) {
+    : m_shaders(std::move(other.m_shaders)), m_shader_count(other.m_shader_count), m_id(other.m_id),
+      m_linked(other.m_linked) {
 
     BOOST_LOG_TRIVIAL(trace) << "program::program " << *this << " other=" << other;
 
-    other.shader_count_ = 0;
-    other.id_ = 0;
-    other.linked_ = false;
+    other.m_shader_count = 0;
+    other.m_id = 0;
+    other.m_linked = false;
 }
 
 program::~program() {
     BOOST_LOG_TRIVIAL(trace) << "program::~program " << *this;
-    if (0 != id_) {
-        graphics::instance().gl_delete_program(id_);
+    if (0 != m_id) {
+        graphics::instance().gl_delete_program(m_id);
     }
 }
 
 program &program::operator=(program &&other) noexcept {
     BOOST_LOG_TRIVIAL(trace) << "program::operator= " << *this << " other=" << other;
 
-    this->shaders_ = std::move(other.shaders_);
+    this->m_shaders = std::move(other.m_shaders);
 
-    this->shader_count_ = other.shader_count_;
-    other.shader_count_ = 0;
+    this->m_shader_count = other.m_shader_count;
+    other.m_shader_count = 0;
 
-    this->id_ = other.id_;
-    other.id_ = 0;
+    this->m_id = other.m_id;
+    other.m_id = 0;
 
-    this->linked_ = other.linked_;
-    other.linked_ = false;
+    this->m_linked = other.m_linked;
+    other.m_linked = false;
 
     return *this;
 }
 
 bool program::operator==(const opengl_wrapper::program &other) const {
     BOOST_LOG_TRIVIAL(trace) << "program::operator== " << *this << " other=" << other;
-    return this->id_ == other.id_;
+    return this->m_id == other.m_id;
 }
 
 void program::add_shader(shader shader) {
     BOOST_LOG_TRIVIAL(trace) << "program::add_shader " << *this << " shader= " << shader;
-    if (0 == id_) {
-        id_ = graphics::instance().gl_create_program();
-        assert(0 == shader_count_);
+    if (0 == m_id) {
+        m_id = graphics::instance().gl_create_program();
+        assert(0 == m_shader_count);
     }
 
-    graphics::instance().gl_attach_shader(id_, shader.get_id());
-    shaders_.emplace_back(std::move(shader));
-    shader_count_++;
+    graphics::instance().gl_attach_shader(m_id, shader.get_id());
+    m_shaders.emplace_back(std::move(shader));
+    m_shader_count++;
 }
 
 void program::link() {
     BOOST_LOG_TRIVIAL(trace) << "program::link " << *this;
     constexpr auto error_string_length = 512;
 
-    assert(0 != id_);
+    assert(0 != m_id);
 
-    graphics::instance().gl_link_program(id_);
+    graphics::instance().gl_link_program(m_id);
 
     int success = 0;
     std::array<char, error_string_length> message = {'\0'};
 
-    graphics::instance().gl_get_programiv(id_, GL_LINK_STATUS, &success);
+    graphics::instance().gl_get_programiv(m_id, GL_LINK_STATUS, &success);
     if (GL_FALSE == success) {
-        graphics::instance().gl_get_program_info_log(id_, message.size(), nullptr, message.data());
+        graphics::instance().gl_get_program_info_log(m_id, message.size(), nullptr, message.data());
         throw gl_error(message.data());
     }
 
-    shaders_.clear();
-    linked_ = true;
+    m_shaders.clear();
+    m_linked = true;
 }
 
 void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
     BOOST_LOG_TRIVIAL(trace) << "program::set_use_callback " << *this << " callback=" << &callback;
-    use_callback_ = std::move(callback);
+    m_use_callback = std::move(callback);
 }
 
 int program::get_uniform_location(const char *var_name) const {
     BOOST_LOG_TRIVIAL(trace) << "program::get_uniform_location " << *this << " var_name=" << std::quoted(var_name);
-    return graphics::instance().gl_get_uniform_location(id_, var_name);
+    return graphics::instance().gl_get_uniform_location(m_id, var_name);
 }
 
 void program::set_uniform(const char *var_name, int value) {
@@ -106,26 +107,26 @@ void program::set_uniform(const char *var_name, const float *value) {
 
 void program::use() { // NOLINT(readability-make-member-function-const)
     BOOST_LOG_TRIVIAL(trace) << "program::use " << *this;
-    graphics::instance().gl_use_program(id_);
-    if (use_callback_) {
-        use_callback_(*this);
+    graphics::instance().gl_use_program(m_id);
+    if (m_use_callback) {
+        m_use_callback(*this);
     }
 }
 
 const std::vector<shader> &program::get_shaders() const {
-    return shaders_;
+    return m_shaders;
 }
 
 GLuint program::get_id() const {
-    return id_;
+    return m_id;
 }
 
 bool program::get_linked() const {
-    return linked_;
+    return m_linked;
 }
 
 const program::use_callback &program::get_use_callback() const {
-    return use_callback_;
+    return m_use_callback;
 }
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p) {

@@ -10,14 +10,14 @@
 
 namespace opengl_wrapper {
 
-shader::shader(GLenum type, const char *source) : id_(graphics::instance().gl_create_shader(type)) {
+shader::shader(GLenum type, const char *source) : m_id(graphics::instance().gl_create_shader(type)) {
     BOOST_LOG_TRIVIAL(trace) << "shader::shader " << *this << " type=" << type << " source=" << std::quoted(source);
     if (source != nullptr) {
         compile(source);
     }
 }
 
-shader::shader(GLenum type, const std::filesystem::path &shader_path) : id_(0) {
+shader::shader(GLenum type, const std::filesystem::path &shader_path) : m_id(0) {
     BOOST_LOG_TRIVIAL(trace) << "shader::shader " << *this << " type=" << type
                              << " source=" << std::quoted(shader_path.string());
 
@@ -31,31 +31,31 @@ shader::shader(GLenum type, const std::filesystem::path &shader_path) : id_(0) {
 
     std::string code = shader_stream.str();
 
-    id_ = graphics::instance().gl_create_shader(type);
+    m_id = graphics::instance().gl_create_shader(type);
     compile(code.c_str());
 }
 
-shader::shader(shader &&other) noexcept : id_(other.id_) {
+shader::shader(shader &&other) noexcept : m_id(other.m_id) {
     BOOST_LOG_TRIVIAL(trace) << "shader::shader " << *this << " other=" << other;
-    other.id_ = 0;
+    other.m_id = 0;
 }
 
 shader::~shader() {
     BOOST_LOG_TRIVIAL(trace) << "shader::~shader " << *this;
-    if (0 != id_) {
-        graphics::instance().gl_delete_shader(id_);
+    if (0 != m_id) {
+        graphics::instance().gl_delete_shader(m_id);
     }
 }
 
 shader &shader::operator=(shader &&other) noexcept {
     BOOST_LOG_TRIVIAL(trace) << "shader::operator= " << *this << " other=" << other;
-    this->id_ = other.id_;
-    other.id_ = 0;
+    this->m_id = other.m_id;
+    other.m_id = 0;
     return *this;
 }
 
 GLuint shader::get_id() const {
-    return id_;
+    return m_id;
 }
 
 void shader::compile(const char *source) { // NOLINT(readability-make-member-function-const)
@@ -64,15 +64,15 @@ void shader::compile(const char *source) { // NOLINT(readability-make-member-fun
 
     constexpr auto error_string_length = 512;
 
-    graphics::instance().gl_shader_source(id_, 1, &source, nullptr);
-    graphics::instance().gl_compile_shader(id_);
+    graphics::instance().gl_shader_source(m_id, 1, &source, nullptr);
+    graphics::instance().gl_compile_shader(m_id);
 
     int success = 0;
     std::array<char, error_string_length> message = {'\0'};
 
-    graphics::instance().gl_get_shaderiv(id_, GL_COMPILE_STATUS, &success);
+    graphics::instance().gl_get_shaderiv(m_id, GL_COMPILE_STATUS, &success);
     if (GL_FALSE == success) {
-        graphics::instance().gl_get_shader_info_log(id_, message.size(), nullptr, message.data());
+        graphics::instance().gl_get_shader_info_log(m_id, message.size(), nullptr, message.data());
         throw gl_error(message.data());
     }
 }

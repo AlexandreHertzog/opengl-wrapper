@@ -4,7 +4,7 @@
 #include <sstream>
 
 namespace opengl_wrapper {
-std::string Formatter::formatGlfwErrorCode(int error_code) {
+std::string formatter::format_glfw_error_code(int error_code) {
     constexpr auto glfw_error_str_length = 8;
 
     std::stringstream stream;

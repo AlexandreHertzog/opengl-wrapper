@@ -62,7 +62,7 @@ class shader {
     [[nodiscard]] GLuint get_id() const;
 
   private:
-    GLuint id_;
+    GLuint m_id;
 
     void compile(const char *source);
 };

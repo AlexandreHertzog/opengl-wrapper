@@ -561,7 +561,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
     virtual int glfw_window_should_close(GLFWwindow *window);
 
   protected:
-    static std::unique_ptr<graphics> api_;
+    static std::unique_ptr<graphics> m_api;
 
     graphics() = default;
 };
