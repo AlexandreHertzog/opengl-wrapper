@@ -79,6 +79,8 @@ class window_manager {
      */
     void render_loop() noexcept;
 
+    void set_wireframe_mode(bool wireframe);
+
   private:
     GLFWframebuffersizefun resize_handler_;
     GLFWkeyfun key_handler_;

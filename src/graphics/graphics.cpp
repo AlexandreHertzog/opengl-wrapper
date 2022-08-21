@@ -177,6 +177,11 @@ void graphics::gl_link_program(GLuint program) {
     glLinkProgram(program);
 }
 
+void graphics::gl_polygon_mode(GLenum face, GLenum mode) {
+    BOOST_LOG_TRIVIAL(trace) << "gl_polygon_mode face=" << face << " mode=" << mode;
+    glPolygonMode(face, mode);
+}
+
 void graphics::gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) {
     BOOST_LOG_TRIVIAL(trace) << "gl_shader_source shader=" << shader << " count=" << count << " string=" << string
                              << " length=" << length;

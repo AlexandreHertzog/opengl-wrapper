@@ -27,6 +27,14 @@ int main() {
             }
         });
 
+        bool wireframe = true;
+        window.set_key_action(GLFW_KEY_BACKSPACE, [&](int action) {
+            if (GLFW_PRESS == action) {
+                window.set_wireframe_mode(wireframe);
+                wireframe = !wireframe;
+            }
+        });
+
         auto square_program = std::make_shared<opengl_wrapper::program>();
 
         square_program->add_shader(

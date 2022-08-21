@@ -152,4 +152,12 @@ void window_manager::set_refresh_rate(int refresh_rate) noexcept {
     frame_time_us_ = s_to_us_multiplier / refresh_rate;
 }
 
+void window_manager::set_wireframe_mode(bool wireframe) {
+    if (wireframe) {
+        graphics::instance().gl_polygon_mode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        graphics::instance().gl_polygon_mode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
 } // namespace opengl_wrapper

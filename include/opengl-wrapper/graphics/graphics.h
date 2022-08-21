@@ -315,6 +315,16 @@ class graphics {
     virtual void gl_link_program(GLuint program);
 
     /**
+     * @brief select a polygon rasterization mode. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPolygonMode.xhtml
+     * @param face Specifies the polygons that mode applies to. Must be GL_FRONT_AND_BACK for front- and back-facing
+     * polygons.
+     * @param mode Specifies how polygons will be rasterized. Accepted values are GL_POINT, GL_LINE, and GL_FILL. The
+     * initial value is GL_FILL for both front- and back-facing polygons.
+     */
+    virtual void gl_polygon_mode(GLenum face, GLenum mode);
+
+    /**
      * @brief Replaces the source code in a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml
      * @param shader Specifies the handle of the shader object whose source code is to be replaced.
