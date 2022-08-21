@@ -1,10 +1,10 @@
 #include "window_manager.h"
 
-#include "models/shape.h"
-#include "opengl-wrapper/graphics/graphics.h"
-#include "opengl-wrapper/utils/glad_error.h"
+#include "data_types/shape.h"
+#include "data_types/window.h"
+#include "graphics/graphics.h"
 #include "renderer.h"
-#include "wraps/window.h"
+#include "utils/glad_error.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
 #include <chrono>

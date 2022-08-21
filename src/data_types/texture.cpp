@@ -1,10 +1,10 @@
-#include "opengl-wrapper/textures/texture.h"
+#include "opengl-wrapper/data_types/texture.h"
 
 #include <cassert>
 
 namespace opengl_wrapper {
 
-texture::texture(GLenum target, GLuint id, int unit) : m_id(id), m_target(target), m_unit(unit) {
+texture::texture(uint32_t target, GLuint id, int unit) : m_id(id), m_target(target), m_unit(unit) {
     graphics::instance().gl_gen_textures(1, &m_id);
 }
 
@@ -37,7 +37,7 @@ void texture::bind() { // NOLINT(readability-make-member-function-const)
     graphics::instance().gl_bind_texture(m_target, m_id);
 }
 
-void texture::set_parameter(GLenum pname, GLint param) { // NOLINT(readability-make-member-function-const)
+void texture::set_parameter(uint32_t pname, GLint param) { // NOLINT(readability-make-member-function-const)
     assert(m_id != 0);
     assert(m_target != 0);
 
@@ -45,7 +45,7 @@ void texture::set_parameter(GLenum pname, GLint param) { // NOLINT(readability-m
 }
 
 void texture::set_image( // NOLINT(readability-make-member-function-const)
-    GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type,
+    GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, uint32_t format, uint32_t type,
     const void *data) {
 
     assert(m_id != 0);

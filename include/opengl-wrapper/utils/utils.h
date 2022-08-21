@@ -6,12 +6,6 @@
 #include <sstream>
 #include <vector>
 
-#include "opengl-wrapper/wraps/buffer.h"
-#include "opengl-wrapper/wraps/program.h"
-#include "opengl-wrapper/wraps/shader.h"
-#include "opengl-wrapper/wraps/vertex_array.h"
-#include "opengl-wrapper/wraps/window.h"
-
 namespace opengl_wrapper {
 
 template <typename TYPE> std::string between(const TYPE &t, char begin, char end) {

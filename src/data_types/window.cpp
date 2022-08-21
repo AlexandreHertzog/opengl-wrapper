@@ -1,7 +1,7 @@
 #include "window.h"
 
-#include "opengl-wrapper/graphics/graphics.h"
-#include "opengl-wrapper/utils/glfw_error.h"
+#include "graphics/graphics.h"
+#include "utils/glfw_error.h"
 #include "utils/utils.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>

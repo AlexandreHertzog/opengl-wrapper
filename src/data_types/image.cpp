@@ -1,4 +1,4 @@
-#include "image.h"
+#include "opengl-wrapper/data_types/image.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 

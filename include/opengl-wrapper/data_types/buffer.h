@@ -11,6 +11,13 @@ namespace opengl_wrapper {
 class buffer {
   public:
     /**
+     * @brief Builds a large amount of buffers at the same time.
+     * @param amount Amount of buffers.
+     * @return Vector with the new buffers.
+     */
+    static std::vector<buffer> build(size_t amount);
+
+    /**
      * @brief Construct a new buffer object.
      *
      * @param id The buffer id.

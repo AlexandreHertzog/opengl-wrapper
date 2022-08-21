@@ -1,10 +1,20 @@
-#include "buffer.h"
+#include "opengl-wrapper/data_types/buffer.h"
 
-#include "opengl-wrapper/graphics/graphics.h"
 #include "utils/utils.h"
 #include <cassert>
 
 namespace opengl_wrapper {
+
+std::vector<buffer> buffer::build(size_t amount) {
+    std::vector<GLuint> ids(amount);
+    graphics::instance().gl_gen_buffers(amount, ids.data());
+
+    std::vector<buffer> ret(amount);
+    for (int i = 0; i < amount; ++i) {
+        ret[i] = buffer(ids[i]);
+    }
+    return ret;
+}
 
 buffer::buffer(GLenum target, GLuint id) : m_target(target), m_id(id) {
     BOOST_LOG_TRIVIAL(trace) << "buffer::buffer " << *this << " target=" << m_target << " id=" << m_id;

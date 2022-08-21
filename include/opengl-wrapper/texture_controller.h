@@ -1,7 +1,7 @@
 #ifndef OPENGL_WRAPPER_TEXTURE_CONTROLLER_H
 #define OPENGL_WRAPPER_TEXTURE_CONTROLLER_H
 
-#include "texture.h"
+#include "opengl-wrapper/data_types/texture.h"
 #include <filesystem>
 #include <memory>
 #include <vector>

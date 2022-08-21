@@ -1,14 +1,14 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cert-err58-cpp" // No need to validate allocation problems here, it is a test program.
 
+#include "opengl-wrapper/data_types/program.h"
+#include "opengl-wrapper/data_types/shader.h"
+#include "opengl-wrapper/data_types/shape.h"
 #include "opengl-wrapper/gl_manager.h"
 #include "opengl-wrapper/graphics/graphics.h"
-#include "opengl-wrapper/models/shape.h"
 #include "opengl-wrapper/renderer.h"
-#include "opengl-wrapper/textures/texture_controller.h"
+#include "opengl-wrapper/texture_controller.h"
 #include "opengl-wrapper/window_manager.h"
-#include "opengl-wrapper/wraps/program.h"
-#include "opengl-wrapper/wraps/shader.h"
 #include <filesystem>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

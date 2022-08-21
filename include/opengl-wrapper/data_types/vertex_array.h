@@ -2,9 +2,7 @@
 #define OPENGL_WRAPPER_WRAPS_VERTEX_ARRAYS_H
 
 #include "buffer.h"
-#include "opengl-wrapper/graphics/graphics.h"
-#include "opengl-wrapper/models/vertex.h"
-#include <array>
+#include "vertex.h"
 #include <ostream>
 #include <vector>
 
@@ -13,12 +11,19 @@ namespace opengl_wrapper {
 class vertex_array {
   public:
     /**
+     * @brief Builds a large amount of vertex arrays at the same time.
+     * @param amount Amount of vertex arrays.
+     * @return Vector with the new vertex arrays.
+     */
+    static std::vector<vertex_array> build(size_t amount);
+
+    /**
      * @brief Construct a new vertex_arrays object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenVertexArrays.xhtml
      *
      * @param size Number of vertex arrays to be generated.
      */
-    explicit vertex_array(std::vector<std::shared_ptr<buffer>> buffers = {}, GLuint id = 0);
+    explicit vertex_array(GLuint id = 0);
 
     /**
      * @brief vertex_arrays move-constructor.
@@ -70,7 +75,7 @@ class vertex_array {
 
   private:
     GLuint m_id;
-    std::vector<std::shared_ptr<buffer>> m_buffers;
+    std::vector<buffer> m_buffers;
 };
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_array &va);

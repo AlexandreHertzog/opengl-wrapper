@@ -1,8 +1,8 @@
-#include "program.h"
+#include "opengl-wrapper/data_types/program.h"
 
+#include "opengl-wrapper/data_types/shader.h"
 #include "opengl-wrapper/graphics/graphics.h"
 #include "opengl-wrapper/utils/gl_error.h"
-#include "shader.h"
 #include "utils/utils.h"
 #include <algorithm>
 #include <boost/log/trivial.hpp>

@@ -42,58 +42,32 @@ target_link_libraries(opengl-wrapper-graphics
         PRIVATE Boost::log
         )
 
-add_library(opengl-wrapper-textures
-        src/textures/texture.cpp
-        src/textures/texture_controller.cpp
-        src/textures/image.cpp
+add_library(opengl-wrapper-data-types
+        src/data_types/buffer.cpp
+        src/data_types/image.cpp
+        src/data_types/program.cpp
+        src/data_types/shader.cpp
+        src/data_types/shape.cpp
+        src/data_types/texture.cpp
+        src/data_types/vertex.cpp
+        src/data_types/vertex_array.cpp
+        src/data_types/window.cpp
         )
 
-target_include_directories(opengl-wrapper-textures
+target_include_directories(opengl-wrapper-data-types
         PUBLIC include
-        PRIVATE include/opengl-wrapper/textures
+        PRIVATE include/opengl-wrapper include/opengl-wrapper/data_types
         )
 
-target_link_libraries(opengl-wrapper-textures
-        PRIVATE opengl-wrapper-graphics stb opengl-wrapper-utils
-        )
-
-add_library(opengl-wrapper-models
-        src/models/vertex.cpp
-        src/models/shape.cpp
-        )
-
-target_include_directories(opengl-wrapper-models
-        PUBLIC include
-        PRIVATE include/opengl-wrapper/models
-        )
-
-target_link_libraries(opengl-wrapper-models
-        PRIVATE opengl-wrapper-graphics
-        )
-
-add_library(opengl-wrapper-wraps
-        src/wraps/buffer.cpp
-        src/wraps/program.cpp
-        src/wraps/shader.cpp
-        src/wraps/vertex_array.cpp
-        src/wraps/window.cpp
-        src/wraps/buffer_controller.cpp
-        src/wraps/vertex_array_controller.cpp
-        )
-
-target_include_directories(opengl-wrapper-wraps
-        PUBLIC include
-        PRIVATE include/opengl-wrapper/wraps include/opengl-wrapper
-        )
-
-target_link_libraries(opengl-wrapper-wraps
-        PUBLIC glad opengl-wrapper-utils
-        PRIVATE Boost::log
+target_link_libraries(opengl-wrapper-data-types
+        PUBLIC Boost::log opengl-wrapper-graphics
+        PRIVATE opengl-wrapper-utils stb
         )
 
 add_library(opengl-wrapper
         src/gl_manager.cpp
         src/renderer.cpp
+        src/texture_controller.cpp
         src/window_manager.cpp
         )
 
@@ -103,7 +77,7 @@ target_include_directories(opengl-wrapper
         )
 
 target_link_libraries(opengl-wrapper
-        PUBLIC glad glfw opengl-wrapper-wraps opengl-wrapper-models opengl-wrapper-textures
+        PUBLIC opengl-wrapper-data-types opengl-wrapper-graphics
         PRIVATE opengl-wrapper-utils Boost::log
         )
 

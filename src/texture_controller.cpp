@@ -1,7 +1,7 @@
 #include "texture_controller.h"
 
-#include "image.h"
-#include "texture.h"
+#include "data_types/image.h"
+#include "data_types/texture.h"
 #include <cassert>
 
 namespace opengl_wrapper {
