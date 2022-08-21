@@ -99,10 +99,20 @@ void graphics::gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays) {
     glDeleteVertexArrays(n, arrays);
 }
 
+void graphics::gl_draw_arrays(GLenum mode, GLint first, GLsizei count) {
+    BOOST_LOG_TRIVIAL(trace) << "gl_draw_arrays mode=" << mode << " first=" << first << " count=" << count;
+    glDrawArrays(mode, first, count);
+}
+
 void graphics::gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) {
     BOOST_LOG_TRIVIAL(trace) << "gl_draw_elements mode=" << mode << " count=" << count << " type=" << type
                              << " indices=" << indices;
     glDrawElements(mode, count, type, indices);
+}
+
+void graphics::gl_enable(GLenum cap) {
+    BOOST_LOG_TRIVIAL(trace) << "gl_enable cap=" << cap;
+    glEnable(cap);
 }
 
 void graphics::gl_enable_vertex_attrib_array(GLuint index) {

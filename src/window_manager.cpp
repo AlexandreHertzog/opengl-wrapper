@@ -101,11 +101,13 @@ void window_manager::render_loop() noexcept {
 
     renderer_->load_vertices();
 
+    graphics::instance().gl_enable(GL_DEPTH_TEST);
+
     while (1 != window_->get_should_close()) {
         auto start_time = std::chrono::high_resolution_clock::now();
 
         graphics::instance().gl_clear_color(0.2F, 0.2F, 0.2F, 1.0F);
-        graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT);
+        graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderer_->draw();
 

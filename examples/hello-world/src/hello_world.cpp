@@ -38,11 +38,48 @@ int main() {
         square_program->link();
 
         opengl_wrapper::shape square;
-        square.add_vertex({{0.5F, 0.5F, 0.0F}, {1.0F, 0.0F, 0.0F}, {1.0F, 1.0F}});
-        square.add_vertex({{0.5F, -0.5F, 0.0F}, {0.0F, 1.0F, 0.0F}, {1.0F, 0.0F}});
-        square.add_vertex({{-0.5F, -0.5F, 0.0F}, {0.0F, 0.0F, 1.0F}, {0.0F, 0.0F}});
-        square.add_vertex({{-0.5F, 0.5F, 0.0F}, {1.0F, 1.0F, 1.0F}, {0.0F, 1.0F}});
-        square.set_draw_order({0, 1, 3, 1, 2, 3});
+        square.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 0.0F}});
+        square.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 0.0F}});
+
+        square.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
+        square.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
+
+        square.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
+        square.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+
+        square.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
+        square.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+
+        square.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
+        square.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+
+        square.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+        square.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
+        square.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
+        square.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {0.0F, 0.0F}});
+        square.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {0.0F, 1.0F}});
+
         square.set_program(square_program);
 
         auto container_texture = window.get_renderer().add_texture("textures/container.jpg", GL_TEXTURE0);
@@ -53,10 +90,18 @@ int main() {
         square.get_program()->set_uniform("texture2", 1);
 
         square.get_program()->set_use_callback([](opengl_wrapper::program &p) {
-            auto transform = glm::mat4(1.0F);
-            transform = glm::translate(transform, glm::vec3(0.5F, -0.5F, 0.0F));
-            transform = glm::rotate(transform, static_cast<float>(glfwGetTime()), glm::vec3(0.0F, 0.0F, 1.0F));
-            p.set_uniform("transform", glm::value_ptr(transform));
+            auto model = glm::mat4(1.0F);
+            model = glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0F),
+                                glm::vec3(0.5F, 1.0F, 0.0F));
+
+            auto view = glm::mat4(1.0F);
+            view = glm::translate(view, glm::vec3(0.0F, 0.0F, -3.0F));
+
+            auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
+
+            p.set_uniform("model", glm::value_ptr(model));
+            p.set_uniform("view", glm::value_ptr(view));
+            p.set_uniform("projection", glm::value_ptr(projection));
         });
 
         square.set_textures({std::move(container_texture), std::move(awesomeface_texture)});

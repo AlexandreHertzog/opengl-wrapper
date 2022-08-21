@@ -33,7 +33,12 @@ void renderer::draw() {
         shape.get_program()->use();
         shape.get_vertex_array()->bind();
 
-        graphics::instance().gl_draw_elements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT, nullptr);
+        if (!shape.get_draw_order().empty()) {
+            graphics::instance().gl_draw_elements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT,
+                                                  nullptr);
+        } else {
+            graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, 36);
+        }
     }
 }
 

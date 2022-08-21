@@ -174,6 +174,17 @@ class graphics {
     virtual void gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays);
 
     /**
+     * @brief render primitives from array data. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArrays.xhtml
+     * @param mode Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP,
+     * GL_LINE_LOOP, GL_LINES, GL_LINE_STRIP_ADJACENCY, GL_LINES_ADJACENCY, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN,
+     * GL_TRIANGLES, GL_TRIANGLE_STRIP_ADJACENCY, GL_TRIANGLES_ADJACENCY and GL_PATCHES are accepted.
+     * @param first Specifies the starting index in the enabled arrays.
+     * @param count Specifies the number of indices to be rendered.
+     */
+    virtual void gl_draw_arrays(GLenum mode, GLint first, GLsizei count);
+
+    /**
      * @brief render primitives from array data.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml
      * @param mode Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP,
@@ -185,6 +196,13 @@ class graphics {
      * @param indices Specifies a pointer to the location where the indices are stored.
      */
     virtual void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices);
+
+    /**
+     * @brief enable or disable server-side GL capabilities. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
+     * @param cap Specifies a symbolic constant indicating a GL capability.
+     */
+    virtual void gl_enable(GLenum cap);
 
     /**
      * @brief Enable or disable a generic vertex attribute array
