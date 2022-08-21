@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_EXCEPTIONS_GLAD_ERROR_H
-#define OPENGL_WRAPPER_EXCEPTIONS_GLAD_ERROR_H
+#pragma once
 
 #include "exception.h"
 
@@ -11,5 +10,3 @@ class glad_error : public exception {
 };
 
 } // namespace opengl_wrapper
-
-#endif

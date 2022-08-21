@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_WRAPS_PROGRAM_H
-#define OPENGL_WRAPPER_WRAPS_PROGRAM_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <functional>
@@ -142,5 +141,3 @@ class program {
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p);
 
 } // namespace opengl_wrapper
-
-#endif

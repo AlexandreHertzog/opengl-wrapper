@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_RENDERER_H
-#define OPENGL_WRAPPER_RENDERER_H
+#pragma once
 
 #include "opengl-wrapper/data_types/program.h"
 #include "texture_controller.h"
@@ -50,5 +49,3 @@ class renderer {
 };
 
 } // namespace opengl_wrapper
-
-#endif

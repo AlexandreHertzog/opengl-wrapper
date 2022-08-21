@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_WRAPS_WINDOW_H
-#define OPENGL_WRAPPER_WRAPS_WINDOW_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <functional>
@@ -101,5 +100,3 @@ class window {
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window &w);
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_WRAPS_WINDOW_H

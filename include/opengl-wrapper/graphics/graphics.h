@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_GRAPHICS_H
-#define OPENGL_WRAPPER_GRAPHICS_H
+#pragma once
 
 #include "glad/glad.h"
 
@@ -567,5 +566,3 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
 };
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_GRAPHICS_H

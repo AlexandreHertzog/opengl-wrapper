@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_GL_MANAGER_H
-#define OPENGL_WRAPPER_GL_MANAGER_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <stdexcept>
@@ -36,5 +35,3 @@ class gl_manager {
 };
 
 } // namespace opengl_wrapper
-
-#endif

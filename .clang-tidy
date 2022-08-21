@@ -3,5 +3,5 @@ Checks: 'clang-analyzer*,cert*,cppcore*,misc*,performance*,portability*,
         readability*,-readability-identifier-length
         google*,
         hicpp*,
-        llvm-*,
+        llvm-*,-llvm-header-guard
         modernize-*,-modernize-use-trailing-return-type'

@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_SHAPE_H
-#define OPENGL_WRAPPER_SHAPE_H
+#pragma once
 
 #include "vertex.h"
 #include "vertex_array.h"
@@ -49,5 +48,3 @@ class shape {
 };
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_SHAPE_H

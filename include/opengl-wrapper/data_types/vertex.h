@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_VERTEX_H
-#define OPENGL_WRAPPER_VERTEX_H
+#pragma once
 
 #include <array>
 
@@ -16,5 +15,3 @@ struct vertex {
 };
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_VERTEX_H

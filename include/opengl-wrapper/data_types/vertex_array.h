@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_WRAPS_VERTEX_ARRAYS_H
-#define OPENGL_WRAPPER_WRAPS_VERTEX_ARRAYS_H
+#pragma once
 
 #include "buffer.h"
 #include "vertex.h"
@@ -81,5 +80,3 @@ class vertex_array {
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_array &va);
 
 } // namespace opengl_wrapper
-
-#endif

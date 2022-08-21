@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_WRAPS_BUFFER_H
-#define OPENGL_WRAPPER_WRAPS_BUFFER_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <boost/log/trivial.hpp>
@@ -94,5 +93,3 @@ class buffer {
 std::ostream &operator<<(std::ostream &s, const opengl_wrapper::buffer &b);
 
 } // namespace opengl_wrapper
-
-#endif

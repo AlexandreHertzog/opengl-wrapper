@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_IMAGE_H
-#define OPENGL_WRAPPER_IMAGE_H
+#pragma once
 
 #include <filesystem>
 
@@ -66,5 +65,3 @@ class image {
 };
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_IMAGE_H

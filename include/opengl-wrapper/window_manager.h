@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_WINDOW_MANAGER_H
-#define OPENGL_WRAPPER_WINDOW_MANAGER_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <functional>
@@ -95,5 +94,3 @@ class window_manager {
 };
 
 } // namespace opengl_wrapper
-
-#endif

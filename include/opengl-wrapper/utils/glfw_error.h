@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_EXCEPTIONS_GLFW_ERROR_H
-#define OPENGL_WRAPPER_EXCEPTIONS_GLFW_ERROR_H
+#pragma once
 
 #include "exception.h"
 
@@ -11,5 +10,3 @@ class glfw_error : public exception {
 };
 
 } // namespace opengl_wrapper
-
-#endif

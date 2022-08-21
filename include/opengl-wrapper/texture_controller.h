@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_TEXTURE_CONTROLLER_H
-#define OPENGL_WRAPPER_TEXTURE_CONTROLLER_H
+#pragma once
 
 #include "opengl-wrapper/data_types/texture.h"
 #include <filesystem>
@@ -29,5 +28,3 @@ class texture_controller {
 };
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_TEXTURE_CONTROLLER_H

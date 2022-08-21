@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_TEXTURE_H
-#define OPENGL_WRAPPER_TEXTURE_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <vector>
@@ -80,5 +79,3 @@ class texture {
 };
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_TEXTURE_H

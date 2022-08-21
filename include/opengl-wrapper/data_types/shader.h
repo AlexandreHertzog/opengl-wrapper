@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_WRAPS_SHADER_H
-#define OPENGL_WRAPPER_WRAPS_SHADER_H
+#pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <filesystem>
@@ -70,5 +69,3 @@ class shader {
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::shader &s);
 
 } // namespace opengl_wrapper
-
-#endif

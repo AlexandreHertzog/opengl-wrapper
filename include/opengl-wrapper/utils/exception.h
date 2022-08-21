@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_EXCEPTIONS_EXCEPTION_H
-#define OPENGL_WRAPPER_EXCEPTIONS_EXCEPTION_H
+#pragma once
 
 #include <stdexcept>
 
@@ -11,5 +10,3 @@ class exception : public std::runtime_error {
 };
 
 } // namespace opengl_wrapper
-
-#endif

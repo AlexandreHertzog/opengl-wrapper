@@ -1,5 +1,4 @@
-#ifndef OPENGL_WRAPPER_UTILS_UTILS_H
-#define OPENGL_WRAPPER_UTILS_UTILS_H
+#pragma once
 
 #include <algorithm>
 #include <ostream>
@@ -41,5 +40,3 @@ template <typename TYPE> std::ostream &operator<<(std::ostream &stream, const st
 }
 
 } // namespace opengl_wrapper
-
-#endif // OPENGL_WRAPPER_UTILS_UTILS_H
