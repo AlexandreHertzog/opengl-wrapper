@@ -10,6 +10,9 @@
 #include "opengl-wrapper/wraps/program.h"
 #include "opengl-wrapper/wraps/shader.h"
 #include <filesystem>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 int main() {
@@ -48,6 +51,14 @@ int main() {
         square.get_program()->use();
         square.get_program()->set_uniform("texture1", 0);
         square.get_program()->set_uniform("texture2", 1);
+
+        square.get_program()->set_use_callback([](opengl_wrapper::program &p) {
+            auto transform = glm::mat4(1.0F);
+            transform = glm::translate(transform, glm::vec3(0.5F, -0.5F, 0.0F));
+            transform = glm::rotate(transform, static_cast<float>(glfwGetTime()), glm::vec3(0.0F, 0.0F, 1.0F));
+            p.set_uniform("transform", glm::value_ptr(transform));
+        });
+
         square.set_textures({std::move(container_texture), std::move(awesomeface_texture)});
 
         window.get_renderer().add_shape(std::move(square));

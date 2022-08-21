@@ -100,6 +100,10 @@ void program::set_uniform(const char *var_name, int value) {
     graphics::instance().gl_uniform1i(get_uniform_location(var_name), value);
 }
 
+void program::set_uniform(const char *var_name, const float *value) {
+    graphics::instance().gl_uniform_matrix_4fv(get_uniform_location(var_name), 1, GL_FALSE, value);
+}
+
 void program::use() { // NOLINT(readability-make-member-function-const)
     BOOST_LOG_TRIVIAL(trace) << "program::use " << *this;
     graphics::instance().gl_use_program(id_);

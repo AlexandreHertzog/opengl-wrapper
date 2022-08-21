@@ -374,6 +374,21 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
     virtual void gl_uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 
     /**
+     * @brief Specify the value of a uniform variable for the current program object.
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param location Specifies the location of the uniform variable to be modified.
+     * @param count For the vector (glUniform*v) commands, specifies the number of elements that are to be modified.
+     * This should be 1 if the targeted uniform variable is not an array, and 1 or more if it is an array. For the
+     * matrix (glUniformMatrix*) commands, specifies the number of matrices that are to be modified. This should be 1 if
+     * the targeted uniform variable is not an array of matrices, and 1 or more if it is an array of matrices.
+     * @param transpose For the matrix commands, specifies whether to transpose the matrix as the values are loaded into
+     * the uniform variable.
+     * @param value For the vector and matrix commands, specifies a pointer to an array of count values that will be
+     * used to update the specified uniform variable.
+     */
+    virtual void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+
+    /**
      * @brief Installs a program object as part of current rendering state
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml
      * @param program Specifies the handle of the program object whose executables are to be used as part of current

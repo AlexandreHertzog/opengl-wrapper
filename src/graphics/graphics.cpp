@@ -199,6 +199,11 @@ void graphics::gl_uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, 
     glUniform4f(location, v0, v1, v2, v3);
 }
 
+void graphics::gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+    BOOST_LOG_TRIVIAL(trace) << "gl_uniform4fv location=" << location << " count=" << count << " value=" << value;
+    glUniformMatrix4fv(location, count, transpose, value);
+}
+
 void graphics::gl_use_program(GLuint program) {
     BOOST_LOG_TRIVIAL(trace) << "gl_use_program program=" << program;
     glUseProgram(program);
