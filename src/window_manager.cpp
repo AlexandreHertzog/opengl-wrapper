@@ -159,4 +159,8 @@ void window_manager::set_wireframe_mode(bool wireframe) {
     }
 }
 
+camera &window_manager::get_camera() {
+    return m_camera;
+}
+
 } // namespace opengl_wrapper

@@ -52,6 +52,7 @@ add_library(opengl-wrapper-data-types
         src/data_types/vertex.cpp
         src/data_types/vertex_array.cpp
         src/data_types/window.cpp
+        src/data_types/camera.cpp
         )
 
 target_include_directories(opengl-wrapper-data-types
@@ -60,7 +61,7 @@ target_include_directories(opengl-wrapper-data-types
         )
 
 target_link_libraries(opengl-wrapper-data-types
-        PUBLIC Boost::log opengl-wrapper-graphics
+        PUBLIC Boost::log opengl-wrapper-graphics glm
         PRIVATE opengl-wrapper-utils stb
         )
 

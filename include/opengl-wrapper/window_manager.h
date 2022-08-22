@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opengl-wrapper/data_types/camera.h"
 #include "opengl-wrapper/data_types/window.h"
 #include "opengl-wrapper/graphics/graphics.h"
 #include <functional>
@@ -74,6 +75,8 @@ class window_manager {
 
     void set_wireframe_mode(bool wireframe);
 
+    camera &get_camera();
+
   private:
     static std::map<const void *, window_manager *> m_windows_map;
     GLFWframebuffersizefun m_resize_handler;
@@ -81,6 +84,7 @@ class window_manager {
     std::map<int, Action> m_action_map;
     bool m_initialized;
     double m_frame_time_us;
+    camera m_camera;
 
     std::unique_ptr<window> m_window;
     std::unique_ptr<renderer> m_renderer;

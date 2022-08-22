@@ -33,6 +33,40 @@ int main() {
             }
         });
 
+        constexpr auto camera_speed = 0.05F;
+        auto &camera = window.get_camera();
+        camera.set_position(glm::vec3(0.0F, 0.0F, 3.0F));
+
+        window.set_key_action(GLFW_KEY_W, [&](int action) {
+            if (GLFW_PRESS == action) {
+                // HACK: this should've been +
+                camera.set_position(camera.get_position() - camera_speed * camera.get_target());
+            }
+        });
+
+        window.set_key_action(GLFW_KEY_S, [&](int action) {
+            if (GLFW_PRESS == action) {
+                // HACK: this should've been -
+                camera.set_position(camera.get_position() + camera_speed * camera.get_target());
+            }
+        });
+
+        window.set_key_action(GLFW_KEY_A, [&](int action) {
+            if (GLFW_PRESS == action) {
+                // HACK: this should've been -
+                camera.set_position(camera.get_position() +
+                                    camera_speed * glm::normalize(glm::cross(camera.get_target(), camera.get_up())));
+            }
+        });
+
+        window.set_key_action(GLFW_KEY_D, [&](int action) {
+            if (GLFW_PRESS == action) {
+                // HACK: this should've been +
+                camera.set_position(camera.get_position() -
+                                    camera_speed * glm::normalize(glm::cross(camera.get_target(), camera.get_up())));
+            }
+        });
+
         auto square_program = std::make_shared<opengl_wrapper::program>();
 
         square_program->add_shader(
@@ -107,8 +141,7 @@ int main() {
             model = glm::translate(model, cube_positions.at(cube_index));
             model = glm::rotate(model, glm::radians(20.0F * cube_index), glm::vec3(1.0F, 0.3F, 0.5F));
 
-            auto view = glm::mat4(1.0F);
-            view = glm::translate(view, glm::vec3(0.0F, 0.0F, -3.0F));
+            auto view = camera.look_at(camera.get_position() + glm::vec3(0.0f, 0.0f, -1.0f));
 
             auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
 
