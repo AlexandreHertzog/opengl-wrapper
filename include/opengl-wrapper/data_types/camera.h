@@ -6,7 +6,7 @@ namespace opengl_wrapper {
 
 class camera {
   public:
-    explicit camera(glm::vec3 position = {}, glm::vec3 target = {});
+    explicit camera(glm::vec3 position = {}, glm::vec3 target = {}, glm::vec3 up = {});
     glm::mat4 look_at(glm::vec3 target);
 
     void set_position(glm::vec3 position);
@@ -20,8 +20,6 @@ class camera {
   private:
     glm::vec3 m_position;
     glm::vec3 m_target;
-    glm::vec3 m_direction;
-    glm::vec3 m_right;
     glm::vec3 m_up;
 };
 

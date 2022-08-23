@@ -33,37 +33,35 @@ int main() {
             }
         });
 
-        constexpr auto camera_speed = 0.05F;
+        constexpr auto camera_speed = 0.1F;
+        constexpr auto camera_front = glm::vec3(0.0, 0.0, -1.0);
         auto &camera = window.get_camera();
         camera.set_position(glm::vec3(0.0F, 0.0F, 3.0F));
+        camera.set_up(glm::vec3(0.0, 1.0, 0.0));
 
         window.set_key_action(GLFW_KEY_W, [&](int action) {
-            if (GLFW_PRESS == action) {
-                // HACK: this should've been +
-                camera.set_position(camera.get_position() - camera_speed * camera.get_target());
+            if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
+                camera.set_position(camera.get_position() + camera_speed * camera_front);
             }
         });
 
         window.set_key_action(GLFW_KEY_S, [&](int action) {
-            if (GLFW_PRESS == action) {
-                // HACK: this should've been -
-                camera.set_position(camera.get_position() + camera_speed * camera.get_target());
+            if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
+                camera.set_position(camera.get_position() - camera_speed * camera_front);
             }
         });
 
         window.set_key_action(GLFW_KEY_A, [&](int action) {
-            if (GLFW_PRESS == action) {
-                // HACK: this should've been -
-                camera.set_position(camera.get_position() +
-                                    camera_speed * glm::normalize(glm::cross(camera.get_target(), camera.get_up())));
+            if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
+                camera.set_position(camera.get_position() -
+                                    camera_speed * glm::normalize(glm::cross(camera_front, camera.get_up())));
             }
         });
 
         window.set_key_action(GLFW_KEY_D, [&](int action) {
-            if (GLFW_PRESS == action) {
-                // HACK: this should've been +
-                camera.set_position(camera.get_position() -
-                                    camera_speed * glm::normalize(glm::cross(camera.get_target(), camera.get_up())));
+            if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
+                camera.set_position(camera.get_position() +
+                                    camera_speed * glm::normalize(glm::cross(camera_front, camera.get_up())));
             }
         });
 
@@ -141,7 +139,7 @@ int main() {
             model = glm::translate(model, cube_positions.at(cube_index));
             model = glm::rotate(model, glm::radians(20.0F * cube_index), glm::vec3(1.0F, 0.3F, 0.5F));
 
-            auto view = camera.look_at(camera.get_position() + glm::vec3(0.0f, 0.0f, -1.0f));
+            auto view = camera.look_at(camera.get_position() + camera_front);
 
             auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
 
