@@ -71,6 +71,14 @@ void window::set_key_callback(GLFWkeyfun fun) {
     }
 }
 
+void window::set_cursor_pos_callback(GLFWcursorposfun fun) {
+    BOOST_LOG_TRIVIAL(trace) << "window::set_cursor_pos_callback " << *this << " fun=" << fun;
+    assert(nullptr != m_window);
+    if (nullptr != graphics::instance().glfw_set_cursor_pos_callback(m_window, fun)) {
+        BOOST_LOG_TRIVIAL(info) << "Overwriting previous cursor position callback";
+    }
+}
+
 void window::set_should_close(int should_close) {
     BOOST_LOG_TRIVIAL(trace) << "window::set_should_close " << *this << " should_close=" << should_close;
     assert(m_window != nullptr);
@@ -87,6 +95,12 @@ void window::swap_buffers() {
     BOOST_LOG_TRIVIAL(trace) << "window::swap_buffers " << *this;
     assert(m_window != nullptr);
     graphics::instance().glfw_swap_buffers(m_window);
+}
+
+void window::set_input_mode(int mode, int value) {
+    BOOST_LOG_TRIVIAL(trace) << "window::set_input_mode " << *this << " mode=" << mode << " value=" << value;
+    assert(nullptr != m_window);
+    graphics::instance().glfw_set_input_mode(m_window, mode, value);
 }
 
 const GLFWwindow *window::get_window() const {

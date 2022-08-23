@@ -25,44 +25,77 @@ int main() {
             }
         });
 
-        bool wireframe = true;
+        bool wireframe = false;
         window.set_key_action(GLFW_KEY_BACKSPACE, [&](int action) {
             if (GLFW_PRESS == action) {
-                window.set_wireframe_mode(wireframe);
                 wireframe = !wireframe;
+                window.set_wireframe_mode(wireframe);
+            }
+        });
+
+        bool cursor_enabled = false;
+        window.set_cursor_enabled(cursor_enabled);
+        window.set_key_action(GLFW_KEY_SPACE, [&](int action) {
+            if (GLFW_PRESS == action) {
+                cursor_enabled = !cursor_enabled;
+                window.set_cursor_enabled(cursor_enabled);
             }
         });
 
         constexpr auto camera_speed = 0.1F;
-        constexpr auto camera_front = glm::vec3(0.0, 0.0, -1.0);
         auto &camera = window.get_camera();
         camera.set_position(glm::vec3(0.0F, 0.0F, 3.0F));
         camera.set_up(glm::vec3(0.0, 1.0, 0.0));
 
         window.set_key_action(GLFW_KEY_W, [&](int action) {
             if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
-                camera.set_position(camera.get_position() + camera_speed * camera_front);
+                camera.set_position(camera.get_position() + camera_speed * camera.get_front());
             }
         });
 
         window.set_key_action(GLFW_KEY_S, [&](int action) {
             if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
-                camera.set_position(camera.get_position() - camera_speed * camera_front);
+                camera.set_position(camera.get_position() - camera_speed * camera.get_front());
             }
         });
 
         window.set_key_action(GLFW_KEY_A, [&](int action) {
             if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
                 camera.set_position(camera.get_position() -
-                                    camera_speed * glm::normalize(glm::cross(camera_front, camera.get_up())));
+                                    camera_speed * glm::normalize(glm::cross(camera.get_front(), camera.get_up())));
             }
         });
 
         window.set_key_action(GLFW_KEY_D, [&](int action) {
             if ((GLFW_PRESS == action) || (GLFW_REPEAT == action)) {
                 camera.set_position(camera.get_position() +
-                                    camera_speed * glm::normalize(glm::cross(camera_front, camera.get_up())));
+                                    camera_speed * glm::normalize(glm::cross(camera.get_front(), camera.get_up())));
             }
+        });
+
+        bool first_cursor_iteration = true;
+        double last_cursor_xpos = 0.0;
+        double last_cursor_ypos = 0.0;
+        auto pitch = 0.0;
+        auto yaw = -90.0;
+        window.set_cursor_position_callback([&](double xpos, double ypos) {
+            if (first_cursor_iteration) {
+                last_cursor_xpos = xpos;
+                last_cursor_ypos = ypos;
+                first_cursor_iteration = false;
+            }
+
+            constexpr auto sensitivity = 0.1;
+            const auto xpos_offset = (xpos - last_cursor_xpos) * sensitivity;
+            const auto ypos_offset = (last_cursor_ypos - ypos) * sensitivity;
+
+            last_cursor_xpos = xpos;
+            last_cursor_ypos = ypos;
+
+            yaw += xpos_offset;
+            pitch = std::max(std::min(pitch + ypos_offset, 89.0), -89.0);
+
+            camera.set_front(pitch, yaw);
         });
 
         auto square_program = std::make_shared<opengl_wrapper::program>();
@@ -139,7 +172,7 @@ int main() {
             model = glm::translate(model, cube_positions.at(cube_index));
             model = glm::rotate(model, glm::radians(20.0F * cube_index), glm::vec3(1.0F, 0.3F, 0.5F));
 
-            auto view = camera.look_at(camera.get_position() + camera_front);
+            auto view = camera.look_at(camera.get_position() + camera.get_front());
 
             auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
 

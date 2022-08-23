@@ -50,7 +50,21 @@ window_manager::window_manager()
           BOOST_LOG_TRIVIAL(trace) << "window_manager::key_handler_(window=" << window << ", key=" << key
                                    << ", scancode=" << scancode << ", mods=" << mods << ") end";
       }),
-      m_initialized(false), m_frame_time_us(0.0) {
+      m_cursor_pos_handler([](GLFWwindow *window, double xpos, double ypos) {
+          BOOST_LOG_TRIVIAL(debug) << "window_manager::window_manager m_cursor_position_handler window=" << window
+                                   << " xpos=" << xpos << " ypos=" << ypos;
+
+          auto window_manager = m_windows_map.find(window);
+          if (m_windows_map.end() == window_manager) {
+              BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
+              return;
+          }
+
+          if (window_manager->second->m_app_cursor_pos_callback) {
+              (*window_manager->second->m_app_cursor_pos_callback)(xpos, ypos);
+          }
+      }),
+      m_initialized(false), m_frame_time_us(0.0), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}) {
 
     BOOST_LOG_TRIVIAL(debug) << "window_manager::window_manager()";
     set_refresh_rate(60); // NOLINT(*-magic-numbers)
@@ -74,6 +88,7 @@ void window_manager::init(int width, int height, const char *title) {
     m_window->set_as_context();
     m_window->set_framebuffer_callback(m_resize_handler);
     m_window->set_key_callback(m_key_handler);
+    m_window->set_cursor_pos_callback(m_cursor_pos_handler);
 
     if (0 == gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) { //  NOLINT(*-reinterpret-cast)
         BOOST_LOG_TRIVIAL(trace) << "window_manager::init(width=" << width << ", height=" << height
@@ -130,7 +145,7 @@ void window_manager::render_loop() noexcept {
     BOOST_LOG_TRIVIAL(trace) << "window_manager::render_loop() end";
 }
 
-void window_manager::set_key_action(int key, Action action) noexcept {
+void window_manager::set_key_action(int key, key_callback_t action) noexcept {
     auto existing_action = m_action_map.find(key);
     if (m_action_map.end() != existing_action) {
         BOOST_LOG_TRIVIAL(info) << "Overwriting callback for key " << key;
@@ -140,9 +155,17 @@ void window_manager::set_key_action(int key, Action action) noexcept {
     }
 }
 
+void window_manager::set_cursor_position_callback(window_manager::cursor_pos_callback_t callback) {
+    m_app_cursor_pos_callback = std::make_unique<cursor_pos_callback_t>(std::move(callback));
+}
+
 void window_manager::set_window_should_close(int value) noexcept {
     assert(m_initialized);
     m_window->set_should_close(value);
+}
+
+void window_manager::set_cursor_enabled(bool enabled) {
+    m_window->set_input_mode(GLFW_CURSOR, enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 }
 
 void window_manager::set_refresh_rate(int refresh_rate) noexcept {

@@ -19,7 +19,15 @@ class window_manager {
      * @param int GLFW_PRESS, GLFW_RELEASE or GLFW_REPEAT
      *
      */
-    using Action = std::function<void(int)>;
+    using key_callback_t = std::function<void(int)>;
+
+    /**
+     * @brief The action to be ran on a cursor position update.
+     *
+     * @param double x position
+     * @param double y position
+     */
+    using cursor_pos_callback_t = std::function<void(double, double)>;
 
     window_manager();
     ~window_manager() = default;
@@ -50,7 +58,13 @@ class window_manager {
      * @param key GLFW respective key
      * @param action Action to be ran upon key
      */
-    void set_key_action(int key, Action action) noexcept;
+    void set_key_action(int key, key_callback_t action) noexcept;
+
+    /**
+     * @brief Sets the callback for when the cursor moves.
+     * @param callback Callback to be called.
+     */
+    void set_cursor_position_callback(cursor_pos_callback_t callback);
 
     /**
      * @brief Set the window_manager Should Close object. Requires init() to be called
@@ -59,6 +73,12 @@ class window_manager {
      * @param value
      */
     void set_window_should_close(int value) noexcept;
+
+    /**
+     * @brief Enables or disables the cursor. Disabling means capturing the cursor and hiding it.
+     * @param enabled
+     */
+    void set_cursor_enabled(bool enabled);
 
     /**
      * @brief Sets the window refresh rate, in hertz.
@@ -81,13 +101,15 @@ class window_manager {
     static std::map<const void *, window_manager *> m_windows_map;
     GLFWframebuffersizefun m_resize_handler;
     GLFWkeyfun m_key_handler;
-    std::map<int, Action> m_action_map;
+    GLFWcursorposfun m_cursor_pos_handler;
+    std::map<int, key_callback_t> m_action_map;
     bool m_initialized;
     double m_frame_time_us;
     camera m_camera;
 
     std::unique_ptr<window> m_window;
     std::unique_ptr<renderer> m_renderer;
+    std::unique_ptr<cursor_pos_callback_t> m_app_cursor_pos_callback;
 };
 
 } // namespace opengl_wrapper

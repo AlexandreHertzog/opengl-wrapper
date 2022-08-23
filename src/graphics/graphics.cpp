@@ -287,6 +287,11 @@ void graphics::glfw_poll_events() {
     glfwPollEvents();
 }
 
+GLFWcursorposfun graphics::glfw_set_cursor_pos_callback(GLFWwindow *window, GLFWcursorposfun fun) {
+    BOOST_LOG_TRIVIAL(trace) << "glfw_set_cursor_pos_callback window=" << window << " fun=" << fun;
+    return glfwSetCursorPosCallback(window, fun);
+}
+
 GLFWerrorfun graphics::glfw_set_error_callback(GLFWerrorfun callback) {
     BOOST_LOG_TRIVIAL(trace) << "glfw_set_error_callback callback=" << callback;
     return glfwSetErrorCallback(callback);
@@ -295,6 +300,11 @@ GLFWerrorfun graphics::glfw_set_error_callback(GLFWerrorfun callback) {
 GLFWframebuffersizefun graphics::glfw_set_framebuffer_size_callback(GLFWwindow *window, GLFWframebuffersizefun cbfun) {
     BOOST_LOG_TRIVIAL(trace) << "glfw_set_framebuffer_size_callback window=" << window << " cbfun=" << cbfun;
     return glfwSetFramebufferSizeCallback(window, cbfun);
+}
+
+void graphics::glfw_set_input_mode(GLFWwindow *window, int mode, int value) {
+    BOOST_LOG_TRIVIAL(trace) << "glfw_set_input_mode window=" << window << " mode=" << mode << " value=" << value;
+    glfwSetInputMode(window, mode, value);
 }
 
 GLFWkeyfun graphics::glfw_set_key_callback(GLFWwindow *window, GLFWkeyfun cbfun) {

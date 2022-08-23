@@ -72,6 +72,13 @@ class window {
     void set_key_callback(GLFWkeyfun fun);
 
     /**
+     * @brief This function sets the cursor position callback of the specified window, which is called when the cursor
+     * is moved. See https://www.glfw.org/docs/3.3/group__input.html#gac1f879ab7435d54d4d79bb469fe225d7
+     * @param fun The new callback, or NULL to remove the currently set callback.
+     */
+    void set_cursor_pos_callback(GLFWcursorposfun fun);
+
+    /**
      * @brief Sets the close flag for the window. See
      * https://www.glfw.org/docs/3.3/group__window.html#ga49c449dde2a6f87d996f4daaa09d6708
      * @param should_close 1 if the window should be closed, 0 otherwise.
@@ -90,6 +97,15 @@ class window {
      * https://www.glfw.org/docs/3.3/group__window.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
      */
     void swap_buffers();
+
+    /**
+     * @brief This function sets an input mode option for the specified window. See
+     * https://www.glfw.org/docs/3.3/group__input.html#gaa92336e173da9c8834558b54ee80563b
+     * @param mode One of GLFW_CURSOR, GLFW_STICKY_KEYS, GLFW_STICKY_MOUSE_BUTTONS, GLFW_LOCK_KEY_MODS or
+     * GLFW_RAW_MOUSE_MOTION.
+     * @param value The new value of the specified input mode.
+     */
+    void set_input_mode(int mode, int value);
 
     [[nodiscard]] const GLFWwindow *get_window() const;
 

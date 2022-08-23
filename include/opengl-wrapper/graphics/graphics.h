@@ -496,6 +496,14 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
     virtual void glfw_poll_events();
 
     /**
+     * @brief This function sets the cursor position callback of the specified window, which is called when the cursor
+     * is moved.
+     * @param window The window whose callback to set.
+     * @param fun The new callback, or NULL to remove the currently set callback.
+     */
+    virtual GLFWcursorposfun glfw_set_cursor_pos_callback(GLFWwindow *window, GLFWcursorposfun fun);
+
+    /**
      * @brief This function sets the error callback, which is called with an error code and a human-readable description
      * each time a GLFW error occurs. https://www.glfw.org/docs/3.3/group__init.html#gaff45816610d53f0b83656092a4034f40
      * @param callback The new callback, or NULL to remove the currently set callback.
@@ -512,6 +520,16 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @return The previously set callback, or NULL if no callback was set or an error occurred.
      */
     virtual GLFWframebuffersizefun glfw_set_framebuffer_size_callback(GLFWwindow *window, GLFWframebuffersizefun cbfun);
+
+    /**
+     * @brief This function sets an input mode option for the specified window. See
+     * https://www.glfw.org/docs/3.3/group__input.html#gaa92336e173da9c8834558b54ee80563b
+     * @param window The window whose input mode to set.
+     * @param mode One of GLFW_CURSOR, GLFW_STICKY_KEYS, GLFW_STICKY_MOUSE_BUTTONS, GLFW_LOCK_KEY_MODS or
+     * GLFW_RAW_MOUSE_MOTION.
+     * @param value The new value of the specified input mode.
+     */
+    virtual void glfw_set_input_mode(GLFWwindow *window, int mode, int value);
 
     /**
      * @brief This function sets the key callback of the specific window, which is called when a key is pressed,
