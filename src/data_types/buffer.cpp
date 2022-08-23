@@ -17,28 +17,23 @@ std::vector<buffer> buffer::build(size_t amount) {
 }
 
 buffer::buffer(GLenum target, GLuint id) : m_target(target), m_id(id) {
-    BOOST_LOG_TRIVIAL(trace) << "buffer::buffer " << *this << " target=" << m_target << " id=" << m_id;
     if (0 == m_id) {
         graphics::instance().gl_gen_buffers(1, &m_id);
     }
 }
 
 buffer::buffer(buffer &&other) noexcept : m_target(other.m_target), m_id(other.m_id) {
-    BOOST_LOG_TRIVIAL(trace) << "buffer::buffer " << *this << " other=" << &other;
-
     other.m_target = 0;
     other.m_id = 0;
 }
 
 buffer::~buffer() {
-    BOOST_LOG_TRIVIAL(trace) << "buffer::~buffer " << *this;
     if (0 != m_id) {
         graphics::instance().gl_delete_buffers(1, &m_id);
     }
 }
 
 buffer &buffer::operator=(buffer &&other) noexcept {
-    BOOST_LOG_TRIVIAL(trace) << "buffer::operator= " << *this << " other=" << &other;
     m_id = other.m_id;
     other.m_id = 0;
 
@@ -48,7 +43,6 @@ buffer &buffer::operator=(buffer &&other) noexcept {
 }
 
 void buffer::bind() {
-    BOOST_LOG_TRIVIAL(trace) << "buffer::bind " << *this;
     assert(0 != m_id);
     assert(0 != m_target);
     graphics::instance().gl_bind_buffer(m_target, m_id);

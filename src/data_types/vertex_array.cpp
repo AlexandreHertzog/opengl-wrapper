@@ -2,7 +2,6 @@
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include "utils/utils.h"
-#include <boost/log/trivial.hpp>
 #include <cassert>
 
 namespace opengl_wrapper {
@@ -19,7 +18,6 @@ std::vector<vertex_array> vertex_array::build(size_t amount) {
 }
 
 vertex_array::vertex_array(GLuint id) : m_id(id), m_buffers(buffer::build(2)) {
-    BOOST_LOG_TRIVIAL(trace) << "vertex_array::vertex_array " << *this << " id=" << id;
     if (0 == m_id) {
         graphics::instance().gl_gen_vertex_arrays(1, &m_id);
     }
@@ -31,19 +29,16 @@ vertex_array::vertex_array(GLuint id) : m_id(id), m_buffers(buffer::build(2)) {
 }
 
 vertex_array::vertex_array(vertex_array &&other) noexcept : m_id(other.m_id), m_buffers(std::move(other.m_buffers)) {
-    BOOST_LOG_TRIVIAL(trace) << "vertex_array::vertex_array " << *this << " other=" << other;
     other.m_id = 0;
 }
 
 vertex_array::~vertex_array() {
-    BOOST_LOG_TRIVIAL(trace) << "vertex_array::~vertex_array " << *this;
     if (0 != m_id) {
         graphics::instance().gl_delete_vertex_arrays(1, &m_id);
     }
 }
 
 vertex_array &vertex_array::operator=(vertex_array &&other) noexcept {
-    BOOST_LOG_TRIVIAL(trace) << "vertex_array::operator= " << *this << " other=" << other;
     m_id = other.m_id;
     other.m_id = 0;
 
@@ -52,7 +47,6 @@ vertex_array &vertex_array::operator=(vertex_array &&other) noexcept {
 }
 
 void vertex_array::bind() {
-    BOOST_LOG_TRIVIAL(trace) << "vertex_array::bind " << *this;
     assert(0 != m_id);
 
     graphics::instance().gl_bind_vertex_array(m_id);

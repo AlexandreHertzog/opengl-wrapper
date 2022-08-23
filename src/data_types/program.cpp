@@ -5,20 +5,16 @@
 #include "opengl-wrapper/utils/gl_error.h"
 #include "utils/utils.h"
 #include <algorithm>
-#include <boost/log/trivial.hpp>
 #include <cassert>
 
 namespace opengl_wrapper {
 
 program::program() : m_shader_count(0), m_id(graphics::instance().gl_create_program()), m_linked(false) {
-    BOOST_LOG_TRIVIAL(trace) << "program::program " << *this;
 }
 
 program::program(program &&other) noexcept
     : m_shaders(std::move(other.m_shaders)), m_shader_count(other.m_shader_count), m_id(other.m_id),
       m_linked(other.m_linked) {
-
-    BOOST_LOG_TRIVIAL(trace) << "program::program " << *this << " other=" << other;
 
     other.m_shader_count = 0;
     other.m_id = 0;
@@ -26,15 +22,12 @@ program::program(program &&other) noexcept
 }
 
 program::~program() {
-    BOOST_LOG_TRIVIAL(trace) << "program::~program " << *this;
     if (0 != m_id) {
         graphics::instance().gl_delete_program(m_id);
     }
 }
 
 program &program::operator=(program &&other) noexcept {
-    BOOST_LOG_TRIVIAL(trace) << "program::operator= " << *this << " other=" << other;
-
     this->m_shaders = std::move(other.m_shaders);
 
     this->m_shader_count = other.m_shader_count;
@@ -50,12 +43,10 @@ program &program::operator=(program &&other) noexcept {
 }
 
 bool program::operator==(const opengl_wrapper::program &other) const {
-    BOOST_LOG_TRIVIAL(trace) << "program::operator== " << *this << " other=" << other;
     return this->m_id == other.m_id;
 }
 
 void program::add_shader(shader shader) {
-    BOOST_LOG_TRIVIAL(trace) << "program::add_shader " << *this << " shader= " << shader;
     if (0 == m_id) {
         m_id = graphics::instance().gl_create_program();
         assert(0 == m_shader_count);
@@ -67,7 +58,6 @@ void program::add_shader(shader shader) {
 }
 
 void program::link() {
-    BOOST_LOG_TRIVIAL(trace) << "program::link " << *this;
     constexpr auto error_string_length = 512;
 
     assert(0 != m_id);
@@ -88,12 +78,10 @@ void program::link() {
 }
 
 void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
-    BOOST_LOG_TRIVIAL(trace) << "program::set_use_callback " << *this << " callback=" << &callback;
     m_use_callback = std::move(callback);
 }
 
 int program::get_uniform_location(const char *var_name) const {
-    BOOST_LOG_TRIVIAL(trace) << "program::get_uniform_location " << *this << " var_name=" << std::quoted(var_name);
     return graphics::instance().gl_get_uniform_location(m_id, var_name);
 }
 
@@ -106,7 +94,6 @@ void program::set_uniform(const char *var_name, const float *value) {
 }
 
 void program::use() { // NOLINT(readability-make-member-function-const)
-    BOOST_LOG_TRIVIAL(trace) << "program::use " << *this;
     graphics::instance().gl_use_program(m_id);
     if (m_use_callback) {
         m_use_callback(*this);

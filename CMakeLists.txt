@@ -61,7 +61,7 @@ target_include_directories(opengl-wrapper-data-types
         )
 
 target_link_libraries(opengl-wrapper-data-types
-        PUBLIC Boost::log opengl-wrapper-graphics glm
+        PUBLIC opengl-wrapper-graphics glm
         PRIVATE opengl-wrapper-utils stb
         )
 

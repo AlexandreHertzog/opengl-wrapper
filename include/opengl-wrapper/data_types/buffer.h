@@ -1,7 +1,6 @@
 #pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
-#include <boost/log/trivial.hpp>
 #include <ostream>
 #include <vector>
 
@@ -63,7 +62,6 @@ class buffer {
      * @param usage Expected usage pattern of the data store.
      */
     template <class TYPE> void load(const std::vector<TYPE> &data, GLenum usage) {
-        BOOST_LOG_TRIVIAL(trace) << "buffer::load " << *this << " data=" << data.size() << ", usage=" << usage;
         graphics::instance().gl_buffer_data(m_target, data.size() * sizeof(TYPE), data.data(), usage);
     }
 

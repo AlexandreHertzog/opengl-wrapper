@@ -16,9 +16,6 @@ std::map<const void *, window_manager *> window_manager::m_windows_map;
 
 window_manager::window_manager()
     : m_resize_handler([](GLFWwindow *window, int width, int height) {
-          BOOST_LOG_TRIVIAL(debug) << "window_manager::resize_handler_(window=" << window << ", width=" << width
-                                   << ", height=" << height << ")";
-
           auto window_manager = m_windows_map.find(window);
           if (m_windows_map.end() == window_manager) {
               BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
@@ -28,14 +25,8 @@ window_manager::window_manager()
           graphics::instance().gl_viewport(0, 0, width, height);
 
           window_manager->second->get_renderer().draw();
-
-          BOOST_LOG_TRIVIAL(trace) << "window_manager::resize_handler_(window=" << window << ", width=" << width
-                                   << ", height=" << height << ") end";
       }),
       m_key_handler([](GLFWwindow *window, int key, int scancode, int action, int mods) {
-          BOOST_LOG_TRIVIAL(debug) << "window_manager::key_handler_(window=" << window << ", key=" << key
-                                   << ", scancode=" << scancode << ", mods=" << mods << ")";
-
           auto window_manager = m_windows_map.find(window);
           if (m_windows_map.end() == window_manager) {
               BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
@@ -46,14 +37,8 @@ window_manager::window_manager()
           if (window_manager->second->m_action_map.end() != existing_action) {
               existing_action->second(action);
           }
-
-          BOOST_LOG_TRIVIAL(trace) << "window_manager::key_handler_(window=" << window << ", key=" << key
-                                   << ", scancode=" << scancode << ", mods=" << mods << ") end";
       }),
       m_cursor_pos_handler([](GLFWwindow *window, double xpos, double ypos) {
-          BOOST_LOG_TRIVIAL(debug) << "window_manager::window_manager m_cursor_position_handler window=" << window
-                                   << " xpos=" << xpos << " ypos=" << ypos;
-
           auto window_manager = m_windows_map.find(window);
           if (m_windows_map.end() == window_manager) {
               BOOST_LOG_TRIVIAL(error) << "Unexpected window: " << window;
@@ -66,9 +51,7 @@ window_manager::window_manager()
       }),
       m_initialized(false), m_frame_time_us(0.0), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}) {
 
-    BOOST_LOG_TRIVIAL(debug) << "window_manager::window_manager()";
     set_refresh_rate(60); // NOLINT(*-magic-numbers)
-    BOOST_LOG_TRIVIAL(trace) << "window_manager::window_manager() end";
 }
 
 renderer &window_manager::get_renderer() {
@@ -103,14 +86,9 @@ void window_manager::init(int width, int height, const char *title) {
     int num_vertex_attributes = 0;
     graphics::instance().gl_get_integerv(GL_MAX_VERTEX_ATTRIBS, &num_vertex_attributes);
     BOOST_LOG_TRIVIAL(info) << "GL_MAX_VERTEX_ATTRIBS = " << num_vertex_attributes;
-
-    BOOST_LOG_TRIVIAL(trace) << "window_manager::init(width=" << width << ", height=" << height << ", title=" << title
-                             << ") end";
 }
 
 void window_manager::render_loop() noexcept {
-    BOOST_LOG_TRIVIAL(debug) << "window_manager::render_loop()";
-
     assert(m_initialized);
 
     m_renderer->load_vertices();
@@ -130,9 +108,6 @@ void window_manager::render_loop() noexcept {
 
         std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
 
-        BOOST_LOG_TRIVIAL(debug) << "render_loop() frame_time_us_=" << m_frame_time_us
-                                 << ", loop_time_us=" << loop_time_us.count();
-
         if (loop_time_us.count() < m_frame_time_us) {
             const auto wait_time_us = m_frame_time_us - loop_time_us.count();
             BOOST_LOG_TRIVIAL(debug) << "Waiting " << wait_time_us << "ms to fill frame_time";
@@ -141,8 +116,6 @@ void window_manager::render_loop() noexcept {
             BOOST_LOG_TRIVIAL(debug) << "loop_time too large, skipping time filler";
         }
     }
-
-    BOOST_LOG_TRIVIAL(trace) << "window_manager::render_loop() end";
 }
 
 void window_manager::set_key_action(int key, key_callback_t action) noexcept {
