@@ -172,6 +172,13 @@ class graphics {
     virtual void gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays);
 
     /**
+     * @brief enable or disable server-side GL capabilities. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
+     * @param cap Specifies a symbolic constant indicating a GL capability.
+     */
+    virtual void gl_disable(GLenum cap);
+
+    /**
      * @brief render primitives from array data. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArrays.xhtml
      * @param mode Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP,

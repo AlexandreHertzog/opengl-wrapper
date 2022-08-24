@@ -101,6 +101,10 @@ void graphics::gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays) {
     glDeleteVertexArrays(n, arrays);
 }
 
+void graphics::gl_disable(GLenum cap) {
+    glDisable(cap);
+}
+
 void graphics::gl_draw_arrays(GLenum mode, GLint first, GLsizei count) {
     glDrawArrays(mode, first, count);
 }
