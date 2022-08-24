@@ -3,7 +3,6 @@
 #include "data_types/shape.h"
 #include "data_types/window.h"
 #include "graphics/graphics.h"
-#include "renderer.h"
 #include "utils/glad_error.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
@@ -23,8 +22,7 @@ window_manager::window_manager()
           }
 
           graphics::instance().gl_viewport(0, 0, width, height);
-
-          window_manager->second->get_renderer().draw();
+          window_manager->second->m_window->draw(window_manager->second->m_shapes);
       }),
       m_key_handler([](GLFWwindow *window, int key, int scancode, int action, int mods) {
           auto window_manager = m_windows_map.find(window);
@@ -54,11 +52,6 @@ window_manager::window_manager()
     set_refresh_rate(60); // NOLINT(*-magic-numbers)
 }
 
-renderer &window_manager::get_renderer() {
-    assert(m_renderer);
-    return *m_renderer;
-}
-
 void window_manager::init(int width, int height, const char *title) {
     BOOST_LOG_TRIVIAL(debug) << "window_manager::init(width=" << width << ", height=" << height << ", title=" << title
                              << ")";
@@ -79,8 +72,6 @@ void window_manager::init(int width, int height, const char *title) {
         throw glad_error("gladLoadGLLoader() failed");
     }
 
-    m_renderer = std::make_unique<renderer>();
-
     m_initialized = true;
 
     int num_vertex_attributes = 0;
@@ -91,7 +82,7 @@ void window_manager::init(int width, int height, const char *title) {
 void window_manager::render_loop() noexcept {
     assert(m_initialized);
 
-    m_renderer->load_vertices();
+    load_vertices();
 
     graphics::instance().gl_enable(GL_DEPTH_TEST);
 
@@ -101,7 +92,7 @@ void window_manager::render_loop() noexcept {
         graphics::instance().gl_clear_color(0.2F, 0.2F, 0.2F, 1.0F);
         graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_renderer->draw();
+        m_window->draw(m_shapes);
 
         m_window->swap_buffers();
         graphics::instance().glfw_poll_events();
@@ -157,6 +148,20 @@ void window_manager::set_wireframe_mode(bool wireframe) {
 
 camera &window_manager::get_camera() {
     return m_camera;
+}
+
+void window_manager::add_shape(shape s) {
+    m_shapes.emplace_back(std::move(s));
+}
+
+void window_manager::load_vertices() {
+    for (auto &shape : m_shapes) {
+        shape.get_vertex_array().load(shape.get_vertices(), shape.get_draw_order(), GL_STATIC_DRAW);
+    }
+}
+
+std::shared_ptr<texture> window_manager::add_texture(const std::filesystem::path &path, int unit) {
+    return m_textures.add_texture(path, unit);
 }
 
 } // namespace opengl_wrapper

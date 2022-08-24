@@ -1,15 +1,17 @@
 #pragma once
 
 #include "opengl-wrapper/data_types/camera.h"
+#include "opengl-wrapper/data_types/program.h"
+#include "opengl-wrapper/data_types/shape.h"
 #include "opengl-wrapper/data_types/window.h"
 #include "opengl-wrapper/graphics/graphics.h"
+#include "texture_controller.h"
+#include <filesystem>
 #include <functional>
 #include <map>
 #include <memory>
 
 namespace opengl_wrapper {
-
-class renderer;
 
 class window_manager {
   public:
@@ -35,13 +37,6 @@ class window_manager {
     window_manager(window_manager &&) = delete;
     window_manager &operator=(const window_manager &) = delete;
     window_manager &operator=(window_manager &&) = delete;
-
-    /**
-     * @brief Returns the renderer associated with this window.
-     *
-     * @return renderer reference.
-     */
-    renderer &get_renderer();
 
     /**
      * @brief Initializes the static window.
@@ -94,6 +89,28 @@ class window_manager {
     void render_loop() noexcept;
 
     void set_wireframe_mode(bool wireframe);
+    /**
+     * @brief Adds first_vertices to the renderer ca cache.
+     *
+     * @param vertices Vertices array.
+     * @param indices Indices for element drawing.
+     * @param program Previously linked program index to be applied to the first_vertices.
+     */
+    void add_shape(shape s);
+
+    /**
+     * @brief Loads first_vertices into OpenGL. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml,
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
+     */
+    void load_vertices();
+
+    /**
+     * @brief Loads a texture from the filesystem into the renderer.
+     * @param path Path to texture.
+     * @return Pointer of the new texture.
+     */
+    std::shared_ptr<texture> add_texture(const std::filesystem::path &path, int unit);
 
     camera &get_camera();
 
@@ -107,8 +124,10 @@ class window_manager {
     double m_frame_time_us;
     camera m_camera;
 
+    std::vector<shape> m_shapes;
+    texture_controller m_textures;
+
     std::unique_ptr<window> m_window;
-    std::unique_ptr<renderer> m_renderer;
     std::unique_ptr<cursor_pos_callback_t> m_app_cursor_pos_callback;
 };
 

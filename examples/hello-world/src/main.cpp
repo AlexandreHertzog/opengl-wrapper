@@ -5,8 +5,6 @@
 #include "opengl-wrapper/data_types/shader.h"
 #include "opengl-wrapper/data_types/shape.h"
 #include "opengl-wrapper/graphics/graphics.h"
-#include "opengl-wrapper/renderer.h"
-#include "opengl-wrapper/texture_controller.h"
 #include "opengl-wrapper/window_manager.h"
 #include <filesystem>
 #include <glm/glm.hpp>
@@ -153,8 +151,8 @@ int main() {
 
         square.set_program(square_program);
 
-        auto container_texture = window.get_renderer().add_texture("textures/container.jpg", GL_TEXTURE0);
-        auto awesomeface_texture = window.get_renderer().add_texture("textures/awesomeface.png", GL_TEXTURE1);
+        auto container_texture = window.add_texture("textures/container.jpg", GL_TEXTURE0);
+        auto awesomeface_texture = window.add_texture("textures/awesomeface.png", GL_TEXTURE1);
 
         square.get_program()->use();
         square.get_program()->set_uniform("texture1", 0);
@@ -188,7 +186,7 @@ int main() {
         square.set_textures({std::move(container_texture), std::move(awesomeface_texture)});
 
         for (auto i = 0; i < cube_positions.size(); i++) {
-            window.get_renderer().add_shape(square);
+            window.add_shape(square);
         }
 
         window.render_loop();

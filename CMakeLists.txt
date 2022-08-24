@@ -66,7 +66,6 @@ target_link_libraries(opengl-wrapper-data-types
         )
 
 add_library(opengl-wrapper
-        src/renderer.cpp
         src/texture_controller.cpp
         src/window_manager.cpp
         )

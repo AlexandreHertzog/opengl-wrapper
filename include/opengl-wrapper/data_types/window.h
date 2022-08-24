@@ -107,6 +107,28 @@ class window {
      */
     void set_input_mode(int mode, int value);
 
+    template <typename TYPE> void draw(TYPE &shapes) {
+        for (auto &shape : shapes) {
+            assert(!shape.get_textures().empty());
+            assert(shape.get_program());
+
+            for (auto &t : shape.get_textures()) {
+                assert(t);
+                t->bind();
+            }
+
+            shape.get_program()->use();
+            shape.get_vertex_array().bind();
+
+            if (!shape.get_draw_order().empty()) {
+                graphics::instance().gl_draw_elements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT,
+                                                      nullptr);
+            } else {
+                graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.get_vertices().size());
+            }
+        }
+    }
+
     [[nodiscard]] const GLFWwindow *get_window() const;
 
   private:
