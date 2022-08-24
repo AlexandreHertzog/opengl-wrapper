@@ -7,7 +7,6 @@
 #include "opengl-wrapper/data_types/shape.h"
 #include "opengl-wrapper/data_types/window.h"
 #include "opengl-wrapper/graphics/graphics.h"
-#include "opengl-wrapper/texture_controller.h"
 #include <boost/log/trivial.hpp>
 #include <csignal>
 #include <filesystem>
@@ -144,11 +143,6 @@ int main() {
 
         cube.set_program(square_program);
 
-        opengl_wrapper::texture_controller tex_controller;
-
-        auto container_texture = tex_controller.add_texture("textures/container.jpg", GL_TEXTURE0);
-        auto awesomeface_texture = tex_controller.add_texture("textures/awesomeface.png", GL_TEXTURE1);
-
         cube.get_program()->use();
         cube.get_program()->set_uniform("texture1", 0);
         cube.get_program()->set_uniform("texture2", 1);
@@ -177,6 +171,12 @@ int main() {
                 cube_index = 0;
             }
         });
+
+        auto container_texture = std::make_shared<opengl_wrapper::texture>(GL_TEXTURE0);
+        container_texture->set_image_from_path("textures/container.jpg");
+
+        auto awesomeface_texture = std::make_shared<opengl_wrapper::texture>(GL_TEXTURE1);
+        awesomeface_texture->set_image_from_path("textures/awesomeface.png");
 
         cube.set_textures({std::move(container_texture), std::move(awesomeface_texture)});
 

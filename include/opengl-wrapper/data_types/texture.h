@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
+#include <filesystem>
 #include <vector>
 
 namespace opengl_wrapper {
@@ -13,7 +14,7 @@ class texture {
      * @param target OpenGL texture target.
      * @param id Texture ID.
      */
-    explicit texture(GLenum target = 0, GLuint id = 0, int unit = 0);
+    explicit texture(int unit = 0, GLenum target = 0, GLuint id = 0);
 
     /**
      * @brief Texture destructor. See
@@ -72,10 +73,19 @@ class texture {
      */
     void generate_mipmap();
 
+    void set_image_from_path(const std::filesystem::path &path);
+
+    [[nodiscard]] GLuint get_id() const;
+    [[nodiscard]] GLenum get_target() const;
+    void set_unit(int unit);
+    [[nodiscard]] int get_unit() const;
+
   private:
     GLuint m_id{};
     GLenum m_target{};
     int m_unit{};
 };
+
+std::ostream &operator<<(std::ostream &os, const texture &t);
 
 } // namespace opengl_wrapper

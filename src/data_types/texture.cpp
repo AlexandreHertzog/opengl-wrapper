@@ -1,10 +1,11 @@
 #include "opengl-wrapper/data_types/texture.h"
+#include "image.h"
 
 #include <cassert>
 
 namespace opengl_wrapper {
 
-texture::texture(uint32_t target, GLuint id, int unit) : m_id(id), m_target(target), m_unit(unit) {
+texture::texture(int unit, GLenum target, GLuint id) : m_id(id), m_target(target), m_unit(unit) {
     graphics::instance().gl_gen_textures(1, &m_id);
 }
 
@@ -58,6 +59,42 @@ void texture::generate_mipmap() { // NOLINT(readability-make-member-function-con
     assert(m_id != 0);
     assert(m_target != 0);
     graphics::instance().gl_generate_mipmap(m_target);
+}
+
+void texture::set_image_from_path(const std::filesystem::path &path) {
+    m_target = GL_TEXTURE_2D;
+
+    bind();
+
+    set_parameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    set_parameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+    set_parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    set_parameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    image i(path);
+    set_image(0, GL_RGB, i.get_width(), i.get_height(), 0, i.has_alpha() ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
+              i.get_data());
+    generate_mipmap();
+}
+
+GLuint texture::get_id() const {
+    return m_id;
+}
+
+GLenum texture::get_target() const {
+    return m_target;
+}
+
+void texture::set_unit(int unit) {
+    m_unit = unit;
+}
+
+int texture::get_unit() const {
+    return m_unit;
+}
+
+std::ostream &operator<<(std::ostream &os, const texture &t) {
+    return os << "texture " << &t << " id=" << t.get_id() << " target=" << t.get_target() << " unit=" << t.get_unit();
 }
 
 } // namespace opengl_wrapper

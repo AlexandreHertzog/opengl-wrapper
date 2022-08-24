@@ -39,7 +39,7 @@ target_include_directories(opengl-wrapper-graphics
 
 target_link_libraries(opengl-wrapper-graphics
         PUBLIC glad glfw
-        PRIVATE Boost::log
+        PRIVATE Boost::log opengl-wrapper-utils
         )
 
 add_library(opengl-wrapper-data-types
@@ -65,19 +65,9 @@ target_link_libraries(opengl-wrapper-data-types
         PRIVATE opengl-wrapper-utils stb
         )
 
-add_library(opengl-wrapper
-        src/texture_controller.cpp
-        )
-
-target_include_directories(opengl-wrapper
-        PUBLIC include
-        PRIVATE include/opengl-wrapper
-        )
-
-target_link_libraries(opengl-wrapper
-        PUBLIC opengl-wrapper-data-types opengl-wrapper-graphics
-        PRIVATE opengl-wrapper-utils Boost::log
-        )
+add_library(opengl-wrapper INTERFACE)
+target_include_directories(opengl-wrapper PUBLIC INTERFACE include)
+target_link_libraries(opengl-wrapper PUBLIC INTERFACE opengl-wrapper-data-types opengl-wrapper-graphics)
 
 if (INCLUDE_EXAMPLES)
     add_subdirectory(examples)
