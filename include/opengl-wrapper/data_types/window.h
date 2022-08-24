@@ -1,7 +1,9 @@
 #pragma once
 
+#include "opengl-wrapper/data_types/program.h"
 #include "opengl-wrapper/data_types/texture.h"
 #include "opengl-wrapper/graphics/graphics.h"
+#include <cassert>
 #include <functional>
 #include <ostream>
 
