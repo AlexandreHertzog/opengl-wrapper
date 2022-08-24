@@ -47,7 +47,7 @@ window_manager::window_manager()
               (*window_manager->second->m_app_cursor_pos_callback)(xpos, ypos);
           }
       }),
-      m_initialized(false), m_frame_time_us(0.0), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}) {
+      m_frame_time_us(0.0), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}) {
 
     set_refresh_rate(60); // NOLINT(*-magic-numbers)
 }
@@ -56,15 +56,13 @@ void window_manager::init(int width, int height, const char *title) {
     BOOST_LOG_TRIVIAL(debug) << "window_manager::init(width=" << width << ", height=" << height << ", title=" << title
                              << ")";
 
-    assert(!m_initialized);
+    assert(!m_window);
 
-    m_window = std::make_unique<window>(width, height, title);
-    m_windows_map[m_window->get_window()] = this;
-
-    m_window->set_as_context();
-    m_window->set_framebuffer_callback(m_resize_handler);
-    m_window->set_key_callback(m_key_handler);
-    m_window->set_cursor_pos_callback(m_cursor_pos_handler);
+    auto new_window = std::make_unique<window>(width, height, title);
+    new_window->set_as_context();
+    new_window->set_framebuffer_callback(m_resize_handler);
+    new_window->set_key_callback(m_key_handler);
+    new_window->set_cursor_pos_callback(m_cursor_pos_handler);
 
     if (0 == gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) { //  NOLINT(*-reinterpret-cast)
         BOOST_LOG_TRIVIAL(trace) << "window_manager::init(width=" << width << ", height=" << height
@@ -72,7 +70,8 @@ void window_manager::init(int width, int height, const char *title) {
         throw glad_error("gladLoadGLLoader() failed");
     }
 
-    m_initialized = true;
+    m_window = std::move(new_window);
+    m_windows_map[m_window->get_window()] = this;
 
     int num_vertex_attributes = 0;
     graphics::instance().gl_get_integerv(GL_MAX_VERTEX_ATTRIBS, &num_vertex_attributes);
@@ -80,7 +79,7 @@ void window_manager::init(int width, int height, const char *title) {
 }
 
 void window_manager::render_loop() noexcept {
-    assert(m_initialized);
+    assert(m_window);
 
     load_vertices();
 
@@ -124,7 +123,7 @@ void window_manager::set_cursor_position_callback(window_manager::cursor_pos_cal
 }
 
 void window_manager::set_window_should_close(int value) noexcept {
-    assert(m_initialized);
+    assert(m_window);
     m_window->set_should_close(value);
 }
 

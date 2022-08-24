@@ -120,7 +120,6 @@ class window_manager {
     GLFWkeyfun m_key_handler;
     GLFWcursorposfun m_cursor_pos_handler;
     std::map<int, key_callback_t> m_action_map;
-    bool m_initialized;
     double m_frame_time_us;
     camera m_camera;
 
