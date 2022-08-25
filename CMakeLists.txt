@@ -29,8 +29,8 @@ target_link_libraries(opengl-wrapper-utils
         )
 
 add_library(opengl-wrapper-graphics
-        src/graphics/graphics.cpp
-        )
+        src/graphics/ogl_graphics.cpp
+        src/graphics/graphics.cpp)
 
 target_include_directories(opengl-wrapper-graphics
         PUBLIC include
@@ -72,3 +72,5 @@ target_link_libraries(opengl-wrapper PUBLIC INTERFACE opengl-wrapper-data-types 
 if (INCLUDE_EXAMPLES)
     add_subdirectory(examples)
 endif ()
+
+add_subdirectory(test)

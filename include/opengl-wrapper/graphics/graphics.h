@@ -4,19 +4,16 @@
 
 #include <GLFW/glfw3.h>
 #include <memory>
+#include <vector>
 
 namespace opengl_wrapper {
 
 class graphics {
   public:
-    graphics(const graphics &) = delete;
-    graphics(graphics &&) = delete;
-    virtual ~graphics();
-
-    graphics &operator=(graphics &&) = delete;
-    graphics &operator=(const graphics &) = delete;
+    virtual ~graphics() = default;
 
     static graphics &instance();
+    static void set_instance(graphics *instance);
 
     /**
      * @brief select active texture unit
@@ -24,7 +21,7 @@ class graphics {
      * dependent, but must be at least 80. texture must be one of GL_TEXTUREi, where i ranges from zero to the value of
      * GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS minus one. The initial value is GL_TEXTURE0.
      */
-    virtual void gl_activate_texture(GLenum texture);
+    virtual void gl_activate_texture(GLenum texture) = 0;
 
     /**
      * @brief Attaches a shader object to a program object
@@ -32,7 +29,7 @@ class graphics {
      * @param program Specifies the program object to which a shader object will be attached.
      * @param shader Specifies the shader object that is to be attached.
      */
-    virtual void gl_attach_shader(GLuint program, GLuint shader);
+    virtual void gl_attach_shader(GLuint program, GLuint shader) = 0;
 
     /**
      * @brief bind a named buffer object
@@ -41,7 +38,7 @@ class graphics {
      * targets in the following table:
      * @param buffer Specifies the name of a buffer object.
      */
-    virtual void gl_bind_buffer(GLenum target, GLuint buffer);
+    virtual void gl_bind_buffer(GLenum target, GLuint buffer) = 0;
 
     /**
      * @brief bind a named texture_coord to a texturing target
@@ -52,14 +49,14 @@ class graphics {
      * GL_TEXTURE_2D_MULTISAMPLE_ARRAY.
      * @param texture Specifies the name of a texture_coord.
      */
-    virtual void gl_bind_texture(GLenum target, GLuint texture);
+    virtual void gl_bind_texture(GLenum target, GLuint texture) = 0;
 
     /**
      * @brief bind a vertex array object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindVertexArray.xhtml
      * @param array Specifies the name of the vertex array to bind
      */
-    virtual void gl_bind_vertex_array(GLuint array);
+    virtual void gl_bind_vertex_array(GLuint array) = 0;
 
     /**
      * @brief creates and initializes a buffer object's data store.
@@ -73,7 +70,7 @@ class graphics {
      * GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, GL_DYNAMIC_DRAW,
      * GL_DYNAMIC_READ, or GL_DYNAMIC_COPY.
      */
-    virtual void gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+    virtual void gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLenum usage) = 0;
 
     /**
      * @brief clear buffers to preset values.
@@ -81,7 +78,7 @@ class graphics {
      * @param mask Bitwise OR of masks that indicate the buffers to be cleared. The three masks are GL_COLOR_BUFFER_BIT,
      * GL_DEPTH_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
      */
-    virtual void gl_clear(GLbitfield mask);
+    virtual void gl_clear(GLbitfield mask) = 0;
 
     /**
      * @brief specify clear values for the color buffers.
@@ -95,14 +92,14 @@ class graphics {
      * @param alpha Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial
      * values are all 0.
      */
-    virtual void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    virtual void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) = 0;
 
     /**
      * @brief Compiles a shader object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml
      * @param shader Specifies the shader object to be compiled.
      */
-    virtual void gl_compile_shader(GLuint shader);
+    virtual void gl_compile_shader(GLuint shader) = 0;
 
     /**
      * @brief Creates a program object.
@@ -113,7 +110,7 @@ class graphics {
      * will be used to create a program (for instance, checking the compatibility between a vertex shader and a fragment
      * shader). When no longer needed as part of a program object, shader objects can be detached.
      */
-    virtual GLuint gl_create_program();
+    virtual GLuint gl_create_program() = 0;
 
     /**
      * @brief Creates a shader object
@@ -131,7 +128,7 @@ class graphics {
      * geometry processor. A shader of type GL_FRAGMENT_SHADER is a shader that is intended to run on the programmable
      * fragment processor.
      */
-    virtual GLuint gl_create_shader(GLenum shader_type);
+    virtual GLuint gl_create_shader(GLenum shader_type) = 0;
 
     /**
      * @brief delete named buffer objects.
@@ -139,21 +136,21 @@ class graphics {
      * @param n Specifies the number of buffer objects to be deleted.
      * @param buffers Specifies an array of buffer objects to be deleted.
      */
-    virtual void gl_delete_buffers(GLsizei n, const GLuint *buffers);
+    virtual void gl_delete_buffers(GLsizei n, const GLuint *buffers) = 0;
 
     /**
      * @brief Deletes a program object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteProgram.xhtml
      * @param program Specifies the program object to be deleted.
      */
-    virtual void gl_delete_program(GLuint program);
+    virtual void gl_delete_program(GLuint program) = 0;
 
     /**
      * @brief Deletes a shader object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml
      * @param shader Specifies the shader object to be deleted.
      */
-    virtual void gl_delete_shader(GLuint shader);
+    virtual void gl_delete_shader(GLuint shader) = 0;
 
     /**
      * @brief delete named textures
@@ -161,7 +158,7 @@ class graphics {
      * @param n Specifies the number of textures to be deleted.
      * @param textures Specifies an array of textures to be deleted.
      */
-    virtual void gl_delete_textures(GLsizei n, const GLuint *textures);
+    virtual void gl_delete_textures(GLsizei n, const GLuint *textures) = 0;
 
     /**
      * @brief delete vertex array objects.
@@ -169,14 +166,14 @@ class graphics {
      * @param n Specifies the number of vertex array objects to be deleted.
      * @param arrays Specifies the address of an array containing the n names of the objects to be deleted.
      */
-    virtual void gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays);
+    virtual void gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays) = 0;
 
     /**
      * @brief enable or disable server-side GL capabilities. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
      * @param cap Specifies a symbolic constant indicating a GL capability.
      */
-    virtual void gl_disable(GLenum cap);
+    virtual void gl_disable(GLenum cap) = 0;
 
     /**
      * @brief render primitives from array data. See
@@ -187,7 +184,7 @@ class graphics {
      * @param first Specifies the starting index in the enabled arrays.
      * @param count Specifies the number of indices to be rendered.
      */
-    virtual void gl_draw_arrays(GLenum mode, GLint first, GLsizei count);
+    virtual void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) = 0;
 
     /**
      * @brief render primitives from array data.
@@ -200,21 +197,21 @@ class graphics {
      * GL_UNSIGNED_INT.
      * @param indices Specifies a pointer to the location where the indices are stored.
      */
-    virtual void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices);
+    virtual void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) = 0;
 
     /**
      * @brief enable or disable server-side GL capabilities. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
      * @param cap Specifies a symbolic constant indicating a GL capability.
      */
-    virtual void gl_enable(GLenum cap);
+    virtual void gl_enable(GLenum cap) = 0;
 
     /**
      * @brief Enable or disable a generic vertex attribute array
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
      * @param index Specifies the index of the generic vertex attribute to be enabled or disabled.
      */
-    virtual void gl_enable_vertex_attrib_array(GLuint index);
+    virtual void gl_enable_vertex_attrib_array(GLuint index) = 0;
 
     /**
      * @brief generate buffer object names
@@ -222,7 +219,7 @@ class graphics {
      * @param n Specifies the number of buffer object names to be generated.
      * @param buffers Specifies an array in which the generated buffer object names are stored.
      */
-    virtual void gl_gen_buffers(GLsizei n, GLuint *buffers);
+    virtual std::vector<GLuint> gl_gen_buffers(GLsizei n) = 0;
 
     /**
      * @brief generate texture_coord names
@@ -230,7 +227,7 @@ class graphics {
      * @param n Specifies the number of texture_coord names to be generated.
      * @param textures Specifies an array in which the generated texture_coord names are stored.
      */
-    virtual void gl_gen_textures(GLsizei n, GLuint *textures);
+    virtual void gl_gen_textures(GLsizei n, GLuint *textures) = 0;
 
     /**
      * @brief generate vertex array object names
@@ -238,7 +235,7 @@ class graphics {
      * @param n Specifies the number of vertex array object names to generate.
      * @param arrays Specifies an array in which the generated vertex array object names are stored.
      */
-    virtual void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays);
+    virtual void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) = 0;
 
     /**
      * @brief generate mipmaps for a specified texture_coord object
@@ -247,7 +244,7 @@ class graphics {
      * of GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_CUBE_MAP, or
      * GL_TEXTURE_CUBE_MAP_ARRAY.
      */
-    virtual void gl_generate_mipmap(GLenum target);
+    virtual void gl_generate_mipmap(GLenum target) = 0;
 
     /**
      * @brief return the value or values of a selected parameter.
@@ -256,7 +253,7 @@ class graphics {
      * constants in the list below are accepted.
      * @param data Returns the value or values of the specified parameter.
      */
-    virtual void gl_get_integerv(GLenum pname, GLint *data);
+    virtual void gl_get_integerv(GLenum pname, GLint *data) = 0;
 
     /**
      * @brief Returns the information log for a program object
@@ -266,7 +263,7 @@ class graphics {
      * @param length Returns the length of the string returned in info_log (excluding the null terminator).
      * @param info_log Specifies an array of characters that is used to return the information log.
      */
-    virtual void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log);
+    virtual void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log) = 0;
 
     /**
      * @brief Returns a parameter from a program object
@@ -281,7 +278,7 @@ class graphics {
      * GL_GEOMETRY_OUTPUT_TYPE.
      * @param params Returns the requested object parameter.
      */
-    virtual void gl_get_programiv(GLuint program, GLenum pname, GLint *params);
+    virtual void gl_get_programiv(GLuint program, GLenum pname, GLint *params) = 0;
 
     /**
      * @brief Returns the information log for a shader object
@@ -291,7 +288,7 @@ class graphics {
      * @param length Returns the length of the string returned in info_log (excluding the null terminator).
      * @param info_log Specifies an array of characters that is used to return the information log.
      */
-    virtual void gl_get_shader_info_log(GLuint shader, GLsizei max_length, GLsizei *length, GLchar *info_log);
+    virtual void gl_get_shader_info_log(GLuint shader, GLsizei max_length, GLsizei *length, GLchar *info_log) = 0;
 
     /**
      * @brief Returns a parameter from a shader object
@@ -301,7 +298,7 @@ class graphics {
      * GL_COMPILE_STATUS, GL_INFO_LOG_LENGTH, GL_SHADER_SOURCE_LENGTH.
      * @param params Returns the requested object parameter.
      */
-    virtual void gl_get_shaderiv(GLuint shader, GLenum pname, GLint *params);
+    virtual void gl_get_shaderiv(GLuint shader, GLenum pname, GLint *params) = 0;
 
     /**
      * @brief Returns the location of a uniform variable
@@ -310,14 +307,14 @@ class graphics {
      * be queried.
      * @return an integer that represents the location of a specific uniform variable within a program object.
      */
-    virtual int gl_get_uniform_location(GLuint program, const GLchar *name);
+    virtual int gl_get_uniform_location(GLuint program, const GLchar *name) = 0;
 
     /**
      * @brief Links a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml
      * @param program Specifies the handle of the program object to be linked.
      */
-    virtual void gl_link_program(GLuint program);
+    virtual void gl_link_program(GLuint program) = 0;
 
     /**
      * @brief select a polygon rasterization mode. See
@@ -327,7 +324,7 @@ class graphics {
      * @param mode Specifies how polygons will be rasterized. Accepted values are GL_POINT, GL_LINE, and GL_FILL. The
      * initial value is GL_FILL for both front- and back-facing polygons.
      */
-    virtual void gl_polygon_mode(GLenum face, GLenum mode);
+    virtual void gl_polygon_mode(GLenum face, GLenum mode) = 0;
 
     /**
      * @brief Replaces the source code in a shader object
@@ -337,7 +334,7 @@ class graphics {
      * @param string Specifies an array of pointers to strings containing the source code to be loaded into the shader.
      * @param length Specifies an array of string lengths.
      */
-    virtual void gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length);
+    virtual void gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) = 0;
 
     /**
      * @brief specify a two-dimensional texture_coord image
@@ -371,7 +368,7 @@ class graphics {
      * @param data Specifies a pointer to the image data in memory.
      */
     virtual void gl_tex_image_2d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height,
-                                 GLint border, GLenum format, GLenum type, const void *data);
+                                 GLint border, GLenum format, GLenum type, const void *data) = 0;
 
     /**
      * @brief set texture_coord parameters
@@ -385,7 +382,7 @@ GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, or GL_TEXTURE_WRAP_R. For the vector comma
 be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param param For the scalar commands, specifies the value of pname.
      */
-    virtual void gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param);
+    virtual void gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -393,7 +390,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param location Specifies the location of the uniform variable to be modified.
      * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform1i(GLint location, GLint v0);
+    virtual void gl_uniform1i(GLint location, GLint v0) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -404,7 +401,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param v2 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      * @param v3 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+    virtual void gl_uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -419,7 +416,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param value For the vector and matrix commands, specifies a pointer to an array of count values that will be
      * used to update the specified uniform variable.
      */
-    virtual void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+    virtual void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) = 0;
 
     /**
      * @brief Installs a program object as part of current rendering state
@@ -427,7 +424,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param program Specifies the handle of the program object whose executables are to be used as part of current
      * rendering state.
      */
-    virtual void gl_use_program(GLuint program);
+    virtual void gl_use_program(GLuint program) = 0;
 
     /**
      * @brief define an array of generic vertex attribute data
@@ -449,7 +446,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * the data store of the buffer currently bound to the GL_ARRAY_BUFFER target. The initial value is 0.
      */
     virtual void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride,
-                                          const void *pointer);
+                                          const void *pointer) = 0;
 
     /**
      * @brief set the viewport
@@ -461,7 +458,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param height Specify the width and height of the viewport. When a GL context is first attached to a window,
      * width and height are set to the dimensions of that window.
      */
-    virtual void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height);
+    virtual void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
 
     /**
      * @brief This function creates a window and its associated OpenGL or OpenGL ES context.
@@ -474,33 +471,33 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @return The handle of the created window, or NULL if an error occurred.
      */
     virtual GLFWwindow *glfw_create_window(int width, int height, const char *title, GLFWmonitor *monitor,
-                                           GLFWwindow *share);
+                                           GLFWwindow *share) = 0;
 
     /**
      * @brief This function destroys the specified window and its context.
      * https://www.glfw.org/docs/3.3/group__window.html#gacdf43e51376051d2c091662e9fe3d7b2
      * @param window The window to destroy.
      */
-    virtual void glfw_destroy_window(GLFWwindow *window);
+    virtual void glfw_destroy_window(GLFWwindow *window) = 0;
 
     /**
      * @brief This function initializes the GLFW library.
      * https://www.glfw.org/docs/3.3/group__init.html#ga317aac130a235ab08c6db0834907d85e
      * @return GLFW_TRUE if successful, or GLFW_FALSE if an error occurred.
      */
-    virtual int glfw_init();
+    virtual int glfw_init() = 0;
 
     /**
      * @brief This function makes the OpenGL or OpenGL ES context of the specified window current on the calling thread.
      * @param window The window whose context to make current, or NULL to detach the current context.
      */
-    virtual void glfw_make_context_current(GLFWwindow *window);
+    virtual void glfw_make_context_current(GLFWwindow *window) = 0;
 
     /**
      * @brief This function processes only those events that are already in the event queue and then returns
      * immediately. https://www.glfw.org/docs/3.3/group__window.html#ga37bd57223967b4211d60ca1a0bf3c832
      */
-    virtual void glfw_poll_events();
+    virtual void glfw_poll_events() = 0;
 
     /**
      * @brief This function sets the cursor position callback of the specified window, which is called when the cursor
@@ -508,7 +505,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param window The window whose callback to set.
      * @param fun The new callback, or NULL to remove the currently set callback.
      */
-    virtual GLFWcursorposfun glfw_set_cursor_pos_callback(GLFWwindow *window, GLFWcursorposfun fun);
+    virtual GLFWcursorposfun glfw_set_cursor_pos_callback(GLFWwindow *window, GLFWcursorposfun fun) = 0;
 
     /**
      * @brief This function sets the error callback, which is called with an error code and a human-readable description
@@ -516,7 +513,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param callback The new callback, or NULL to remove the currently set callback.
      * @return The previously set callback, or NULL if no callback was set.
      */
-    virtual GLFWerrorfun glfw_set_error_callback(GLFWerrorfun callback);
+    virtual GLFWerrorfun glfw_set_error_callback(GLFWerrorfun callback) = 0;
 
     /**
      * @brief This function sets the framebuffer resize callback of the specified window, which is called when the
@@ -526,7 +523,8 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param cbfun The new callback, or NULL to remove the currently set callback.
      * @return The previously set callback, or NULL if no callback was set or an error occurred.
      */
-    virtual GLFWframebuffersizefun glfw_set_framebuffer_size_callback(GLFWwindow *window, GLFWframebuffersizefun cbfun);
+    virtual GLFWframebuffersizefun glfw_set_framebuffer_size_callback(GLFWwindow *window,
+                                                                      GLFWframebuffersizefun cbfun) = 0;
 
     /**
      * @brief This function sets an input mode option for the specified window. See
@@ -536,7 +534,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * GLFW_RAW_MOUSE_MOTION.
      * @param value The new value of the specified input mode.
      */
-    virtual void glfw_set_input_mode(GLFWwindow *window, int mode, int value);
+    virtual void glfw_set_input_mode(GLFWwindow *window, int mode, int value) = 0;
 
     /**
      * @brief This function sets the key callback of the specific window, which is called when a key is pressed,
@@ -545,7 +543,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param cbfun The new key callback, or NULL to remove the currently set callback.
      * @return The previously set callback, or NULL if no callback was set or an error occurred.
      */
-    virtual GLFWkeyfun glfw_set_key_callback(GLFWwindow *window, GLFWkeyfun cbfun);
+    virtual GLFWkeyfun glfw_set_key_callback(GLFWwindow *window, GLFWkeyfun cbfun) = 0;
 
     /**
      * @brief This function sets the value of the close flag of the specified window.
@@ -553,20 +551,20 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param window The window whose flag to change.
      * @param value The new value.
      */
-    virtual void glfw_set_window_should_close(GLFWwindow *window, int value);
+    virtual void glfw_set_window_should_close(GLFWwindow *window, int value) = 0;
 
     /**
      * @brief This function swaps the front and back buffers of the specified window when rendering with OpenGL or
      * OpenGL ES. https://www.glfw.org/docs/3.3/group__window.html#ga15a5a1ee5b3c2ca6b15ca209a12efd14
      * @param window The window whose buffers to swap.
      */
-    virtual void glfw_swap_buffers(GLFWwindow *window);
+    virtual void glfw_swap_buffers(GLFWwindow *window) = 0;
 
     /**
      * @brief This function destroys all remaining windows and cursors, restores any modified gamma ramps and frees any
      * other allocated resources. https://www.glfw.org/docs/3.3/group__init.html#gaaae48c0a18607ea4a4ba951d939f0901
      */
-    virtual void glfw_terminate();
+    virtual void glfw_terminate() = 0;
 
     /**
      * @brief This function sets hints for the next call to glfwCreateWindow.
@@ -574,19 +572,17 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param hint The window hint to set.
      * @param value The new value of the window hint.
      */
-    virtual void glfw_window_hint(int hint, int value);
+    virtual void glfw_window_hint(int hint, int value) = 0;
 
     /**
      * @brief This function returns the value of the close flag of the specified window.
      * @param window The window to query.
      * @return The value of the close flag.
      */
-    virtual int glfw_window_should_close(GLFWwindow *window);
+    virtual int glfw_window_should_close(GLFWwindow *window) = 0;
 
-  protected:
-    GLFWerrorfun m_error_handler;
-
-    graphics();
+  private:
+    static graphics *m_instance;
 };
 
 } // namespace opengl_wrapper

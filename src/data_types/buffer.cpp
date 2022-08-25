@@ -6,19 +6,21 @@
 namespace opengl_wrapper {
 
 std::vector<buffer> buffer::build(size_t amount) {
-    std::vector<GLuint> ids(amount);
-    graphics::instance().gl_gen_buffers(amount, ids.data());
+    assert(amount > 0);
 
-    std::vector<buffer> ret(amount);
+    const auto ids = graphics::instance().gl_gen_buffers(amount);
+
+    std::vector<buffer> ret;
+    ret.reserve(amount);
     for (int i = 0; i < amount; ++i) {
-        ret[i] = buffer(ids[i]);
+        ret.emplace_back(buffer(ids[i]));
     }
     return ret;
 }
 
-buffer::buffer(GLenum target, GLuint id) : m_target(target), m_id(id) {
+buffer::buffer(GLuint id, GLenum target) : m_target(target), m_id(id) {
     if (0 == m_id) {
-        graphics::instance().gl_gen_buffers(1, &m_id);
+        m_id = graphics::instance().gl_gen_buffers(1)[0];
     }
 }
 
