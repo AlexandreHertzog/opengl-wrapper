@@ -12,11 +12,11 @@ namespace opengl_wrapper {
 
 shader::shader(GLenum type, const char *source) : m_id(graphics::instance().gl_create_shader(type)) {
     if (source != nullptr) {
-        compile(source);
+        compile(source, true);
     }
 }
 
-shader::shader(GLenum type, const std::filesystem::path &shader_path) : m_id(0) {
+shader::shader(GLenum type, const std::filesystem::path &shader_path) {
     std::ifstream shader_file(shader_path);
     if (!shader_file.is_open()) {
         throw exception("shader file not found: " + shader_path.string());
@@ -28,22 +28,21 @@ shader::shader(GLenum type, const std::filesystem::path &shader_path) : m_id(0) 
     std::string code = shader_stream.str();
 
     m_id = graphics::instance().gl_create_shader(type);
-    compile(code.c_str());
+    compile(code.c_str(), false);
 }
 
-shader::shader(shader &&other) noexcept : m_id(other.m_id) {
-    other.m_id = 0;
+shader::shader(shader &&other) noexcept {
+    gl_delete();
+    std::swap(m_id, other.m_id);
 }
 
 shader::~shader() {
-    if (0 != m_id) {
-        graphics::instance().gl_delete_shader(m_id);
-    }
+    gl_delete();
 }
 
 shader &shader::operator=(shader &&other) noexcept {
-    this->m_id = other.m_id;
-    other.m_id = 0;
+    gl_delete();
+    std::swap(m_id, other.m_id);
     return *this;
 }
 
@@ -51,7 +50,7 @@ GLuint shader::get_id() const {
     return m_id;
 }
 
-void shader::compile(const char *source) { // NOLINT(readability-make-member-function-const)
+void shader::compile(const char *source, bool free_on_error) { // NOLINT(readability-make-member-function-const)
     assert(nullptr != source);
 
     constexpr auto error_string_length = 512;
@@ -65,7 +64,19 @@ void shader::compile(const char *source) { // NOLINT(readability-make-member-fun
     graphics::instance().gl_get_shaderiv(m_id, GL_COMPILE_STATUS, &success);
     if (GL_FALSE == success) {
         graphics::instance().gl_get_shader_info_log(m_id, message.size(), nullptr, message.data());
+
+        if (free_on_error) {
+            gl_delete();
+        }
+
         throw gl_error(message.data());
+    }
+}
+
+void shader::gl_delete() {
+    if (0 != m_id) {
+        graphics::instance().gl_delete_shader(m_id);
+        m_id = 0;
     }
 }
 

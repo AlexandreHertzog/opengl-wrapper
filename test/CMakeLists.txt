@@ -14,5 +14,5 @@ enable_testing()
 add_library(graphics INTERFACE src/mock_graphics.h)
 target_link_libraries(graphics PUBLIC INTERFACE opengl-wrapper gmock)
 
-add_executable(autotest src/buffer_test.cpp)
+add_executable(autotest src/buffer_test.cpp src/shader_test.cpp)
 target_link_libraries(autotest PRIVATE graphics gtest_main)

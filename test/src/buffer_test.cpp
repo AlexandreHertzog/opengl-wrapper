@@ -6,7 +6,6 @@ using ::testing::_;
 using ::testing::A;
 using ::testing::Exactly;
 using ::testing::Return;
-using ::testing::SetArrayArgument;
 
 TEST(BufferTest, buffer_build_2) {
     const std::vector<GLuint> ret = {1, 2};

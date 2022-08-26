@@ -61,9 +61,10 @@ class shader {
     [[nodiscard]] GLuint get_id() const;
 
   private:
-    GLuint m_id;
+    GLuint m_id{};
 
-    void compile(const char *source);
+    void compile(const char *source, bool free_on_error);
+    void gl_delete();
 };
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::shader &s);
