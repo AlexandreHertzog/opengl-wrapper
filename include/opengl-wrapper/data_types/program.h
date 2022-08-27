@@ -8,10 +8,11 @@
 namespace opengl_wrapper {
 
 class shader;
+class shape;
 
 class program {
   public:
-    using use_callback = std::function<void(program &program)>;
+    using use_callback = std::function<void(program &program, shape &shape)>;
 
     /**
      * @brief Construct a new program object. See
@@ -103,7 +104,7 @@ class program {
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml
      *
      */
-    void use();
+    void use(shape &s);
 
     /**
      * @brief Gets the shaders associated with the program. Only valid before linking, after that it returns an empty

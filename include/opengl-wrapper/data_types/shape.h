@@ -40,6 +40,14 @@ class shape {
     void set_textures(textures_t t);
     [[nodiscard]] const textures_t &get_textures() const;
 
+    void set_translation(glm::vec3 translation);
+    [[nodiscard]] const glm::vec3 &get_translation() const;
+    void set_rotation(float angle, glm::vec3 axis);
+    [[nodiscard]] float get_rotation_angle() const;
+    [[nodiscard]] const glm::vec3 &get_rotation_axis() const;
+    void set_scale(glm::vec3 scale);
+    [[nodiscard]] const glm::vec3 &get_scale() const;
+
   private:
     std::string m_material_library{"mtllib_undefined"};
     std::string m_name{"name_undefined"};
@@ -53,6 +61,11 @@ class shape {
     vertex_array m_vertex_array;
     std::shared_ptr<program> m_program;
     textures_t m_textures;
+
+    glm::vec3 m_translation;
+    float m_rotation_angle;
+    glm::vec3 m_rotation_axis;
+    glm::vec3 m_scale{1.0F, 1.0F, 1.0F};
 };
 
 } // namespace opengl_wrapper

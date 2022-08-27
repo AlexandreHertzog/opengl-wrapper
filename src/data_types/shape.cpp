@@ -65,16 +65,20 @@ shape::shape(opengl_wrapper::shape &&other) noexcept
       m_vertex_normals(std::move(other.m_vertex_normals)), m_used_material(std::move(other.m_used_material)),
       m_smooth_shading(other.m_smooth_shading), m_faces(std::move(other.m_faces)),
       m_vertex_array(std::move(other.m_vertex_array)), m_program(std::move(other.m_program)),
-      m_textures(std::move(other.m_textures)) {
+      m_textures(std::move(other.m_textures)), m_translation(std::move(other.m_translation)),
+      m_rotation_angle(other.m_rotation_angle), m_rotation_axis(std::move(other.m_rotation_axis)),
+      m_scale(std::move(other.m_scale)) {
 
     other.m_smooth_shading = false;
+    other.m_rotation_angle = 0.0F;
 }
 
 shape::shape(const opengl_wrapper::shape &other)
     : m_material_library(other.m_material_library), m_name(other.m_name), m_vertices(other.m_vertices),
       m_texture_coords(other.m_texture_coords), m_vertex_normals(other.m_vertex_normals),
       m_used_material(other.m_used_material), m_smooth_shading(other.m_smooth_shading), m_faces(other.m_faces),
-      m_vertex_array(), m_program(other.m_program), m_textures(other.m_textures) {
+      m_vertex_array(), m_program(other.m_program), m_textures(other.m_textures), m_translation(other.m_translation),
+      m_rotation_angle(other.m_rotation_angle), m_rotation_axis(other.m_rotation_axis), m_scale(other.m_scale) {
 }
 
 shape &shape::operator=(shape &&other) noexcept {
@@ -90,6 +94,11 @@ shape &shape::operator=(shape &&other) noexcept {
     m_vertex_array = std::move(other.m_vertex_array);
     m_program = std::move(other.m_program);
     m_textures = std::move(other.m_textures);
+    m_translation = std::move(other.m_translation);
+    m_rotation_angle = other.m_rotation_angle;
+    other.m_rotation_angle = 0.0F;
+    m_rotation_axis = std::move(other.m_rotation_axis);
+    m_scale = std::move(other.m_scale);
     return *this;
 }
 
@@ -106,6 +115,10 @@ shape &shape::operator=(const shape &other) {
         m_vertex_array = vertex_array();
         m_program = other.m_program;
         m_textures = other.m_textures;
+        m_translation = other.m_translation;
+        m_rotation_angle = other.m_rotation_angle;
+        m_rotation_axis = other.m_rotation_axis;
+        m_scale = other.m_scale;
     }
 
     return *this;
@@ -160,6 +173,35 @@ void shape::set_textures(textures_t t) {
 
 const shape::textures_t &shape::get_textures() const {
     return m_textures;
+}
+
+void shape::set_translation(glm::vec3 translation) {
+    m_translation = std::move(translation);
+}
+
+const glm::vec3 &shape::get_translation() const {
+    return m_translation;
+}
+
+void shape::set_rotation(float angle, glm::vec3 axis) {
+    m_rotation_angle = angle;
+    m_rotation_axis = std::move(axis);
+}
+
+float shape::get_rotation_angle() const {
+    return m_rotation_angle;
+}
+
+const glm::vec3 &shape::get_rotation_axis() const {
+    return m_rotation_axis;
+}
+
+void shape::set_scale(glm::vec3 scale) {
+    m_scale = std::move(scale);
+}
+
+const glm::vec3 &shape::get_scale() const {
+    return m_scale;
 }
 
 } // namespace opengl_wrapper

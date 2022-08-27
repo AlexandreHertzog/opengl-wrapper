@@ -6,7 +6,7 @@ int main() {
         test_app::integration app;
         app.init_callbacks();
 
-        app.build_cube();
+        app.build_shapes();
         app.init_textures();
         app.prepare_render_loop();
         app.render_loop();

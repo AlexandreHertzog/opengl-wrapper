@@ -126,7 +126,7 @@ class window {
                 t->bind();
             }
 
-            shape.get_program()->use();
+            shape.get_program()->use(shape);
             shape.get_vertex_array().bind();
 
             const auto draw_order = shape.serialize_draw_order();

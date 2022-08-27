@@ -1,6 +1,7 @@
 #include "opengl-wrapper/data_types/program.h"
 
 #include "opengl-wrapper/data_types/shader.h"
+#include "opengl-wrapper/data_types/shape.h"
 #include "opengl-wrapper/graphics/graphics.h"
 #include "opengl-wrapper/utils/gl_error.h"
 #include "utils/utils.h"
@@ -93,10 +94,10 @@ void program::set_uniform(const char *var_name, const float *value) {
     graphics::instance().gl_uniform_matrix_4fv(get_uniform_location(var_name), 1, GL_FALSE, value);
 }
 
-void program::use() { // NOLINT(readability-make-member-function-const)
+void program::use(shape &s) { // NOLINT(readability-make-member-function-const)
     graphics::instance().gl_use_program(m_id);
     if (m_use_callback) {
-        m_use_callback(*this);
+        m_use_callback(*this, s);
     }
 }
 

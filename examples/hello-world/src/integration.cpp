@@ -22,6 +22,8 @@ void integration::init_callbacks() {
         w.draw(m_shapes);
     });
 
+    //    m_window.set_input_mode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int scancode, int action, int mods) {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
             w.set_should_close(1);
@@ -77,9 +79,12 @@ std::shared_ptr<opengl_wrapper::program> integration::build_program() {
     program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/square.frag")));
     program->link();
 
-    program->set_use_callback([&](opengl_wrapper::program &p) {
+    program->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
         auto model = glm::mat4(1.0F);
-        model = glm::translate(model, {0.0, 0.0, 0.0});
+        model = glm::translate(model, s.get_translation());
+        model = glm::rotate(model, glm::radians(s.get_rotation_angle()), s.get_rotation_axis());
+        model = glm::scale(model, s.get_scale());
+
         auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
         auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
 
@@ -90,8 +95,10 @@ std::shared_ptr<opengl_wrapper::program> integration::build_program() {
     return program;
 }
 
-void integration::build_cube() {
-    auto cube = opengl_wrapper::shape::build_from_file("./objects/untitled.obj");
+void integration::build_shapes() {
+    auto cube = opengl_wrapper::shape::build_from_file("./objects/cube.obj");
+    cube.set_rotation(45.0F, glm::vec3(1.0, 0.5, 0.5));
+    cube.set_scale(glm::vec3(1.0, 0.5, 0.5));
     cube.set_program(build_program());
     m_shapes.emplace_back(std::move(cube));
 }
@@ -105,7 +112,7 @@ void integration::init_textures() {
 
     for (auto &s : m_shapes) {
         s.set_textures({container_texture, awesomeface_texture});
-        s.get_program()->use();
+        s.get_program()->use(s);
         s.get_program()->set_uniform("texture1", 0);
         s.get_program()->set_uniform("texture2", 1);
     }
