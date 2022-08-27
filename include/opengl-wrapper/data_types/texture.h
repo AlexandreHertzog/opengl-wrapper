@@ -14,7 +14,7 @@ class texture {
      * @param target OpenGL texture target.
      * @param id Texture ID.
      */
-    explicit texture(int unit = 0, GLenum target = 0, GLuint id = 0);
+    explicit texture(int unit, GLenum target, GLuint id = 0);
 
     /**
      * @brief Texture destructor. See
@@ -84,6 +84,8 @@ class texture {
     GLuint m_id{};
     GLenum m_target{};
     int m_unit{};
+
+    void gl_delete();
 };
 
 std::ostream &operator<<(std::ostream &os, const texture &t);

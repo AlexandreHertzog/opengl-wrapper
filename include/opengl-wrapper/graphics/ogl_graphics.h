@@ -36,7 +36,7 @@ class ogl_graphics : public graphics {
     void gl_enable(GLenum cap) override;
     void gl_enable_vertex_attrib_array(GLuint index) override;
     std::vector<GLuint> gl_gen_buffers(GLsizei n) override;
-    void gl_gen_textures(GLsizei n, GLuint *textures) override;
+    std::vector<GLuint> gl_gen_textures(GLsizei n) override;
     void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) override;
     void gl_generate_mipmap(GLenum target) override;
     void gl_get_integerv(GLenum pname, GLint *data) override;

@@ -61,9 +61,6 @@ TEST(ShaderTest, shader_construct_compile_failed) {
     EXPECT_THROW(s.reset(new opengl_wrapper::shader(type, source)), opengl_wrapper::gl_error);
 }
 
-TEST(ShaderTest, shader_construct_with_path) {
-}
-
 TEST(ShaderTest, shader_move_constructor) {
     opengl_wrapper_test::mock_graphics graphics;
 

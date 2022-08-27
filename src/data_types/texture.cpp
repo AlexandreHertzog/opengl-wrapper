@@ -6,26 +6,33 @@
 namespace opengl_wrapper {
 
 texture::texture(int unit, GLenum target, GLuint id) : m_id(id), m_target(target), m_unit(unit) {
-    graphics::instance().gl_gen_textures(1, &m_id);
-}
+    assert(0 != target);
+    assert(0 != unit);
 
-texture::texture(opengl_wrapper::texture &&other) noexcept : m_id(other.m_id), m_target(other.m_target) {
-    other.m_target = 0;
-    other.m_id = 0;
-}
-
-texture::~texture() {
-    if (m_id != 0) {
-        graphics::instance().gl_delete_textures(1, &m_id);
+    if (0 == m_id) {
+        m_id = graphics::instance().gl_gen_textures(1)[0];
     }
 }
 
-texture &texture::operator=(opengl_wrapper::texture &&other) noexcept {
-    m_id = other.m_id;
-    m_target = other.m_target;
+texture::texture(opengl_wrapper::texture &&other) noexcept {
+    gl_delete();
 
-    other.m_target = 0;
-    other.m_id = 0;
+    std::swap(m_id, other.m_id);
+    std::swap(m_target, other.m_target);
+    std::swap(m_unit, other.m_unit);
+}
+
+texture::~texture() {
+    gl_delete();
+}
+
+texture &texture::operator=(opengl_wrapper::texture &&other) noexcept {
+    gl_delete();
+
+    std::swap(m_id, other.m_id);
+    std::swap(m_target, other.m_target);
+    std::swap(m_unit, other.m_unit);
+
     return *this;
 }
 
@@ -46,7 +53,7 @@ void texture::set_parameter(uint32_t pname, GLint param) { // NOLINT(readability
 }
 
 void texture::set_image( // NOLINT(readability-make-member-function-const)
-    GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, uint32_t format, uint32_t type,
+    GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type,
     const void *data) {
 
     assert(m_id != 0);
@@ -91,6 +98,16 @@ void texture::set_unit(int unit) {
 
 int texture::get_unit() const {
     return m_unit;
+}
+
+void texture::gl_delete() {
+    if (0 != m_id) {
+        graphics::instance().gl_delete_textures(1, &m_id);
+
+        m_id = 0;
+        m_target = 0;
+        m_unit = 0;
+    }
 }
 
 std::ostream &operator<<(std::ostream &os, const texture &t) {

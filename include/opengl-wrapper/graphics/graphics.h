@@ -227,7 +227,7 @@ class graphics {
      * @param n Specifies the number of texture_coord names to be generated.
      * @param textures Specifies an array in which the generated texture_coord names are stored.
      */
-    virtual void gl_gen_textures(GLsizei n, GLuint *textures) = 0;
+    virtual std::vector<GLuint> gl_gen_textures(GLsizei n) = 0;
 
     /**
      * @brief generate vertex array object names

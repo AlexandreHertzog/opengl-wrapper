@@ -122,8 +122,10 @@ std::vector<GLuint> ogl_graphics::gl_gen_buffers(GLsizei n) {
     return ret;
 }
 
-void ogl_graphics::gl_gen_textures(GLsizei n, GLuint *textures) {
-    glGenTextures(n, textures);
+std::vector<GLuint> ogl_graphics::gl_gen_textures(GLsizei n) {
+    std::vector<GLuint> ret(n);
+    glGenTextures(n, ret.data());
+    return ret;
 }
 
 void ogl_graphics::gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) {

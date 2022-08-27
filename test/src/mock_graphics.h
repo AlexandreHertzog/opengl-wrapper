@@ -33,7 +33,7 @@ class mock_graphics : opengl_wrapper::graphics {
     MOCK_METHOD(void, gl_enable, (GLenum cap), (override));
     MOCK_METHOD(void, gl_enable_vertex_attrib_array, (GLuint index), (override));
     MOCK_METHOD(std::vector<GLuint>, gl_gen_buffers, (GLsizei n), (override));
-    MOCK_METHOD(void, gl_gen_textures, (GLsizei n, GLuint *textures), (override));
+    MOCK_METHOD(std::vector<GLuint>, gl_gen_textures, (GLsizei n), (override));
     MOCK_METHOD(void, gl_gen_vertex_arrays, (GLsizei n, GLuint *arrays), (override));
     MOCK_METHOD(void, gl_generate_mipmap, (GLenum target), (override));
     MOCK_METHOD(void, gl_get_integerv, (GLenum pname, GLint *data), (override));
