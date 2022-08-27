@@ -1,6 +1,8 @@
 #pragma once
 
+#include "exception.h"
 #include <algorithm>
+#include <glm/glm.hpp>
 #include <ostream>
 #include <sstream>
 #include <vector>
@@ -37,6 +39,35 @@ template <typename TYPE> std::ostream &operator<<(std::ostream &stream, const st
     });
 
     return stream << braces(res.str());
+}
+
+inline std::istream &operator>>(std::istream &is, glm::vec2 &vec) {
+    return is >> vec.x >> vec.y;
+}
+
+inline std::istream &operator>>(std::istream &is, glm::vec3 &vec) {
+    return is >> vec.x >> vec.y >> vec.z;
+}
+
+template <class TYPE> std::istream &operator>>(std::istream &is, std::vector<TYPE> &out) {
+    while (!is.eof()) {
+        TYPE data;
+        is >> data;
+        out.emplace_back(std::move(data));
+    }
+    return is;
+}
+
+inline int to_int(const char *s, size_t len, int base = 10) {
+    assert(nullptr != s);
+    assert(len > 0);
+
+    char *end{};
+    const int ret = std::strtol(s, &end, base);
+    if (end == s) {
+        throw exception("Invalid to_int parameter: " + std::string(s));
+    }
+    return ret;
 }
 
 } // namespace opengl_wrapper

@@ -53,7 +53,7 @@ add_library(opengl-wrapper-data-types
         src/data_types/vertex_array.cpp
         src/data_types/window.cpp
         src/data_types/camera.cpp
-        )
+        src/data_types/face_vertex_indices.cpp)
 
 target_include_directories(opengl-wrapper-data-types
         PUBLIC include
@@ -61,13 +61,26 @@ target_include_directories(opengl-wrapper-data-types
         )
 
 target_link_libraries(opengl-wrapper-data-types
-        PUBLIC opengl-wrapper-graphics glm
-        PRIVATE opengl-wrapper-utils stb
+        PUBLIC opengl-wrapper-graphics glm opengl-wrapper-utils
+        PRIVATE opengl-wrapper-utils stb opengl-wrapper-parsers Boost::log
+        )
+
+add_library(opengl-wrapper-parsers
+        src/parsers/obj_parser.cpp)
+
+target_include_directories(opengl-wrapper-parsers
+        PUBLIC include
+        PRIVATE include/opengl-wrapper include/opengl-wrapper/parsers
+        )
+
+target_link_libraries(opengl-wrapper-parsers
+        PUBLIC glm
+        PRIVATE opengl-wrapper-utils
         )
 
 add_library(opengl-wrapper INTERFACE)
 target_include_directories(opengl-wrapper PUBLIC INTERFACE include)
-target_link_libraries(opengl-wrapper PUBLIC INTERFACE opengl-wrapper-data-types opengl-wrapper-graphics)
+target_link_libraries(opengl-wrapper PUBLIC INTERFACE opengl-wrapper-data-types opengl-wrapper-graphics opengl-wrapper-parsers)
 
 if (INCLUDE_EXAMPLES)
     add_subdirectory(examples)

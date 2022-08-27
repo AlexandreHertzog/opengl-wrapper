@@ -6,7 +6,6 @@
 namespace opengl_wrapper {
 
 texture::texture(int unit, GLenum target, GLuint id) : m_id(id), m_target(target), m_unit(unit) {
-    assert(0 != target);
     assert(0 != unit);
 
     if (0 == m_id) {

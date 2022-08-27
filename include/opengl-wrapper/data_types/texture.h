@@ -14,7 +14,7 @@ class texture {
      * @param target OpenGL texture target.
      * @param id Texture ID.
      */
-    explicit texture(int unit, GLenum target, GLuint id = 0);
+    explicit texture(int unit, GLenum target = 0, GLuint id = 0);
 
     /**
      * @brief Texture destructor. See

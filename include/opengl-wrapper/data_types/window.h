@@ -129,11 +129,11 @@ class window {
             shape.get_program()->use();
             shape.get_vertex_array().bind();
 
-            if (!shape.get_draw_order().empty()) {
-                graphics::instance().gl_draw_elements(GL_TRIANGLES, shape.get_draw_order().size(), GL_UNSIGNED_INT,
-                                                      nullptr);
+            const auto draw_order = shape.serialize_draw_order();
+            if (!draw_order.empty()) {
+                graphics::instance().gl_draw_elements(GL_TRIANGLES, draw_order.size(), GL_UNSIGNED_INT, nullptr);
             } else {
-                graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.get_vertices().size());
+                graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.serialize_vertices().size());
             }
         }
 

@@ -8,11 +8,7 @@
 namespace test_app {
 
 integration::integration()
-    : m_window(800, 600, "Test application"), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}),
-      m_shape_positions({glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f, 5.0f, -15.0f), glm::vec3(-1.5f, -2.2f, -2.5f),
-                         glm::vec3(-3.8f, -2.0f, -12.3f), glm::vec3(2.4f, -0.4f, -3.5f), glm::vec3(-1.7f, 3.0f, -7.5f),
-                         glm::vec3(1.3f, -2.0f, -2.5f), glm::vec3(1.5f, 2.0f, -2.5f), glm::vec3(1.5f, 0.2f, -1.5f),
-                         glm::vec3(-1.3f, 1.0f, -1.5f)}) {
+    : m_window(800, 600, "Test application"), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}) {
 
     m_camera.set_position(glm::vec3(0.0F, 0.0F, 3.0F));
     m_camera.set_up(glm::vec3(0.0, 1.0, 0.0));
@@ -83,86 +79,35 @@ std::shared_ptr<opengl_wrapper::program> integration::build_program() {
 
     program->set_use_callback([&](opengl_wrapper::program &p) {
         auto model = glm::mat4(1.0F);
-        model = glm::translate(model, m_shape_positions.at(m_shape_position_index));
-        model = glm::rotate(model, glm::radians(20.0F * m_shape_position_index), glm::vec3(1.0F, 0.3F, 0.5F));
-
+        model = glm::translate(model, {0.0, 0.0, 0.0});
         auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
-
         auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
 
         p.set_uniform("model", glm::value_ptr(model));
         p.set_uniform("view", glm::value_ptr(view));
         p.set_uniform("projection", glm::value_ptr(projection));
-
-        if (m_shape_position_index++ >= m_shape_positions.size() - 1) {
-            m_shape_position_index = 0;
-        }
     });
     return program;
 }
 
-opengl_wrapper::shape integration::build_cube() {
-    opengl_wrapper::shape cube;
-    cube.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 0.0F}});
-    cube.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 0.0F}});
-
-    cube.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
-    cube.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
-
-    cube.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
-    cube.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-
-    cube.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
-    cube.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-
-    cube.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{0.5F, -0.5F, -0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{0.5F, -0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, 0.5F}, {}, {0.0F, 0.0F}});
-    cube.add_vertex({{-0.5F, -0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-
-    cube.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    cube.add_vertex({{0.5F, 0.5F, -0.5F}, {}, {1.0F, 1.0F}});
-    cube.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{0.5F, 0.5F, 0.5F}, {}, {1.0F, 0.0F}});
-    cube.add_vertex({{-0.5F, 0.5F, 0.5F}, {}, {0.0F, 0.0F}});
-    cube.add_vertex({{-0.5F, 0.5F, -0.5F}, {}, {0.0F, 1.0F}});
-    return cube;
+void integration::build_cube() {
+    auto cube = opengl_wrapper::shape::build_from_file("./objects/untitled.obj");
+    cube.set_program(build_program());
+    m_shapes.emplace_back(std::move(cube));
 }
 
-void integration::init_textures(opengl_wrapper::shape &s) {
+void integration::init_textures() {
     auto container_texture = std::make_shared<opengl_wrapper::texture>(GL_TEXTURE0);
     container_texture->set_image_from_path("textures/container.jpg");
 
     auto awesomeface_texture = std::make_shared<opengl_wrapper::texture>(GL_TEXTURE1);
     awesomeface_texture->set_image_from_path("textures/awesomeface.png");
 
-    s.set_textures({std::move(container_texture), std::move(awesomeface_texture)});
-    s.get_program()->use();
-    s.get_program()->set_uniform("texture1", 0);
-    s.get_program()->set_uniform("texture2", 1);
-}
-
-void integration::init_shapes(opengl_wrapper::shape &s) {
-    for (auto i = 0; i < m_shape_positions.size(); i++) {
-        m_shapes.emplace_back(s);
+    for (auto &s : m_shapes) {
+        s.set_textures({container_texture, awesomeface_texture});
+        s.get_program()->use();
+        s.get_program()->set_uniform("texture1", 0);
+        s.get_program()->set_uniform("texture2", 1);
     }
 }
 
@@ -171,7 +116,7 @@ void integration::prepare_render_loop() {
     m_window.set_clear_color(0.2F, 0.2F, 0.2F, 1.0F);
 
     for (auto &shape : m_shapes) {
-        shape.get_vertex_array().load(shape.get_vertices(), shape.get_draw_order(), GL_STATIC_DRAW);
+        shape.get_vertex_array().load(shape.serialize_vertices(), shape.serialize_draw_order(), GL_STATIC_DRAW);
     }
 }
 

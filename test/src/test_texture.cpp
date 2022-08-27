@@ -45,9 +45,7 @@ TEST(TextureTest, texture_constructor_invalid_values) {
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(0));
 
     std::unique_ptr<opengl_wrapper::texture> t;
-    EXPECT_DEATH(t.reset(new opengl_wrapper::texture(unit, 0)), "0 != target");
     EXPECT_DEATH(t.reset(new opengl_wrapper::texture(0, target)), "0 != unit");
-    EXPECT_DEATH(t.reset(new opengl_wrapper::texture(0, 0)), "0 != target");
 }
 
 TEST(TextureTest, texture_move_constructor) {
