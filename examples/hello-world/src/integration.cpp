@@ -94,24 +94,31 @@ std::shared_ptr<opengl_wrapper::program> integration::build_program() {
 
 void integration::build_shapes() {
     auto p = build_program();
+    auto base_texture = opengl_wrapper::texture::build("./textures/checker.png", GL_TEXTURE0);
 
     auto cube = opengl_wrapper::shape::build_from_file("./objects/cube.obj");
     cube.set_translation(glm::vec3(0.0F, 0.0F, -1.0F));
     cube.set_rotation(45.0F, glm::vec3(0.0F, 1.0F, 0.0F));
     cube.set_scale(glm::vec3(0.5F, 0.5F, 0.5F));
     cube.set_program(p);
+    cube.add_texture(base_texture);
+    cube.add_texture(opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1));
     m_shapes.emplace_back(std::move(cube));
 
     auto plane = opengl_wrapper::shape::build_from_file("./objects/plane.obj");
     plane.set_translation(glm::vec3(0.0F, -0.5F, 0.0F));
     plane.set_scale(glm::vec3(10.0F, 10.0F, 10.0F));
     plane.set_program(p);
+    plane.add_texture(base_texture);
+    plane.add_texture(opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1));
     m_shapes.emplace_back(std::move(plane));
 
     auto sphere = opengl_wrapper::shape::build_from_file("./objects/sphere.obj");
     sphere.set_translation(glm::vec3(1.5F, 0.0F, -1.0F));
     sphere.set_scale(glm::vec3(0.6F, 0.6F, 0.6F));
     sphere.set_program(p);
+    sphere.add_texture(base_texture);
+    sphere.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
     m_shapes.emplace_back(std::move(sphere));
 
     auto torus = opengl_wrapper::shape::build_from_file("./objects/torus.obj");
@@ -119,21 +126,14 @@ void integration::build_shapes() {
     torus.set_rotation(45.0F, glm::vec3(0.0F, 0.0F, 1.0F));
     torus.set_scale(glm::vec3(0.6F, 0.6F, 0.6F));
     torus.set_program(p);
+    torus.add_texture(base_texture);
+    torus.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
     m_shapes.emplace_back(std::move(torus));
-}
-
-void integration::init_textures() {
-    auto container_texture = std::make_shared<opengl_wrapper::texture>(GL_TEXTURE0);
-    container_texture->set_image_from_path("textures/container.jpg");
-
-    auto awesomeface_texture = std::make_shared<opengl_wrapper::texture>(GL_TEXTURE1);
-    awesomeface_texture->set_image_from_path("textures/awesomeface.png");
 
     for (auto &s : m_shapes) {
-        s.set_textures({container_texture, awesomeface_texture});
         s.set_uniform("uniform_texture1", 0);
         s.set_uniform("uniform_texture2", 1);
-        s.set_uniform("uniform_texture_mix", 0.2F);
+        s.set_uniform("uniform_texture_mix", 0.8F);
     }
 }
 

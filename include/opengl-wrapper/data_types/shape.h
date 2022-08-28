@@ -2,6 +2,7 @@
 
 #include "face_vertex_indices.h"
 #include "program.h"
+#include "texture.h"
 #include "vertex.h"
 #include "vertex_array.h"
 #include <filesystem>
@@ -13,12 +14,10 @@
 namespace opengl_wrapper {
 
 class program;
-class texture;
 
 class shape {
   public:
-    using texture_pointer_t = std::shared_ptr<texture>;
-    using textures_t = std::vector<texture_pointer_t>;
+    using textures_t = std::vector<texture::pointer_t>;
 
     static shape build_from_file(const std::filesystem::path &shape_path);
 
@@ -32,6 +31,7 @@ class shape {
 
     void set_program(std::shared_ptr<program> p);
     void set_textures(textures_t t);
+    void add_texture(texture::pointer_t t);
     [[nodiscard]] const textures_t &get_textures() const;
 
     void load_vertices();

@@ -15,7 +15,6 @@ class integration {
     void init_callbacks();
     std::shared_ptr<opengl_wrapper::program> build_program();
     void build_shapes();
-    void init_textures();
     void prepare_render_loop();
     void render_loop();
 

@@ -1,7 +1,6 @@
 #include "shape.h"
 
 #include "parsers/obj_parser.h"
-#include "texture.h"
 #include "utils/exception.h"
 #include <boost/log/trivial.hpp>
 
@@ -157,6 +156,10 @@ void shape::set_program(std::shared_ptr<program> p) {
 
 void shape::set_textures(textures_t t) {
     m_textures = std::move(t);
+}
+
+void shape::add_texture(opengl_wrapper::texture::pointer_t t) {
+    m_textures.emplace_back(std::move(t));
 }
 
 const shape::textures_t &shape::get_textures() const {

@@ -8,6 +8,10 @@ namespace opengl_wrapper {
 
 class texture {
   public:
+    using pointer_t = std::shared_ptr<texture>;
+
+    static pointer_t build(const std::filesystem::path &path, int unit);
+
     /**
      * @brief Creates a texture object with the given target and id. If ID is zero the texture is created. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenTextures.xhtml

@@ -35,6 +35,12 @@ texture &texture::operator=(opengl_wrapper::texture &&other) noexcept {
     return *this;
 }
 
+texture::pointer_t texture::build(const std::filesystem::path &path, int unit) {
+    auto ret = std::make_shared<texture>(unit);
+    ret->set_image_from_path(path);
+    return ret;
+}
+
 void texture::bind() { // NOLINT(readability-make-member-function-const)
     assert(0 != m_id);
     assert(0 != m_target);
