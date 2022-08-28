@@ -28,8 +28,8 @@ integration::integration()
           if (!m_lights.empty()) {
               p.set_uniform("uniform_light_pos", m_lights[0].get_transform().translation());
           }
-          p.set_uniform("uniform_specular", s.get_specular());
-          p.set_uniform("uniform_shininess", s.get_shininess());
+          p.set_uniform("uniform_specular", s.get_material().specular());
+          p.set_uniform("uniform_shininess", s.get_material().shininess());
       }) {
 
     IMGUI_CHECKVERSION();
@@ -257,8 +257,8 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
 
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
-    ret.set_shininess(64.0F);
-    ret.set_specular(0.8F);
+
+    ret.get_material().shininess(64.0F).specular(0.8F);
 
     return ret;
 }
@@ -276,8 +276,8 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
-    ret.set_specular(128.0F);
-    ret.set_specular(0.3F);
+
+    ret.get_material().specular(128.0F).specular(0.3F);
 
     return ret;
 }

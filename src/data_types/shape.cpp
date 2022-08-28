@@ -85,22 +85,6 @@ void shape::bind() {
     m_vertex_array.bind();
 }
 
-void shape::set_specular(float v) {
-    m_specular = v;
-}
-
-float shape::get_specular() const {
-    return m_specular;
-}
-
-void shape::set_shininess(float v) {
-    m_shininess = v;
-}
-
-float shape::get_shininess() const {
-    return m_shininess;
-}
-
 mesh &shape::get_mesh() {
     return m_mesh;
 }
@@ -115,6 +99,14 @@ transform &shape::get_transform() {
 
 void shape::set_transform(transform t) {
     m_transform = std::move(t);
+}
+
+material &shape::get_material() {
+    return m_material;
+}
+
+void shape::set_material(material m) {
+    m_material = std::move(m);
 }
 
 } // namespace opengl_wrapper

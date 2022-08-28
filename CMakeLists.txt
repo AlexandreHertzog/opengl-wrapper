@@ -56,6 +56,7 @@ add_library(opengl-wrapper-data-types
         src/data_types/face_vertex_indices.cpp
         src/data_types/mesh.cpp
         src/data_types/transform.cpp
+        src/data_types/material.cpp
         )
 
 target_include_directories(opengl-wrapper-data-types
