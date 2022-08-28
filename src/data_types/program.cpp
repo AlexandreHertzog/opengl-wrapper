@@ -86,8 +86,12 @@ int program::get_uniform_location(const char *var_name) const {
     return graphics::instance().gl_get_uniform_location(m_id, var_name);
 }
 
+void program::set_uniform(const char *var_name, float value) {
+    graphics::instance().gl_uniform(get_uniform_location(var_name), value);
+}
+
 void program::set_uniform(const char *var_name, int value) {
-    graphics::instance().gl_uniform1i(get_uniform_location(var_name), value);
+    graphics::instance().gl_uniform(get_uniform_location(var_name), value);
 }
 
 void program::set_uniform(const char *var_name, const float *value) {

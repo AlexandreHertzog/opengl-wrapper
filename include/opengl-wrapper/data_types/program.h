@@ -97,6 +97,14 @@ class program {
      * @param var_name Uniform name.
      * @param value Uniform value.
      */
+    void set_uniform(const char *var_name, float value);
+
+    /**
+     * @brief Sets the value for a  uniform variable. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param var_name Uniform name.
+     * @param value Uniform value.
+     */
     void set_uniform(const char *var_name, const float *value);
 
     /**

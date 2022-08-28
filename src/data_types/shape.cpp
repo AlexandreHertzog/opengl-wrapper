@@ -151,20 +151,8 @@ std::vector<unsigned> shape::serialize_draw_order() const {
     return ret;
 }
 
-const std::vector<glm::vec2> &shape::get_texture_coords() const {
-    return m_texture_coords;
-}
-
-vertex_array &shape::get_vertex_array() {
-    return m_vertex_array;
-}
-
 void shape::set_program(std::shared_ptr<program> p) {
     m_program = std::move(p);
-}
-
-std::shared_ptr<program> shape::get_program() const {
-    return m_program;
 }
 
 void shape::set_textures(textures_t t) {
@@ -173,6 +161,23 @@ void shape::set_textures(textures_t t) {
 
 const shape::textures_t &shape::get_textures() const {
     return m_textures;
+}
+
+void shape::load_vertices() {
+    m_vertex_array.load(serialize_vertices(), serialize_draw_order(), GL_STATIC_DRAW);
+}
+
+void shape::bind() {
+    assert(m_program);
+    assert(!m_textures.empty());
+
+    for (auto &t : m_textures) {
+        assert(t);
+        t->bind();
+    }
+
+    m_program->use(*this);
+    m_vertex_array.bind();
 }
 
 void shape::set_translation(glm::vec3 translation) {

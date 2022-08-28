@@ -1,6 +1,7 @@
 #pragma once
 
 #include "face_vertex_indices.h"
+#include "program.h"
 #include "vertex.h"
 #include "vertex_array.h"
 #include <filesystem>
@@ -29,16 +30,15 @@ class shape {
     shape &operator=(const shape &other);
     shape &operator=(shape &&other) noexcept;
 
-    [[nodiscard]] std::vector<vertex> serialize_vertices() const;
-    [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
-    [[nodiscard]] const std::vector<glm::vec2> &get_texture_coords() const;
-    [[nodiscard]] vertex_array &get_vertex_array();
-
     void set_program(std::shared_ptr<program> p);
-    [[nodiscard]] std::shared_ptr<program> get_program() const;
-
     void set_textures(textures_t t);
     [[nodiscard]] const textures_t &get_textures() const;
+
+    void load_vertices();
+    void bind();
+
+    [[nodiscard]] std::vector<vertex> serialize_vertices() const;
+    [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
 
     void set_translation(glm::vec3 translation);
     [[nodiscard]] const glm::vec3 &get_translation() const;
@@ -47,6 +47,12 @@ class shape {
     [[nodiscard]] const glm::vec3 &get_rotation_axis() const;
     void set_scale(glm::vec3 scale);
     [[nodiscard]] const glm::vec3 &get_scale() const;
+
+    template <class T> void set_uniform(const char *name, T value) {
+        assert(m_program);
+        m_program->use(*this);
+        m_program->set_uniform(name, value);
+    }
 
   private:
     std::string m_material_library{"mtllib_undefined"};
@@ -64,7 +70,7 @@ class shape {
 
     glm::vec3 m_translation;
     float m_rotation_angle;
-    glm::vec3 m_rotation_axis;
+    glm::vec3 m_rotation_axis{1.0F, 1.0F, 1.0F};
     glm::vec3 m_scale{1.0F, 1.0F, 1.0F};
 };
 

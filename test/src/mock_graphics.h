@@ -53,8 +53,9 @@ class mock_graphics : opengl_wrapper::graphics {
                  GLenum format, GLenum type, const void *data),
                 (override));
     MOCK_METHOD(void, gl_tex_parameter_i, (GLuint texture, GLenum pname, GLint param), (override));
-    MOCK_METHOD(void, gl_uniform1i, (GLint location, GLint v0), (override));
-    MOCK_METHOD(void, gl_uniform4f, (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3), (override));
+    MOCK_METHOD(void, gl_uniform, (GLint location, GLfloat v0), (override));
+    MOCK_METHOD(void, gl_uniform, (GLint location, GLint v0), (override));
+    MOCK_METHOD(void, gl_uniform, (GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3), (override));
     MOCK_METHOD(void, gl_uniform_matrix_4fv, (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value),
                 (override));
     MOCK_METHOD(void, gl_use_program, (GLuint program), (override));

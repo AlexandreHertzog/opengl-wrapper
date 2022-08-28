@@ -8,10 +8,7 @@
 namespace test_app {
 
 integration::integration()
-    : m_window(800, 600, "Test application"), m_camera({0.0, 0.0, 3.0}, {0.0, 0.0, -1.0}, {0.0, 1.0, 0.0}) {
-
-    m_camera.set_position(glm::vec3(0.0F, 0.0F, 3.0F));
-    m_camera.set_up(glm::vec3(0.0, 1.0, 0.0));
+    : m_window(800, 600, "Test application"), m_camera({0.0, 2.0, 5.0}, {0.0, -0.3, -1.0}, {0.0, 1.0, 0.0}) {
 }
 
 void integration::init_callbacks() {
@@ -88,19 +85,41 @@ std::shared_ptr<opengl_wrapper::program> integration::build_program() {
         auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
         auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
 
-        p.set_uniform("model", glm::value_ptr(model));
-        p.set_uniform("view", glm::value_ptr(view));
-        p.set_uniform("projection", glm::value_ptr(projection));
+        p.set_uniform("uniform_model", glm::value_ptr(model));
+        p.set_uniform("uniform_view", glm::value_ptr(view));
+        p.set_uniform("uniform_projection", glm::value_ptr(projection));
     });
     return program;
 }
 
 void integration::build_shapes() {
+    auto p = build_program();
+
     auto cube = opengl_wrapper::shape::build_from_file("./objects/cube.obj");
-    cube.set_rotation(45.0F, glm::vec3(1.0, 0.5, 0.5));
-    cube.set_scale(glm::vec3(1.0, 0.5, 0.5));
-    cube.set_program(build_program());
+    cube.set_translation(glm::vec3(0.0F, 0.0F, -1.0F));
+    cube.set_rotation(45.0F, glm::vec3(0.0F, 1.0F, 0.0F));
+    cube.set_scale(glm::vec3(0.5F, 0.5F, 0.5F));
+    cube.set_program(p);
     m_shapes.emplace_back(std::move(cube));
+
+    auto plane = opengl_wrapper::shape::build_from_file("./objects/plane.obj");
+    plane.set_translation(glm::vec3(0.0F, -0.5F, 0.0F));
+    plane.set_scale(glm::vec3(10.0F, 10.0F, 10.0F));
+    plane.set_program(p);
+    m_shapes.emplace_back(std::move(plane));
+
+    auto sphere = opengl_wrapper::shape::build_from_file("./objects/sphere.obj");
+    sphere.set_translation(glm::vec3(1.5F, 0.0F, -1.0F));
+    sphere.set_scale(glm::vec3(0.6F, 0.6F, 0.6F));
+    sphere.set_program(p);
+    m_shapes.emplace_back(std::move(sphere));
+
+    auto torus = opengl_wrapper::shape::build_from_file("./objects/torus.obj");
+    torus.set_translation(glm::vec3(-1.0F, 0.0F, -1.0F));
+    torus.set_rotation(45.0F, glm::vec3(0.0F, 0.0F, 1.0F));
+    torus.set_scale(glm::vec3(0.6F, 0.6F, 0.6F));
+    torus.set_program(p);
+    m_shapes.emplace_back(std::move(torus));
 }
 
 void integration::init_textures() {
@@ -112,9 +131,9 @@ void integration::init_textures() {
 
     for (auto &s : m_shapes) {
         s.set_textures({container_texture, awesomeface_texture});
-        s.get_program()->use(s);
-        s.get_program()->set_uniform("texture1", 0);
-        s.get_program()->set_uniform("texture2", 1);
+        s.set_uniform("uniform_texture1", 0);
+        s.set_uniform("uniform_texture2", 1);
+        s.set_uniform("uniform_texture_mix", 0.2F);
     }
 }
 
@@ -123,7 +142,7 @@ void integration::prepare_render_loop() {
     m_window.set_clear_color(0.2F, 0.2F, 0.2F, 1.0F);
 
     for (auto &shape : m_shapes) {
-        shape.get_vertex_array().load(shape.serialize_vertices(), shape.serialize_draw_order(), GL_STATIC_DRAW);
+        shape.load_vertices();
     }
 }
 

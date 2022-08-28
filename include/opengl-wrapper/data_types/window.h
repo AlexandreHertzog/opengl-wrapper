@@ -118,16 +118,7 @@ class window {
         graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         for (auto &shape : shapes) {
-            assert(!shape.get_textures().empty());
-            assert(shape.get_program());
-
-            for (auto &t : shape.get_textures()) {
-                assert(t);
-                t->bind();
-            }
-
-            shape.get_program()->use(shape);
-            shape.get_vertex_array().bind();
+            shape.bind();
 
             const auto draw_order = shape.serialize_draw_order();
             if (!draw_order.empty()) {

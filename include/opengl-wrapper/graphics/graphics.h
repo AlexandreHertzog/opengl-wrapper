@@ -390,7 +390,15 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param location Specifies the location of the uniform variable to be modified.
      * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform1i(GLint location, GLint v0) = 0;
+    virtual void gl_uniform(GLint location, GLfloat v0) = 0;
+
+    /**
+     * @brief Specify the value of a uniform variable for the current program object.
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param location Specifies the location of the uniform variable to be modified.
+     * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
+     */
+    virtual void gl_uniform(GLint location, GLint v0) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -401,7 +409,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param v2 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      * @param v3 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) = 0;
+    virtual void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
