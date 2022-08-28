@@ -90,6 +90,18 @@ void program::set_uniform(const char *var_name, float value) {
     graphics::instance().gl_uniform(get_uniform_location(var_name), value);
 }
 
+void program::set_uniform(const char *var_name, const glm::vec3 &vec) {
+    graphics::instance().gl_uniform(get_uniform_location(var_name), vec.x, vec.y, vec.z);
+}
+
+void program::set_uniform(const char *var_name, float v0, float v1, float v2) {
+    graphics::instance().gl_uniform(get_uniform_location(var_name), v0, v1, v2);
+}
+
+void program::set_uniform(const char *var_name, float v0, float v1, float v2, float v3) {
+    graphics::instance().gl_uniform(get_uniform_location(var_name), v0, v1, v2, v3);
+}
+
 void program::set_uniform(const char *var_name, int value) {
     graphics::instance().gl_uniform(get_uniform_location(var_name), value);
 }

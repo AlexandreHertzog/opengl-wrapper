@@ -48,10 +48,10 @@ class shape {
     void set_scale(glm::vec3 scale);
     [[nodiscard]] const glm::vec3 &get_scale() const;
 
-    template <class T> void set_uniform(const char *name, T value) {
+    template <class... T> void set_uniform(const char *name, T... value) {
         assert(m_program);
         m_program->use(*this);
-        m_program->set_uniform(name, value);
+        m_program->set_uniform(name, value...);
     }
 
   private:

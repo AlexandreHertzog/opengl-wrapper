@@ -13,7 +13,8 @@ class integration {
   public:
     integration();
     void init_callbacks();
-    std::shared_ptr<opengl_wrapper::program> build_program();
+    std::shared_ptr<opengl_wrapper::program> build_object_program();
+    std::shared_ptr<opengl_wrapper::program> build_light_program();
     void build_shapes();
     void prepare_render_loop();
     void render_loop();
@@ -21,6 +22,7 @@ class integration {
   private:
     opengl_wrapper::window m_window;
     std::vector<opengl_wrapper::shape> m_shapes;
+    std::vector<opengl_wrapper::shape> m_lights;
     opengl_wrapper::camera m_camera;
 
     bool m_wireframe{};
@@ -30,6 +32,18 @@ class integration {
     double m_last_cursor_ypos = 0.0;
     double m_pitch = 0.0;
     double m_yaw = -90.0;
+
+    const std::function<void(opengl_wrapper::program &, opengl_wrapper::shape &)> m_default_callback;
+
+    static opengl_wrapper::shape build_cube(std::shared_ptr<opengl_wrapper::program> &object_program,
+                                            opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_plane(std::shared_ptr<opengl_wrapper::program> &object_program,
+                                             opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_sphere(std::shared_ptr<opengl_wrapper::program> &object_program,
+                                              opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
+                                             opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
 };
 
 } // namespace test_app

@@ -128,9 +128,15 @@ std::vector<vertex> shape::serialize_vertices() const {
     ret.reserve(m_faces.size() * 3);
     for (const auto &face : m_faces) {
         assert(3 == face.size());
-        vertex v1{m_vertices[face[0].m_vertex_index - 1], {}, {m_texture_coords[face[0].m_texture_coord_index - 1]}};
-        vertex v2{m_vertices[face[1].m_vertex_index - 1], {}, {m_texture_coords[face[1].m_texture_coord_index - 1]}};
-        vertex v3{m_vertices[face[2].m_vertex_index - 1], {}, {m_texture_coords[face[2].m_texture_coord_index - 1]}};
+        vertex v1{m_vertices[face[0].m_vertex_index - 1],
+                  {m_texture_coords[face[0].m_texture_coord_index - 1]},
+                  {m_vertex_normals[face[0].m_normal_index - 1]}};
+        vertex v2{m_vertices[face[1].m_vertex_index - 1],
+                  {m_texture_coords[face[1].m_texture_coord_index - 1]},
+                  {m_vertex_normals[face[1].m_normal_index - 1]}};
+        vertex v3{m_vertices[face[2].m_vertex_index - 1],
+                  {m_texture_coords[face[2].m_texture_coord_index - 1]},
+                  {m_vertex_normals[face[2].m_normal_index - 1]}};
         ret.emplace_back(v1);
         ret.emplace_back(v2);
         ret.emplace_back(v3);

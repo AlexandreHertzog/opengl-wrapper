@@ -190,6 +190,10 @@ void ogl_graphics::gl_uniform(GLint location, GLint v0) {
     glUniform1i(location, v0);
 }
 
+void ogl_graphics::gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) {
+    glUniform3f(location, v0, v1, v2);
+}
+
 void ogl_graphics::gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) {
     glUniform4f(location, v0, v1, v2, v3);
 }

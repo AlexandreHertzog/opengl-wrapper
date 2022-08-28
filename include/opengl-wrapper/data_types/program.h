@@ -2,6 +2,7 @@
 
 #include "opengl-wrapper/graphics/graphics.h"
 #include <functional>
+#include <glm/glm.hpp>
 #include <ostream>
 #include <vector>
 
@@ -98,6 +99,30 @@ class program {
      * @param value Uniform value.
      */
     void set_uniform(const char *var_name, float value);
+
+    /**
+     * @brief Sets the value for a  uniform variable. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param var_name Uniform name.
+     * @param value Uniform value.
+     */
+    void set_uniform(const char *var_name, const glm::vec3 &vec);
+
+    /**
+     * @brief Sets the value for a  uniform variable. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param var_name Uniform name.
+     * @param value Uniform value.
+     */
+    void set_uniform(const char *var_name, float v0, float v1, float v2);
+
+    /**
+     * @brief Sets the value for a  uniform variable. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param var_name Uniform name.
+     * @param value Uniform value.
+     */
+    void set_uniform(const char *var_name, float v0, float v1, float v2, float v3);
 
     /**
      * @brief Sets the value for a  uniform variable. See

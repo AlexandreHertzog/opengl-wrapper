@@ -161,6 +161,10 @@ void window::set_clear_color(float red, float green, float blue, float alpha) { 
     graphics::instance().gl_clear_color(red, green, blue, alpha);
 }
 
+void window::clear() {
+    graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window &w) {
     return os << "window" << parenthesis(&w) << " window=" << w.get_window();
 }

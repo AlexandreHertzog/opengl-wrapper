@@ -115,8 +115,6 @@ class window {
     void set_input_mode(int mode, int value);
 
     template <typename TYPE> void draw(TYPE &shapes) {
-        graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         for (auto &shape : shapes) {
             shape.bind();
 
@@ -159,6 +157,8 @@ class window {
      * @param alpha Alpha component.
      */
     void set_clear_color(float red, float green, float blue, float alpha);
+
+    void clear();
 
     [[nodiscard]] const GLFWwindow *get_window() const;
 

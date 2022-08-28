@@ -53,6 +53,7 @@ class ogl_graphics : public graphics {
     void gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param) override;
     void gl_uniform(GLint location, GLfloat v0) override;
     void gl_uniform(GLint location, GLint v0) override;
+    void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) override;
     void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) override;
     void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) override;
     void gl_use_program(GLuint program) override;
