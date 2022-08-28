@@ -2,13 +2,16 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include <boost/log/trivial.hpp>
 #include <csignal>
 
 namespace test_app {
 
 integration::integration()
-    : m_window(800, 600, "Test application"), m_camera({0.0, 2.0, 5.0}, {0.0, -0.3, -1.0}, {0.0, 1.0, 0.0}),
+    : m_window(1920, 1080, "Test application"), m_camera({0.0, 3.0, 8.0}, {0.0, -0.3, -1.0}, {0.0, 1.0, 0.0}),
       m_default_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
           auto model = glm::mat4(1.0F);
           model = glm::translate(model, s.get_translation());
@@ -16,7 +19,7 @@ integration::integration()
           model = glm::scale(model, s.get_scale());
 
           auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
-          auto projection = glm::perspective(glm::radians(45.0F), 800.0F / 600.0F, 0.1F, 100.0F);
+          auto projection = glm::perspective(glm::radians(45.0F), 1920.0F / 1080.0F, 0.1F, 100.0F);
 
           p.set_uniform("uniform_model", glm::value_ptr(model));
           p.set_uniform("uniform_view", glm::value_ptr(view));
@@ -25,6 +28,17 @@ integration::integration()
               p.set_uniform("uniform_light_pos", m_lights[0].get_translation());
           }
       }) {
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(m_window.get_window(), true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+}
+
+integration::~integration() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void integration::init_callbacks() {
@@ -34,8 +48,6 @@ void integration::init_callbacks() {
         w.set_viewport(width, height);
         w.draw(m_shapes);
     });
-
-    //    m_window.set_input_mode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int scancode, int action, int mods) {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
@@ -66,6 +78,10 @@ void integration::init_callbacks() {
     });
 
     m_window.set_cursor_pos_callback([&](opengl_wrapper::window &w, double xpos, double ypos) {
+        if (m_cursor_enabled) {
+            return;
+        }
+
         if (m_first_cursor_iteration) {
             m_last_cursor_xpos = xpos;
             m_last_cursor_ypos = ypos;
@@ -86,30 +102,6 @@ void integration::init_callbacks() {
     });
 }
 
-std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
-    auto program = std::make_shared<opengl_wrapper::program>();
-    program->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/object.vert")));
-    program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/object.frag")));
-    program->link();
-
-    program->set_use_callback(m_default_callback);
-    return program;
-}
-
-std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
-    auto program = std::make_shared<opengl_wrapper::program>();
-    program->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/object.vert")));
-    program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/light.frag")));
-    program->link();
-    program->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
-        constexpr auto radius = 4.0F;
-        s.set_translation(
-            glm::vec3(radius * sin(glfwGetTime() * 5), s.get_translation().y, radius * cos(glfwGetTime() * 5)));
-        m_default_callback(p, s);
-    });
-    return program;
-}
-
 void integration::build_shapes() {
     auto object_program = build_object_program();
     auto light_program = build_light_program();
@@ -120,14 +112,14 @@ void integration::build_shapes() {
     m_shapes.emplace_back(build_sphere(object_program, base_texture));
     m_shapes.emplace_back(build_torus(object_program, base_texture));
 
+    m_lights.emplace_back(build_light(light_program));
+
     for (auto &s : m_shapes) {
         s.set_uniform("uniform_texture1", 0);
         s.set_uniform("uniform_texture2", 1);
         s.set_uniform("uniform_texture_mix", 0.8F);
         s.set_uniform("uniform_light_color", glm::vec3(1.0F, 1.0F, 1.0F));
     }
-
-    m_lights.emplace_back(build_light(light_program));
 }
 
 void integration::prepare_render_loop() {
@@ -145,9 +137,17 @@ void integration::render_loop() {
 
     while (!m_window.get_should_close()) {
         auto start_time = std::chrono::high_resolution_clock::now();
+
+        build_ui();
+
         m_window.clear();
+
         m_window.draw(m_shapes);
         m_window.draw(m_lights);
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        m_window.poll_events();
 
         std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
 
@@ -158,7 +158,59 @@ void integration::render_loop() {
         } else {
             BOOST_LOG_TRIVIAL(debug) << "loop_time too large, skipping time filler";
         }
+
+        m_window.swap_buffers();
     }
+}
+
+void integration::build_ui() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    //    ImGui::ShowDemoWindow();
+
+    ImGui::Begin("OpenGL Wrapper test app");
+    ImGui::Checkbox("Auto-rotate light", &m_auto_rotate_light);
+    if (m_auto_rotate_light) {
+        ImGui::BeginDisabled(true);
+    }
+    ImGui::InputFloat3("Light position", m_light_position);
+    if (m_auto_rotate_light) {
+        ImGui::EndDisabled();
+    }
+    ImGui::End();
+
+    ImGui::Render();
+}
+
+std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
+    auto program = std::make_shared<opengl_wrapper::program>();
+    program->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/object.vert")));
+    program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/object.frag")));
+    program->link();
+
+    program->set_use_callback(m_default_callback);
+    return program;
+}
+
+std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
+    auto program = std::make_shared<opengl_wrapper::program>();
+    program->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/light.vert")));
+    program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/light.frag")));
+    program->link();
+
+    program->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
+        constexpr auto radius = 4.0F;
+        if (m_auto_rotate_light) {
+            s.set_translation(
+                glm::vec3(radius * sin(glfwGetTime()), s.get_translation().y, radius * cos(glfwGetTime())));
+        } else {
+            s.set_translation(glm::vec3(m_light_position[0], m_light_position[1], m_light_position[2]));
+        }
+        m_default_callback(p, s);
+    });
+    return program;
 }
 
 opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::program> &object_program,
@@ -209,8 +261,8 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 
 opengl_wrapper::shape integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
     auto light = opengl_wrapper::shape::build_from_file("./objects/cube.obj");
-    light.set_translation(glm::vec3(2.0F));
-    light.set_scale(glm::vec3(0.2F));
+    light.set_translation(glm::vec3(m_light_position[0], m_light_position[1], m_light_position[2]));
+    light.set_scale(glm::vec3(0.2F, 0.2F, 0.2F));
     light.set_program(light_program);
     light.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
     return light;

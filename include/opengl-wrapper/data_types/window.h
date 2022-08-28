@@ -105,6 +105,8 @@ class window {
      */
     void swap_buffers();
 
+    void poll_events();
+
     /**
      * @brief This function sets an input mode option for the specified window. See
      * https://www.glfw.org/docs/3.3/group__input.html#gaa92336e173da9c8834558b54ee80563b
@@ -125,9 +127,6 @@ class window {
                 graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.serialize_vertices().size());
             }
         }
-
-        swap_buffers();
-        graphics::instance().glfw_poll_events();
     }
 
     /**
@@ -160,7 +159,7 @@ class window {
 
     void clear();
 
-    [[nodiscard]] const GLFWwindow *get_window() const;
+    [[nodiscard]] GLFWwindow *get_window() const;
 
   private:
     GLFWwindow *m_window;

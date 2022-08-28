@@ -21,7 +21,9 @@ class window::manager {
         assert(nullptr != window_it->second);
 
         auto &window = *window_it->second;
-        window.m_cursor_pos_callback(window, xpos, ypos);
+        if (window.m_cursor_pos_callback) {
+            window.m_cursor_pos_callback(window, xpos, ypos);
+        }
     }
 
     static void callback_framebuffer_size(GLFWwindow *glfw_window, int width, int height) {
@@ -122,12 +124,17 @@ void window::swap_buffers() {
     graphics::instance().glfw_swap_buffers(m_window);
 }
 
+void window::poll_events() {
+    assert(m_window != nullptr);
+    graphics::instance().glfw_poll_events();
+}
+
 void window::set_input_mode(int mode, int value) {
     assert(nullptr != m_window);
     graphics::instance().glfw_set_input_mode(m_window, mode, value);
 }
 
-const GLFWwindow *window::get_window() const {
+GLFWwindow *window::get_window() const {
     return m_window;
 }
 
