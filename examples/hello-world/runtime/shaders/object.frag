@@ -11,6 +11,9 @@ uniform float uniform_texture_mix;
 
 uniform vec3 uniform_light_color;
 uniform vec3 uniform_light_pos;
+uniform vec3 uniform_view_pos;
+uniform float uniform_specular;
+uniform float uniform_shininess;
 
 void main()
 {
@@ -26,5 +29,11 @@ void main()
                             texture(uniform_texture2, vert_out_tex_coord),
                             uniform_texture_mix);
 
-    frag_out_color = vec4(ambient_light + diffuse_light, 1.0) * object_color;
+    vec3 view_direction = normalize(uniform_view_pos - vert_out_position);
+    vec3 reflect_direction = reflect(-light_direction, normals);
+
+    float specular_absolute = pow(max(dot(view_direction, reflect_direction), 0.0), uniform_shininess);
+    vec3 specular_light = uniform_specular * specular_absolute * uniform_light_color;
+
+    frag_out_color = vec4(ambient_light + diffuse_light + specular_light, 1.0) * object_color;
 }

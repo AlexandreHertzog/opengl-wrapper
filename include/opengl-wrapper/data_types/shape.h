@@ -51,6 +51,12 @@ class shape {
     void set_scale(float x, float y, float z);
     [[nodiscard]] const glm::vec3 &get_scale() const;
 
+    void set_specular(float v);
+    [[nodiscard]] float get_specular() const;
+
+    void set_shininess(float v);
+    [[nodiscard]] float get_shininess() const;
+
     template <class... T> void set_uniform(const char *name, T... value) {
         assert(m_program);
         m_program->use(*this);
@@ -75,6 +81,9 @@ class shape {
     float m_rotation_angle;
     glm::vec3 m_rotation_axis{1.0F, 1.0F, 1.0F};
     glm::vec3 m_scale{1.0F, 1.0F, 1.0F};
+
+    float m_specular{0.5F};
+    float m_shininess{32.0F};
 };
 
 } // namespace opengl_wrapper

@@ -27,6 +27,8 @@ integration::integration()
           if (!m_lights.empty()) {
               p.set_uniform("uniform_light_pos", m_lights[0].get_translation());
           }
+          p.set_uniform("uniform_specular", s.get_specular());
+          p.set_uniform("uniform_shininess", s.get_shininess());
       }) {
 
     IMGUI_CHECKVERSION();
@@ -211,6 +213,7 @@ std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
         } else {
             s.set_translation(m_light_position[0], m_light_position[1], m_light_position[2]);
         }
+        p.set_uniform("uniform_view_pos", m_camera.get_position());
         m_default_callback(p, s);
     });
     return program;
@@ -223,6 +226,7 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
     cube.set_rotation(45.0F, 0.0F, 1.0F, 0.0F);
     cube.set_scale(0.5F, 0.5F, 0.5F);
     cube.set_program(object_program);
+
     cube.add_texture(base_texture);
     cube.add_texture(opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1));
     return cube;
@@ -245,8 +249,12 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
     sphere.set_translation(1.5F, 0.0F, -1.0F);
     sphere.set_scale(0.6F, 0.6F, 0.6F);
     sphere.set_program(object_program);
+
     sphere.add_texture(base_texture);
     sphere.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
+    sphere.set_shininess(64.0F);
+    sphere.set_specular(0.8F);
+
     return sphere;
 }
 
@@ -257,8 +265,12 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     torus.set_rotation(45.0F, 0.0F, 0.0F, 1.0F);
     torus.set_scale(0.6F, 0.6F, 0.6F);
     torus.set_program(object_program);
+
     torus.add_texture(base_texture);
     torus.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
+    torus.set_specular(128.0F);
+    torus.set_specular(0.3F);
+
     return torus;
 }
 

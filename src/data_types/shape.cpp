@@ -231,4 +231,20 @@ const glm::vec3 &shape::get_scale() const {
     return m_scale;
 }
 
+void shape::set_specular(float v) {
+    m_specular = v;
+}
+
+float shape::get_specular() const {
+    return m_specular;
+}
+
+void shape::set_shininess(float v) {
+    m_shininess = v;
+}
+
+float shape::get_shininess() const {
+    return m_shininess;
+}
+
 } // namespace opengl_wrapper
