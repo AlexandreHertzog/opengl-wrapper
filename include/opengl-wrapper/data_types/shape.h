@@ -4,6 +4,7 @@
 #include "mesh.h"
 #include "program.h"
 #include "texture.h"
+#include "transform.h"
 #include "vertex.h"
 #include "vertex_array.h"
 #include <filesystem>
@@ -39,18 +40,10 @@ class shape {
     mesh &get_mesh();
     void set_mesh(mesh m);
 
-    [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
+    transform &get_transform();
+    void set_transform(transform t);
 
-    void set_translation(glm::vec3 translation);
-    void set_translation(float x, float y, float z);
-    [[nodiscard]] const glm::vec3 &get_translation() const;
-    void set_rotation(float angle, glm::vec3 axis);
-    void set_rotation(float angle, float axis_x, float axis_y, float axis_z);
-    [[nodiscard]] float get_rotation_angle() const;
-    [[nodiscard]] const glm::vec3 &get_rotation_axis() const;
-    void set_scale(glm::vec3 scale);
-    void set_scale(float x, float y, float z);
-    [[nodiscard]] const glm::vec3 &get_scale() const;
+    [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
 
     void set_specular(float v);
     [[nodiscard]] float get_specular() const;
@@ -66,14 +59,10 @@ class shape {
 
   private:
     mesh m_mesh;
+    transform m_transform;
     vertex_array m_vertex_array;
     std::shared_ptr<program> m_program;
     textures_t m_textures;
-
-    glm::vec3 m_translation;
-    float m_rotation_angle;
-    glm::vec3 m_rotation_axis{1.0F, 1.0F, 1.0F};
-    glm::vec3 m_scale{1.0F, 1.0F, 1.0F};
 
     float m_specular{0.5F};
     float m_shininess{32.0F};

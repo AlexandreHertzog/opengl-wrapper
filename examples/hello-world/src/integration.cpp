@@ -14,9 +14,10 @@ integration::integration()
     : m_window(1920, 1080, "Test application"), m_camera({0.0, 3.0, 8.0}, {0.0, -0.3, -1.0}, {0.0, 1.0, 0.0}),
       m_default_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
           auto model = glm::mat4(1.0F);
-          model = glm::translate(model, s.get_translation());
-          model = glm::rotate(model, glm::radians(s.get_rotation_angle()), s.get_rotation_axis());
-          model = glm::scale(model, s.get_scale());
+          auto &transform = s.get_transform();
+          model = glm::translate(model, transform.translation());
+          model = glm::rotate(model, glm::radians(transform.rotation_angle()), transform.rotation_axis());
+          model = glm::scale(model, transform.scale());
 
           auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
           auto projection = glm::perspective(glm::radians(45.0F), 1920.0F / 1080.0F, 0.1F, 100.0F);
@@ -25,7 +26,7 @@ integration::integration()
           p.set_uniform("uniform_view", glm::value_ptr(view));
           p.set_uniform("uniform_projection", glm::value_ptr(projection));
           if (!m_lights.empty()) {
-              p.set_uniform("uniform_light_pos", m_lights[0].get_translation());
+              p.set_uniform("uniform_light_pos", m_lights[0].get_transform().translation());
           }
           p.set_uniform("uniform_specular", s.get_specular());
           p.set_uniform("uniform_shininess", s.get_shininess());
@@ -208,10 +209,11 @@ std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
 
     ret->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
         constexpr auto radius = 4.0F;
+        auto &transform = s.get_transform();
         if (m_auto_rotate_light) {
-            s.set_translation(radius * sin(glfwGetTime()), s.get_translation().y, radius * cos(glfwGetTime()));
+            transform.translate(radius * sin(glfwGetTime()), transform.translation().y, radius * cos(glfwGetTime()));
         } else {
-            s.set_translation(m_light_position[0], m_light_position[1], m_light_position[2]);
+            transform.translate(m_light_position[0], m_light_position[1], m_light_position[2]);
         }
         p.set_uniform("uniform_view_pos", m_camera.get_position());
         m_default_callback(p, s);
@@ -223,9 +225,11 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
                                               opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/cube.obj"));
-    ret.set_translation(0.0F, 0.0F, -1.0F);
-    ret.set_rotation(45.0F, 0.0F, 1.0F, 0.0F);
-    ret.set_scale(0.5F, 0.5F, 0.5F);
+    ret.set_transform(opengl_wrapper::transform()
+                          .translate(0.0F, 0.0F, -1.0F)
+                          .rotate(45.0F, 0.0F, 1.0F, 0.0F)
+                          .scale(0.5F, 0.5F, 0.5F));
+
     ret.set_program(object_program);
 
     ret.add_texture(base_texture);
@@ -237,8 +241,7 @@ opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::p
                                                opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/plane.obj"));
-    ret.set_translation(0.0F, -0.5F, 0.0F);
-    ret.set_scale(10.0F, 10.0F, 10.0F);
+    ret.set_transform(opengl_wrapper::transform().translate(0.0F, -0.5F, 0.0F).scale(10.0F, 10.0F, 10.0F));
     ret.set_program(object_program);
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1));
@@ -249,8 +252,7 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
                                                 opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
-    ret.set_translation(1.5F, 0.0F, -1.0F);
-    ret.set_scale(0.6F, 0.6F, 0.6F);
+    ret.set_transform(opengl_wrapper::transform().translate(1.5F, 0.0F, -1.0F).scale(0.6F, 0.6F, 0.6F));
     ret.set_program(object_program);
 
     ret.add_texture(base_texture);
@@ -265,9 +267,11 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
                                                opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/torus.obj"));
-    ret.set_translation(-1.0F, 0.0F, -1.0F);
-    ret.set_rotation(45.0F, 0.0F, 0.0F, 1.0F);
-    ret.set_scale(0.6F, 0.6F, 0.6F);
+    ret.set_transform(opengl_wrapper::transform()
+                          .translate(-1.0F, 0.0F, -1.0F)
+                          .rotate(45.0F, 0.0F, 0.0F, 1.0F)
+                          .scale(0.6F, 0.6F, 0.6F));
+
     ret.set_program(object_program);
 
     ret.add_texture(base_texture);
@@ -281,8 +285,9 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 opengl_wrapper::shape integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
-    ret.set_translation(m_light_position[0], m_light_position[1], m_light_position[2]);
-    ret.set_scale(0.1F, 0.1F, 0.1F);
+    ret.set_transform(opengl_wrapper::transform()
+                          .translate(m_light_position[0], m_light_position[1], m_light_position[2])
+                          .scale(0.1F, 0.1F, 0.1F));
     ret.set_program(light_program);
     ret.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
     return ret;
