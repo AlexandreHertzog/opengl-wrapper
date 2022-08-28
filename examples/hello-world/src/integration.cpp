@@ -191,22 +191,22 @@ void integration::build_ui() {
 }
 
 std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
-    auto program = std::make_shared<opengl_wrapper::program>();
-    program->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/object.vert")));
-    program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/object.frag")));
-    program->link();
+    auto ret = std::make_shared<opengl_wrapper::program>();
+    ret->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/object.vert")));
+    ret->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/object.frag")));
+    ret->link();
 
-    program->set_use_callback(m_default_callback);
-    return program;
+    ret->set_use_callback(m_default_callback);
+    return ret;
 }
 
 std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
-    auto program = std::make_shared<opengl_wrapper::program>();
-    program->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/light.vert")));
-    program->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/light.frag")));
-    program->link();
+    auto ret = std::make_shared<opengl_wrapper::program>();
+    ret->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/light.vert")));
+    ret->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/light.frag")));
+    ret->link();
 
-    program->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
+    ret->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
         constexpr auto radius = 4.0F;
         if (m_auto_rotate_light) {
             s.set_translation(radius * sin(glfwGetTime()), s.get_translation().y, radius * cos(glfwGetTime()));
@@ -216,71 +216,76 @@ std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
         p.set_uniform("uniform_view_pos", m_camera.get_position());
         m_default_callback(p, s);
     });
-    return program;
+    return ret;
 }
 
 opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::program> &object_program,
                                               opengl_wrapper::texture::pointer_t &base_texture) {
-    auto cube = opengl_wrapper::shape::build_from_file("./objects/cube.obj");
-    cube.set_translation(0.0F, 0.0F, -1.0F);
-    cube.set_rotation(45.0F, 0.0F, 1.0F, 0.0F);
-    cube.set_scale(0.5F, 0.5F, 0.5F);
-    cube.set_program(object_program);
+    opengl_wrapper::shape ret;
+    ret.set_mesh(opengl_wrapper::mesh("./objects/cube.obj"));
+    ret.set_translation(0.0F, 0.0F, -1.0F);
+    ret.set_rotation(45.0F, 0.0F, 1.0F, 0.0F);
+    ret.set_scale(0.5F, 0.5F, 0.5F);
+    ret.set_program(object_program);
 
-    cube.add_texture(base_texture);
-    cube.add_texture(opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1));
-    return cube;
+    ret.add_texture(base_texture);
+    ret.add_texture(opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1));
+    return ret;
 }
 
 opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::program> &object_program,
                                                opengl_wrapper::texture::pointer_t &base_texture) {
-    auto plane = opengl_wrapper::shape::build_from_file("./objects/plane.obj");
-    plane.set_translation(0.0F, -0.5F, 0.0F);
-    plane.set_scale(10.0F, 10.0F, 10.0F);
-    plane.set_program(object_program);
-    plane.add_texture(base_texture);
-    plane.add_texture(opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1));
-    return plane;
+    opengl_wrapper::shape ret;
+    ret.set_mesh(opengl_wrapper::mesh("./objects/plane.obj"));
+    ret.set_translation(0.0F, -0.5F, 0.0F);
+    ret.set_scale(10.0F, 10.0F, 10.0F);
+    ret.set_program(object_program);
+    ret.add_texture(base_texture);
+    ret.add_texture(opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1));
+    return ret;
 }
 
 opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::program> &object_program,
                                                 opengl_wrapper::texture::pointer_t &base_texture) {
-    auto sphere = opengl_wrapper::shape::build_from_file("./objects/sphere.obj");
-    sphere.set_translation(1.5F, 0.0F, -1.0F);
-    sphere.set_scale(0.6F, 0.6F, 0.6F);
-    sphere.set_program(object_program);
+    opengl_wrapper::shape ret;
+    ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
+    ret.set_translation(1.5F, 0.0F, -1.0F);
+    ret.set_scale(0.6F, 0.6F, 0.6F);
+    ret.set_program(object_program);
 
-    sphere.add_texture(base_texture);
-    sphere.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
-    sphere.set_shininess(64.0F);
-    sphere.set_specular(0.8F);
+    ret.add_texture(base_texture);
+    ret.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
+    ret.set_shininess(64.0F);
+    ret.set_specular(0.8F);
 
-    return sphere;
+    return ret;
 }
 
 opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
                                                opengl_wrapper::texture::pointer_t &base_texture) {
-    auto torus = opengl_wrapper::shape::build_from_file("./objects/torus.obj");
-    torus.set_translation(-1.0F, 0.0F, -1.0F);
-    torus.set_rotation(45.0F, 0.0F, 0.0F, 1.0F);
-    torus.set_scale(0.6F, 0.6F, 0.6F);
-    torus.set_program(object_program);
+    opengl_wrapper::shape ret;
+    ret.set_mesh(opengl_wrapper::mesh("./objects/torus.obj"));
+    ret.set_translation(-1.0F, 0.0F, -1.0F);
+    ret.set_rotation(45.0F, 0.0F, 0.0F, 1.0F);
+    ret.set_scale(0.6F, 0.6F, 0.6F);
+    ret.set_program(object_program);
 
-    torus.add_texture(base_texture);
-    torus.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
-    torus.set_specular(128.0F);
-    torus.set_specular(0.3F);
+    ret.add_texture(base_texture);
+    ret.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
+    ret.set_specular(128.0F);
+    ret.set_specular(0.3F);
 
-    return torus;
+    return ret;
 }
 
 opengl_wrapper::shape integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
-    auto light = opengl_wrapper::shape::build_from_file("./objects/sphere.obj");
-    light.set_translation(m_light_position[0], m_light_position[1], m_light_position[2]);
-    light.set_scale(0.1F, 0.1F, 0.1F);
-    light.set_program(light_program);
-    light.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
-    return light;
+    opengl_wrapper::shape ret;
+    ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
+    ret.set_translation(m_light_position[0], m_light_position[1], m_light_position[2]);
+    ret.set_scale(0.1F, 0.1F, 0.1F);
+    ret.set_program(light_program);
+    ret.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
+    return ret;
 }
 
 } // namespace test_app

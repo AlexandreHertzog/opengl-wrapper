@@ -1,6 +1,7 @@
 #pragma once
 
 #include "face_vertex_indices.h"
+#include "mesh.h"
 #include "program.h"
 #include "texture.h"
 #include "vertex.h"
@@ -19,8 +20,6 @@ class shape {
   public:
     using textures_t = std::vector<texture::pointer_t>;
 
-    static shape build_from_file(const std::filesystem::path &shape_path);
-
     explicit shape(vertex_array va = vertex_array());
     shape(const shape &other);
     shape(shape &&other) noexcept;
@@ -37,7 +36,9 @@ class shape {
     void load_vertices();
     void bind();
 
-    [[nodiscard]] std::vector<vertex> serialize_vertices() const;
+    mesh &get_mesh();
+    void set_mesh(mesh m);
+
     [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
 
     void set_translation(glm::vec3 translation);
@@ -64,15 +65,7 @@ class shape {
     }
 
   private:
-    std::string m_material_library{"mtllib_undefined"};
-    std::string m_name{"name_undefined"};
-    std::vector<glm::vec3> m_vertices;
-    std::vector<glm::vec2> m_texture_coords;
-    std::vector<glm::vec3> m_vertex_normals;
-    std::string m_used_material{"usemtl_undefined"};
-    bool m_smooth_shading{false};
-    std::vector<std::vector<face_t>> m_faces;
-
+    mesh m_mesh;
     vertex_array m_vertex_array;
     std::shared_ptr<program> m_program;
     textures_t m_textures;

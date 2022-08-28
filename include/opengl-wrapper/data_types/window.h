@@ -124,7 +124,7 @@ class window {
             if (!draw_order.empty()) {
                 graphics::instance().gl_draw_elements(GL_TRIANGLES, draw_order.size(), GL_UNSIGNED_INT, nullptr);
             } else {
-                graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.serialize_vertices().size());
+                graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.get_mesh().get_vertices().size());
             }
         }
     }

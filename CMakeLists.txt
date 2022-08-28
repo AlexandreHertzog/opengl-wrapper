@@ -53,7 +53,9 @@ add_library(opengl-wrapper-data-types
         src/data_types/vertex_array.cpp
         src/data_types/window.cpp
         src/data_types/camera.cpp
-        src/data_types/face_vertex_indices.cpp)
+        src/data_types/face_vertex_indices.cpp
+        src/data_types/mesh.cpp
+        )
 
 target_include_directories(opengl-wrapper-data-types
         PUBLIC include
