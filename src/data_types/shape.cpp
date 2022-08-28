@@ -193,6 +193,10 @@ void shape::set_translation(glm::vec3 translation) {
     m_translation = std::move(translation);
 }
 
+void shape::set_translation(float x, float y, float z) {
+    m_translation = glm::vec3(x, y, z);
+}
+
 const glm::vec3 &shape::get_translation() const {
     return m_translation;
 }
@@ -200,6 +204,11 @@ const glm::vec3 &shape::get_translation() const {
 void shape::set_rotation(float angle, glm::vec3 axis) {
     m_rotation_angle = angle;
     m_rotation_axis = std::move(axis);
+}
+
+void shape::set_rotation(float angle, float axis_x, float axis_y, float axis_z) {
+    m_rotation_angle = angle;
+    m_rotation_axis = glm::vec3(axis_x, axis_y, axis_z);
 }
 
 float shape::get_rotation_angle() const {
@@ -212,6 +221,10 @@ const glm::vec3 &shape::get_rotation_axis() const {
 
 void shape::set_scale(glm::vec3 scale) {
     m_scale = std::move(scale);
+}
+
+void shape::set_scale(float x, float y, float z) {
+    m_scale = glm::vec3(x, y, z);
 }
 
 const glm::vec3 &shape::get_scale() const {

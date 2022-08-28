@@ -41,11 +41,14 @@ class shape {
     [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
 
     void set_translation(glm::vec3 translation);
+    void set_translation(float x, float y, float z);
     [[nodiscard]] const glm::vec3 &get_translation() const;
     void set_rotation(float angle, glm::vec3 axis);
+    void set_rotation(float angle, float axis_x, float axis_y, float axis_z);
     [[nodiscard]] float get_rotation_angle() const;
     [[nodiscard]] const glm::vec3 &get_rotation_axis() const;
     void set_scale(glm::vec3 scale);
+    void set_scale(float x, float y, float z);
     [[nodiscard]] const glm::vec3 &get_scale() const;
 
     template <class... T> void set_uniform(const char *name, T... value) {
