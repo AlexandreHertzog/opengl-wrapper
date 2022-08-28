@@ -2,15 +2,30 @@
 
 namespace opengl_wrapper {
 
-material::material(float specular, float shininess) : m_specular(specular), m_shininess(shininess) {
-}
-
-material &material::specular(float v) {
-    m_specular = v;
+material &material::ambient(glm::vec3 v) {
+    m_ambient = std::move(v);
     return *this;
 }
 
-float material::specular() const {
+const glm::vec3 &material::ambient() const {
+    return m_ambient;
+}
+
+material &material::diffuse(glm::vec3 v) {
+    m_diffuse = std::move(v);
+    return *this;
+}
+
+const glm::vec3 &material::diffuse() const {
+    return m_diffuse;
+}
+
+material &material::specular(glm::vec3 v) {
+    m_specular = std::move(v);
+    return *this;
+}
+
+const glm::vec3 &material::specular() const {
     return m_specular;
 }
 

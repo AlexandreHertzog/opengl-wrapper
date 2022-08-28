@@ -28,8 +28,10 @@ integration::integration()
           if (!m_lights.empty()) {
               p.set_uniform("uniform_light_pos", m_lights[0].get_transform().translation());
           }
-          p.set_uniform("uniform_specular", s.get_material().specular());
-          p.set_uniform("uniform_shininess", s.get_material().shininess());
+          p.set_uniform("uniform_material.ambient", s.get_material().ambient());
+          p.set_uniform("uniform_material.diffuse", s.get_material().diffuse());
+          p.set_uniform("uniform_material.specular", s.get_material().specular());
+          p.set_uniform("uniform_material.shininess", s.get_material().shininess());
       }) {
 
     IMGUI_CHECKVERSION();
@@ -258,7 +260,11 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
 
-    ret.get_material().shininess(64.0F).specular(0.8F);
+    ret.get_material()
+        .ambient({0.1F, 0.1F, 0.1F})
+        .diffuse({0.1F, 0.1F, 0.1F})
+        .shininess(32.0F)
+        .specular({2.0F, 2.0F, 2.0F});
 
     return ret;
 }
@@ -277,7 +283,11 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
 
-    ret.get_material().specular(128.0F).specular(0.3F);
+    ret.get_material()
+        .ambient({1.0F, 1.0F, 1.0F})
+        .diffuse({1.0F, 1.0F, 1.0F})
+        .shininess(2.0F)
+        .specular({0.1F, 0.1F, 0.1F});
 
     return ret;
 }
