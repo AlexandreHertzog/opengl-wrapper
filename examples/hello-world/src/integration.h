@@ -1,5 +1,6 @@
 #pragma once
 #include "opengl-wrapper/data_types/camera.h"
+#include "opengl-wrapper/data_types/light.h"
 #include "opengl-wrapper/data_types/program.h"
 #include "opengl-wrapper/data_types/shader.h"
 #include "opengl-wrapper/data_types/shape.h"
@@ -23,7 +24,7 @@ class integration {
   private:
     opengl_wrapper::window m_window;
     std::vector<opengl_wrapper::shape> m_shapes;
-    std::vector<opengl_wrapper::shape> m_lights;
+    std::vector<opengl_wrapper::light> m_lights;
     opengl_wrapper::camera m_camera;
 
     bool m_wireframe{};
@@ -48,8 +49,8 @@ class integration {
                                               opengl_wrapper::texture::pointer_t &base_texture);
     static opengl_wrapper::shape build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
                                              opengl_wrapper::texture::pointer_t &base_texture);
-    opengl_wrapper::shape build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
-    void shape_debug_ui(opengl_wrapper::shape &s);
+    opengl_wrapper::light build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
+    static void shape_debug_ui(opengl_wrapper::shape &s);
 };
 
 } // namespace test_app

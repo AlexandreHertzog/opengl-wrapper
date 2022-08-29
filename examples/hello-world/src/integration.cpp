@@ -26,7 +26,10 @@ integration::integration()
           p.set_uniform("uniform_view", glm::value_ptr(view));
           p.set_uniform("uniform_projection", glm::value_ptr(projection));
           if (!m_lights.empty()) {
-              p.set_uniform("uniform_light_pos", m_lights[0].get_transform().m_translation);
+              p.set_uniform("uniform_light.position", m_lights[0].m_shape.get_transform().m_translation);
+              p.set_uniform("uniform_light.ambient", m_lights[0].m_ambient);
+              p.set_uniform("uniform_light.diffuse", m_lights[0].m_diffuse);
+              p.set_uniform("uniform_light.specular", m_lights[0].m_specular);
           }
           p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
           p.set_uniform("uniform_material.diffuse", s.get_material().m_diffuse);
@@ -51,7 +54,9 @@ void integration::init_callbacks() {
 
     m_window.set_framebuffer_callback([&](opengl_wrapper::window &w, int width, int height) {
         w.set_viewport(width, height);
-        w.draw(m_shapes);
+        for (auto &s : m_shapes) {
+            w.draw(s);
+        }
     });
 
     m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int scancode, int action, int mods) {
@@ -123,7 +128,6 @@ void integration::build_shapes() {
         s.set_uniform("uniform_texture1", 0);
         s.set_uniform("uniform_texture2", 1);
         s.set_uniform("uniform_texture_mix", 0.8F);
-        s.set_uniform("uniform_light_color", glm::vec3(1.0F, 1.0F, 1.0F));
     }
 }
 
@@ -136,7 +140,7 @@ void integration::prepare_render_loop() {
     }
 
     for (auto &light : m_lights) {
-        light.load_vertices();
+        light.m_shape.load_vertices();
     }
 }
 
@@ -151,8 +155,13 @@ void integration::render_loop() {
 
         m_window.clear();
 
-        m_window.draw(m_shapes);
-        m_window.draw(m_lights);
+        for (auto &s : m_shapes) {
+            m_window.draw(s);
+        }
+
+        for (auto &l : m_lights) {
+            m_window.draw(l.m_shape);
+        }
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -186,10 +195,20 @@ void integration::build_ui() {
         if (m_auto_rotate_light) {
             ImGui::BeginDisabled(true);
         }
-        ImGui::InputScalarN("Light position", ImGuiDataType_Float, &m_lights.front().get_transform().m_translation, 3);
+        ImGui::InputScalarN("Light position", ImGuiDataType_Float,
+                            &m_lights.front().m_shape.get_transform().m_translation, 3);
         if (m_auto_rotate_light) {
             ImGui::EndDisabled();
         }
+
+        float min_material = 0.0F;
+        float max_material = 2.0F;
+        ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &m_lights.front().m_ambient, 3, &min_material,
+                             &max_material);
+        ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &m_lights.front().m_diffuse, 3, &min_material,
+                             &max_material);
+        ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &m_lights.front().m_specular, 3, &min_material,
+                             &max_material);
     }
 
     if (ImGui::CollapsingHeader("Cube")) {
@@ -349,16 +368,16 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     return ret;
 }
 
-opengl_wrapper::shape integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
-    opengl_wrapper::shape ret;
-    ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
+opengl_wrapper::light integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
+    opengl_wrapper::light ret;
+    ret.m_shape.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
 
     opengl_wrapper::transform t;
     t.m_scale = {0.1F, 0.1F, 0.1F};
 
-    ret.set_transform(t);
-    ret.set_program(light_program);
-    ret.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
+    ret.m_shape.set_transform(t);
+    ret.m_shape.set_program(light_program);
+    ret.m_shape.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
     return ret;
 }
 

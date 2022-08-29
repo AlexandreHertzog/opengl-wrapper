@@ -116,16 +116,14 @@ class window {
      */
     void set_input_mode(int mode, int value);
 
-    template <typename TYPE> void draw(TYPE &shapes) {
-        for (auto &shape : shapes) {
-            shape.bind();
+    template <typename TYPE> void draw(TYPE &shape) {
+        shape.bind();
 
-            const auto draw_order = shape.serialize_draw_order();
-            if (!draw_order.empty()) {
-                graphics::instance().gl_draw_elements(GL_TRIANGLES, draw_order.size(), GL_UNSIGNED_INT, nullptr);
-            } else {
-                graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.get_mesh().get_vertices().size());
-            }
+        const auto draw_order = shape.serialize_draw_order();
+        if (!draw_order.empty()) {
+            graphics::instance().gl_draw_elements(GL_TRIANGLES, draw_order.size(), GL_UNSIGNED_INT, nullptr);
+        } else {
+            graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.get_mesh().get_vertices().size());
         }
     }
 
