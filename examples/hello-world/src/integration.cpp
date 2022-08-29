@@ -15,9 +15,9 @@ integration::integration()
       m_default_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
           auto model = glm::mat4(1.0F);
           auto &transform = s.get_transform();
-          model = glm::translate(model, transform.translation());
-          model = glm::rotate(model, glm::radians(transform.rotation_angle()), transform.rotation_axis());
-          model = glm::scale(model, transform.scale());
+          model = glm::translate(model, transform.m_translation);
+          model = glm::rotate(model, glm::radians(transform.m_rotation_angle), transform.m_rotation_axis);
+          model = glm::scale(model, transform.m_scale);
 
           auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
           auto projection = glm::perspective(glm::radians(45.0F), 1920.0F / 1080.0F, 0.1F, 100.0F);
@@ -26,12 +26,12 @@ integration::integration()
           p.set_uniform("uniform_view", glm::value_ptr(view));
           p.set_uniform("uniform_projection", glm::value_ptr(projection));
           if (!m_lights.empty()) {
-              p.set_uniform("uniform_light_pos", m_lights[0].get_transform().translation());
+              p.set_uniform("uniform_light_pos", m_lights[0].get_transform().m_translation);
           }
-          p.set_uniform("uniform_material.ambient", s.get_material().ambient());
-          p.set_uniform("uniform_material.diffuse", s.get_material().diffuse());
-          p.set_uniform("uniform_material.specular", s.get_material().specular());
-          p.set_uniform("uniform_material.shininess", s.get_material().shininess());
+          p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
+          p.set_uniform("uniform_material.diffuse", s.get_material().m_diffuse);
+          p.set_uniform("uniform_material.specular", s.get_material().m_specular);
+          p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
       }) {
 
     IMGUI_CHECKVERSION();
@@ -180,17 +180,53 @@ void integration::build_ui() {
     //    ImGui::ShowDemoWindow();
 
     ImGui::Begin("OpenGL Wrapper test app");
-    ImGui::Checkbox("Auto-rotate light", &m_auto_rotate_light);
-    if (m_auto_rotate_light) {
-        ImGui::BeginDisabled(true);
+
+    if (ImGui::CollapsingHeader("Lights")) {
+        ImGui::Checkbox("Auto-rotate light", &m_auto_rotate_light);
+        if (m_auto_rotate_light) {
+            ImGui::BeginDisabled(true);
+        }
+        ImGui::InputScalarN("Light position", ImGuiDataType_Float, &m_lights.front().get_transform().m_translation, 3);
+        if (m_auto_rotate_light) {
+            ImGui::EndDisabled();
+        }
     }
-    ImGui::InputFloat3("Light position", m_light_position);
-    if (m_auto_rotate_light) {
-        ImGui::EndDisabled();
+
+    if (ImGui::CollapsingHeader("Cube")) {
+        shape_debug_ui(m_shapes[0]);
     }
+    if (ImGui::CollapsingHeader("Plane")) {
+        shape_debug_ui(m_shapes[1]);
+    }
+    if (ImGui::CollapsingHeader("Sphere")) {
+        shape_debug_ui(m_shapes[2]);
+    }
+    if (ImGui::CollapsingHeader("Torus")) {
+        shape_debug_ui(m_shapes[3]);
+    }
+
     ImGui::End();
 
     ImGui::Render();
+}
+
+void integration::shape_debug_ui(opengl_wrapper::shape &s) {
+    float min_translation = -10.0F;
+    float max_translation = 10.0F;
+
+    ImGui::SliderScalarN("Position", ImGuiDataType_Float, &s.get_transform().m_translation, 3, &min_translation,
+                         &max_translation);
+    ImGui::SliderFloat("Rot angle", &s.get_transform().m_rotation_angle, -180.0F, 180.0F);
+    ImGui::InputScalarN("Rot axis", ImGuiDataType_Float, &s.get_transform().m_rotation_axis, 3);
+    ImGui::InputScalarN("Scale", ImGuiDataType_Float, &s.get_transform().m_scale, 3);
+
+    float min_material = 0.0F;
+    float max_material = 2.0F;
+    ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &s.get_material().m_ambient, 3, &min_material, &max_material);
+    ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &s.get_material().m_diffuse, 3, &min_material, &max_material);
+    ImGui::SliderFloat("Shininess", &s.get_material().m_shininess, 0.0F, 10.0F);
+    ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &s.get_material().m_specular, 3, &min_material,
+                         &max_material);
 }
 
 std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
@@ -213,9 +249,8 @@ std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
         constexpr auto radius = 4.0F;
         auto &transform = s.get_transform();
         if (m_auto_rotate_light) {
-            transform.translate(radius * sin(glfwGetTime()), transform.translation().y, radius * cos(glfwGetTime()));
-        } else {
-            transform.translate(m_light_position[0], m_light_position[1], m_light_position[2]);
+            transform.m_translation.x = radius * sin(glfwGetTime());
+            transform.m_translation.z = radius * cos(glfwGetTime());
         }
         p.set_uniform("uniform_view_pos", m_camera.get_position());
         m_default_callback(p, s);
@@ -227,10 +262,14 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
                                               opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/cube.obj"));
-    ret.set_transform(opengl_wrapper::transform()
-                          .translate(0.0F, 0.0F, -1.0F)
-                          .rotate(45.0F, 0.0F, 1.0F, 0.0F)
-                          .scale(0.5F, 0.5F, 0.5F));
+
+    opengl_wrapper::transform t;
+    t.m_translation = {0.0F, 0.0F, -1.0F};
+    t.m_rotation_angle = 45.0F;
+    t.m_rotation_axis = {0.0F, 1.0F, 0.0F};
+    t.m_scale = {0.5F, 0.5F, 0.5F};
+
+    ret.set_transform(t);
 
     ret.set_program(object_program);
 
@@ -243,7 +282,12 @@ opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::p
                                                opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/plane.obj"));
-    ret.set_transform(opengl_wrapper::transform().translate(0.0F, -0.5F, 0.0F).scale(10.0F, 10.0F, 10.0F));
+
+    opengl_wrapper::transform t;
+    t.m_translation = {0.0F, -0.5F, 0.0F};
+    t.m_scale = {10.0F, 10.0F, 10.0F};
+
+    ret.set_transform(t);
     ret.set_program(object_program);
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1));
@@ -254,17 +298,24 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
                                                 opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
-    ret.set_transform(opengl_wrapper::transform().translate(1.5F, 0.0F, -1.0F).scale(0.6F, 0.6F, 0.6F));
+
+    opengl_wrapper::transform t;
+    t.m_translation = {1.5F, 0.0F, -1.0F};
+    t.m_scale = {0.6F, 0.6F, 0.6F};
+
+    ret.set_transform(t);
     ret.set_program(object_program);
 
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
 
-    ret.get_material()
-        .ambient({0.1F, 0.1F, 0.1F})
-        .diffuse({0.1F, 0.1F, 0.1F})
-        .shininess(32.0F)
-        .specular({2.0F, 2.0F, 2.0F});
+    opengl_wrapper::material m;
+    m.m_ambient = {0.1F, 0.1F, 0.1F};
+    m.m_diffuse = {0.1F, 0.1F, 0.1F};
+    m.m_shininess = 32.0F;
+    m.m_specular = {2.0F, 2.0F, 2.0F};
+
+    ret.set_material(m);
 
     return ret;
 }
@@ -273,21 +324,27 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
                                                opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/torus.obj"));
-    ret.set_transform(opengl_wrapper::transform()
-                          .translate(-1.0F, 0.0F, -1.0F)
-                          .rotate(45.0F, 0.0F, 0.0F, 1.0F)
-                          .scale(0.6F, 0.6F, 0.6F));
+
+    opengl_wrapper::transform t;
+    t.m_translation = {-1.0F, 0.0F, -1.0F};
+    t.m_rotation_axis = {0.0F, 0.0F, 1.0F};
+    t.m_rotation_angle = 45.0F;
+    t.m_scale = {0.6F, 0.6F, 0.6F};
+
+    ret.set_transform(t);
 
     ret.set_program(object_program);
 
     ret.add_texture(base_texture);
     ret.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
 
-    ret.get_material()
-        .ambient({1.0F, 1.0F, 1.0F})
-        .diffuse({1.0F, 1.0F, 1.0F})
-        .shininess(2.0F)
-        .specular({0.1F, 0.1F, 0.1F});
+    opengl_wrapper::material m;
+    m.m_ambient = {1.0F, 1.0F, 1.0F};
+    m.m_diffuse = {1.0F, 1.0F, 1.0F};
+    m.m_shininess = 2.0F;
+    m.m_diffuse = {0.1F, 0.1F, 0.1F};
+
+    ret.set_material(m);
 
     return ret;
 }
@@ -295,9 +352,11 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 opengl_wrapper::shape integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
-    ret.set_transform(opengl_wrapper::transform()
-                          .translate(m_light_position[0], m_light_position[1], m_light_position[2])
-                          .scale(0.1F, 0.1F, 0.1F));
+
+    opengl_wrapper::transform t;
+    t.m_scale = {0.1F, 0.1F, 0.1F};
+
+    ret.set_transform(t);
     ret.set_program(light_program);
     ret.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
     return ret;

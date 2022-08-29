@@ -35,7 +35,6 @@ class integration {
     double m_yaw = -90.0;
 
     bool m_auto_rotate_light{true};
-    float m_light_position[3]{2.0F, 2.0F, 2.0F};
 
     const std::function<void(opengl_wrapper::program &, opengl_wrapper::shape &)> m_default_callback;
 
@@ -50,6 +49,7 @@ class integration {
     static opengl_wrapper::shape build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
                                              opengl_wrapper::texture::pointer_t &base_texture);
     opengl_wrapper::shape build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
+    void shape_debug_ui(opengl_wrapper::shape &s);
 };
 
 } // namespace test_app
