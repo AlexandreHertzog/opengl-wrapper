@@ -125,9 +125,9 @@ void integration::build_shapes() {
     m_lights.emplace_back(build_light(light_program));
 
     for (auto &s : m_shapes) {
-        s.set_uniform("uniform_texture1", 0);
-        s.set_uniform("uniform_texture2", 1);
-        s.set_uniform("uniform_texture_mix", 0.8F);
+        s.set_uniform("uniform_material.texture1", 0);
+        s.set_uniform("uniform_material.texture2", 1);
+        s.set_uniform("uniform_material.texture_mix", 0.8F);
     }
 }
 
