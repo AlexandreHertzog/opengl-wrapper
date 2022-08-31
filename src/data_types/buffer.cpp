@@ -18,14 +18,14 @@ std::vector<buffer> buffer::build(size_t amount) {
     return ret;
 }
 
-buffer::buffer(GLuint id, GLenum target) : m_target(target), m_id(id) {
+buffer::buffer(identifier_t id, buffer_target_t target) : m_target(target), m_id(id) {
     if (0 == m_id) {
         m_id = graphics::instance().gl_gen_buffers(1)[0];
     }
 }
 
 buffer::buffer(buffer &&other) noexcept : m_target(other.m_target), m_id(other.m_id) {
-    other.m_target = 0;
+    other.m_target = buffer_target_t::undefined;
     other.m_id = 0;
 }
 
@@ -40,25 +40,25 @@ buffer &buffer::operator=(buffer &&other) noexcept {
     other.m_id = 0;
 
     m_target = other.m_target;
-    other.m_target = 0;
+    other.m_target = buffer_target_t::undefined;
     return *this;
 }
 
 void buffer::bind() {
     assert(0 != m_id);
-    assert(0 != m_target);
+    assert(buffer_target_t::undefined != m_target);
     graphics::instance().gl_bind_buffer(m_target, m_id);
 }
 
-GLuint buffer::get_id() const {
+identifier_t buffer::get_id() const {
     return m_id;
 }
 
-GLenum buffer::get_target() const {
+buffer_target_t buffer::get_target() const {
     return m_target;
 }
 
-void buffer::set_target(GLenum target) {
+void buffer::set_target(buffer_target_t target) {
     m_target = target;
 }
 

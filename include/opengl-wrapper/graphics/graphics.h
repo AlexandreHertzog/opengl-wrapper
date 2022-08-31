@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glad/glad.h"
+#include "opengl-wrapper/data_types/types.h"
 
 #include <GLFW/glfw3.h>
 #include <memory>
@@ -38,7 +39,7 @@ class graphics {
      * targets in the following table:
      * @param buffer Specifies the name of a buffer object.
      */
-    virtual void gl_bind_buffer(GLenum target, GLuint buffer) = 0;
+    virtual void gl_bind_buffer(buffer_target_t target, GLuint buffer) = 0;
 
     /**
      * @brief bind a named texture_coord to a texturing target
@@ -70,7 +71,7 @@ class graphics {
      * GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, GL_DYNAMIC_DRAW,
      * GL_DYNAMIC_READ, or GL_DYNAMIC_COPY.
      */
-    virtual void gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLenum usage) = 0;
+    virtual void gl_buffer_data(buffer_target_t target, size_t size, const void *data) = 0;
 
     /**
      * @brief clear buffers to preset values.
@@ -219,7 +220,7 @@ class graphics {
      * @param n Specifies the number of buffer object names to be generated.
      * @param buffers Specifies an array in which the generated buffer object names are stored.
      */
-    virtual std::vector<GLuint> gl_gen_buffers(GLsizei n) = 0;
+    virtual std::vector<identifier_t> gl_gen_buffers(size_t n) = 0;
 
     /**
      * @brief generate texture_coord names

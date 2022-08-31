@@ -16,10 +16,10 @@ class ogl_graphics : public graphics {
 
     void gl_activate_texture(GLenum texture) override;
     void gl_attach_shader(GLuint program, GLuint shader) override;
-    void gl_bind_buffer(GLenum target, GLuint buffer) override;
+    void gl_bind_buffer(buffer_target_t target, GLuint buffer) override;
     void gl_bind_texture(GLenum target, GLuint texture) override;
     void gl_bind_vertex_array(GLuint array) override;
-    void gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLenum usage) override;
+    void gl_buffer_data(buffer_target_t target, size_t size, const void *data) override;
     void gl_clear(GLbitfield mask) override;
     void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) override;
     void gl_compile_shader(GLuint shader) override;
@@ -35,7 +35,7 @@ class ogl_graphics : public graphics {
     void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) override;
     void gl_enable(GLenum cap) override;
     void gl_enable_vertex_attrib_array(GLuint index) override;
-    std::vector<GLuint> gl_gen_buffers(GLsizei n) override;
+    std::vector<identifier_t> gl_gen_buffers(size_t n) override;
     std::vector<GLuint> gl_gen_textures(GLsizei n) override;
     void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) override;
     void gl_generate_mipmap(GLenum target) override;

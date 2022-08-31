@@ -24,8 +24,8 @@ vertex_array::vertex_array(GLuint id) : m_id(id), m_buffers(buffer::build(2)) {
 
     assert(m_buffers.size() == 2);
 
-    m_buffers[0].set_target(GL_ARRAY_BUFFER);
-    m_buffers[1].set_target(GL_ELEMENT_ARRAY_BUFFER);
+    m_buffers[0].set_target(buffer_target_t::simple_array);
+    m_buffers[1].set_target(buffer_target_t::element_array);
 }
 
 vertex_array::vertex_array(vertex_array &&other) noexcept : m_id(other.m_id), m_buffers(std::move(other.m_buffers)) {
@@ -60,10 +60,10 @@ void vertex_array::load(const std::vector<vertex> &vertices, const std::vector<u
     bind();
 
     m_buffers[0].bind();
-    m_buffers[0].load(vertices, usage);
+    m_buffers[0].load(vertices);
 
     m_buffers[1].bind();
-    m_buffers[1].load(indices, usage);
+    m_buffers[1].load(indices);
 
     graphics::instance().gl_vertex_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr);
     graphics::instance().gl_enable_vertex_attrib_array(0);

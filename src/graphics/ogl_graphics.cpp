@@ -40,8 +40,8 @@ void ogl_graphics::gl_attach_shader(GLuint program, GLuint shader) {
     glAttachShader(program, shader);
 }
 
-void ogl_graphics::gl_bind_buffer(GLenum target, GLuint buffer) {
-    glBindBuffer(target, buffer);
+void ogl_graphics::gl_bind_buffer(buffer_target_t target, GLuint buffer) {
+    glBindBuffer(static_cast<GLenum>(target), buffer);
 }
 
 void ogl_graphics::gl_bind_texture(GLenum target, GLuint texture) {
@@ -52,8 +52,8 @@ void ogl_graphics::gl_bind_vertex_array(GLuint array) {
     glBindVertexArray(array);
 }
 
-void ogl_graphics::gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
-    glBufferData(target, size, data, usage);
+void ogl_graphics::gl_buffer_data(buffer_target_t target, size_t size, const void *data) {
+    glBufferData(static_cast<GLenum>(target), size, data, GL_STATIC_DRAW);
 }
 
 void ogl_graphics::gl_clear(GLbitfield mask) {
@@ -116,7 +116,7 @@ void ogl_graphics::gl_enable_vertex_attrib_array(GLuint index) {
     glEnableVertexAttribArray(index);
 }
 
-std::vector<GLuint> ogl_graphics::gl_gen_buffers(GLsizei n) {
+std::vector<identifier_t> ogl_graphics::gl_gen_buffers(size_t n) {
     std::vector<GLuint> ret(n);
     glGenBuffers(n, ret.data());
     return ret;

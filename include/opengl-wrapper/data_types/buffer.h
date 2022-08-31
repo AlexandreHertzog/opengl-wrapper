@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opengl-wrapper/graphics/graphics.h"
+#include "types.h"
 #include <ostream>
 #include <vector>
 
@@ -21,7 +22,7 @@ class buffer {
      * @param id The buffer id.
      * @param target The buffer target.
      */
-    explicit buffer(GLuint id = 0, GLenum target = 0);
+    explicit buffer(identifier_t id = 0, buffer_target_t target = buffer_target_t::undefined);
 
     /**
      * @brief buffer move-constructor.
@@ -61,31 +62,31 @@ class buffer {
      * @param data Data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    template <class TYPE> void load(const std::vector<TYPE> &data, GLenum usage) {
-        graphics::instance().gl_buffer_data(m_target, data.size() * sizeof(TYPE), data.data(), usage);
+    template <class TYPE> void load(const std::vector<TYPE> &data) {
+        graphics::instance().gl_buffer_data(m_target, data.size() * sizeof(TYPE), data.data());
     }
 
     /**
      * @brief Get the buffer ids associated with this object.
      * @return Buffer ids.
      */
-    [[nodiscard]] GLuint get_id() const;
+    [[nodiscard]] identifier_t get_id() const;
 
     /**
      * @brief Gets the buffer target associated with this object.
      * @return Buffer target.
      */
-    [[nodiscard]] GLenum get_target() const;
+    [[nodiscard]] buffer_target_t get_target() const;
 
     /**
      * @brief Sets the buffer target.
      * @param target Buffer target.
      */
-    void set_target(GLenum target);
+    void set_target(buffer_target_t target);
 
   private:
-    GLuint m_id;
-    GLenum m_target;
+    identifier_t m_id;
+    buffer_target_t m_target;
 };
 
 std::ostream &operator<<(std::ostream &s, const opengl_wrapper::buffer &b);
