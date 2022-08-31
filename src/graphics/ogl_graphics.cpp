@@ -44,8 +44,8 @@ void ogl_graphics::gl_bind_buffer(buffer_target_t target, GLuint buffer) {
     glBindBuffer(static_cast<GLenum>(target), buffer);
 }
 
-void ogl_graphics::gl_bind_texture(GLenum target, GLuint texture) {
-    glBindTexture(target, texture);
+void ogl_graphics::gl_bind_texture(texture_target_t target, GLuint texture) {
+    glBindTexture(static_cast<GLenum>(target), texture);
 }
 
 void ogl_graphics::gl_bind_vertex_array(GLuint array) {
@@ -132,8 +132,8 @@ void ogl_graphics::gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) {
     glGenVertexArrays(n, arrays);
 }
 
-void ogl_graphics::gl_generate_mipmap(GLenum target) {
-    glGenerateMipmap(target);
+void ogl_graphics::gl_generate_mipmap(texture_target_t target) {
+    glGenerateMipmap(static_cast<GLenum>(target));
 }
 
 void ogl_graphics::gl_get_integerv(GLenum pname, GLint *data) {
@@ -172,14 +172,17 @@ void ogl_graphics::gl_shader_source(GLuint shader, GLsizei count, const GLchar *
     glShaderSource(shader, count, string, length);
 }
 
-void ogl_graphics::gl_tex_image_2d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height,
-                                   GLint border, GLenum format, GLenum type, const void *data) {
+void ogl_graphics::gl_tex_image_2d(texture_target_t target, size_t width, size_t height, texture_format_t format,
+                                   const unsigned char *data) {
 
-    glTexImage2D(target, level, internalformat, width, height, border, format, type, data);
+    glTexImage2D(static_cast<GLenum>(target), 0, GL_RGB, width, height, 0, static_cast<GLenum>(format),
+                 GL_UNSIGNED_BYTE, data);
 }
 
-void ogl_graphics::gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param) {
-    glTexParameteri(texture, pname, param);
+void ogl_graphics::gl_tex_parameter(texture_target_t target, texture_parameter_t name,
+                                    texture_parameter_values_t value) {
+
+    glTexParameteri(static_cast<GLenum>(target), static_cast<GLenum>(name), static_cast<GLint>(value));
 }
 
 void ogl_graphics::gl_uniform(GLint location, GLfloat v0) {

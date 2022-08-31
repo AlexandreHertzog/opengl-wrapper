@@ -50,7 +50,7 @@ class graphics {
      * GL_TEXTURE_2D_MULTISAMPLE_ARRAY.
      * @param texture Specifies the name of a texture_coord.
      */
-    virtual void gl_bind_texture(GLenum target, GLuint texture) = 0;
+    virtual void gl_bind_texture(texture_target_t target, GLuint texture) = 0;
 
     /**
      * @brief bind a vertex array object.
@@ -245,7 +245,7 @@ class graphics {
      * of GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_CUBE_MAP, or
      * GL_TEXTURE_CUBE_MAP_ARRAY.
      */
-    virtual void gl_generate_mipmap(GLenum target) = 0;
+    virtual void gl_generate_mipmap(texture_target_t target) = 0;
 
     /**
      * @brief return the value or values of a selected parameter.
@@ -345,45 +345,34 @@ class graphics {
      * GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
      * GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, or
      * GL_PROXY_TEXTURE_CUBE_MAP.
-     * @param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap
-     * reduction image. If target is GL_TEXTURE_RECTANGLE or GL_PROXY_TEXTURE_RECTANGLE, level must be 0.
-     * @param internalformat Specifies the number of color components in the texture_coord. Must be one of base internal
-     * formats given in Table 1, one of the sized internal formats given in Table 2, or one of the compressed internal
-     * formats given in Table 3, below.
      * @param width Specifies the width of the texture_coord image. All implementations support texture_coord images
      * that are at least 1024 texels wide.
      * @param height Specifies the height of the texture_coord image, or the number of layers in a texture_coord array,
      * in the case of the GL_TEXTURE_1D_ARRAY and GL_PROXY_TEXTURE_1D_ARRAY targets. All implementations support 2D
      * texture_coord images that are at least 1024 texels high, and texture_coord arrays that are at least 256 layers
      * deep.
-     * @param border This value must be 0.
      * @param format Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG,
      * GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER,
      * GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL.
-     * @param type Specifies the data type of the pixel data. The following symbolic values are accepted:
-     * GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_HALF_FLOAT, GL_FLOAT,
-     * GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV,
-     * GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, GL_UNSIGNED_SHORT_5_5_5_1,
-     * GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, GL_UNSIGNED_INT_10_10_10_2,
-     * and GL_UNSIGNED_INT_2_10_10_10_REV.
      * @param data Specifies a pointer to the image data in memory.
      */
-    virtual void gl_tex_image_2d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height,
-                                 GLint border, GLenum format, GLenum type, const void *data) = 0;
+    virtual void gl_tex_image_2d(texture_target_t target, size_t width, size_t height, texture_format_t format,
+                                 const unsigned char *data) = 0;
 
     /**
      * @brief set texture_coord parameters
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
-     * @param texture Specifies the texture_coord object name for glTextureParameter functions.
-     * @param pname Specifies the symbolic name of a single-valued texture_coord parameter. pname can be one of the
+     * @param target Specifies the texture_coord object name for glTextureParameter functions.
+     * @param name Specifies the symbolic name of a single-valued texture_coord parameter. pname can be one of the
 following: GL_DEPTH_STENCIL_TEXTURE_MODE, GL_TEXTURE_BASE_LEVEL, GL_TEXTURE_COMPARE_FUNC, GL_TEXTURE_COMPARE_MODE,
 GL_TEXTURE_LOD_BIAS, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_LOD, GL_TEXTURE_MAX_LOD,
 GL_TEXTURE_MAX_LEVEL, GL_TEXTURE_SWIZZLE_R, GL_TEXTURE_SWIZZLE_G, GL_TEXTURE_SWIZZLE_B, GL_TEXTURE_SWIZZLE_A,
 GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, or GL_TEXTURE_WRAP_R. For the vector commands (glTexParameter*v), pname can also
 be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
-     * @param param For the scalar commands, specifies the value of pname.
+     * @param value For the scalar commands, specifies the value of pname.
      */
-    virtual void gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param) = 0;
+    virtual void gl_tex_parameter(texture_target_t target, texture_parameter_t name,
+                                  texture_parameter_values_t value) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.

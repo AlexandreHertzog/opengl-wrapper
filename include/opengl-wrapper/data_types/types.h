@@ -24,7 +24,37 @@ enum class shader_type_t {
     vertex = 0x8B31
 };
 
+enum class texture_format_t {
+    undefined = -1,
+    rgb = 0x1907,
+    rgba = 0x1908
+};
+
+enum class texture_target_t {
+    undefined = -1,
+    tex_2d = 0x0DE1
+};
+
+enum class texture_parameter_t {
+    undefined = -1,
+    mag_filter = 0x2800,
+    min_filter = 0x2801,
+    wrap_s = 0x2802,
+    wrap_t = 0x2803,
+};
+
+enum class texture_parameter_values_t {
+    undefined = -1,
+    linear = 0x2601,
+    linear_mipmap_linear = 0x2703,
+    repeat = 0x2901
+};
+
 inline std::ostream &operator<<(std::ostream &os, buffer_target_t t) {
+    return os << std::hex << "0x" << static_cast<int>(t);
+}
+
+inline std::ostream &operator<<(std::ostream &os, texture_target_t t) {
     return os << std::hex << "0x" << static_cast<int>(t);
 }
 

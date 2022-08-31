@@ -17,7 +17,7 @@ class ogl_graphics : public graphics {
     void gl_activate_texture(GLenum texture) override;
     void gl_attach_shader(GLuint program, GLuint shader) override;
     void gl_bind_buffer(buffer_target_t target, GLuint buffer) override;
-    void gl_bind_texture(GLenum target, GLuint texture) override;
+    void gl_bind_texture(texture_target_t target, GLuint texture) override;
     void gl_bind_vertex_array(GLuint array) override;
     void gl_buffer_data(buffer_target_t target, size_t size, const void *data) override;
     void gl_clear(GLbitfield mask) override;
@@ -38,7 +38,7 @@ class ogl_graphics : public graphics {
     std::vector<identifier_t> gl_gen_buffers(size_t n) override;
     std::vector<GLuint> gl_gen_textures(GLsizei n) override;
     void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) override;
-    void gl_generate_mipmap(GLenum target) override;
+    void gl_generate_mipmap(texture_target_t target) override;
     void gl_get_integerv(GLenum pname, GLint *data) override;
     void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log) override;
     void gl_get_programiv(GLuint program, GLenum pname, GLint *params) override;
@@ -48,9 +48,9 @@ class ogl_graphics : public graphics {
     void gl_link_program(GLuint program) override;
     void gl_polygon_mode(GLenum face, GLenum mode) override;
     void gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) override;
-    void gl_tex_image_2d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border,
-                         GLenum format, GLenum type, const void *data) override;
-    void gl_tex_parameter_i(GLuint texture, GLenum pname, GLint param) override;
+    void gl_tex_image_2d(texture_target_t target, size_t width, size_t height, texture_format_t format,
+                         const unsigned char *data) override;
+    void gl_tex_parameter(texture_target_t target, texture_parameter_t name, texture_parameter_values_t value) override;
     void gl_uniform(GLint location, GLfloat v0) override;
     void gl_uniform(GLint location, GLint v0) override;
     void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) override;
