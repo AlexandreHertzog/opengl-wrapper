@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opengl-wrapper/graphics/graphics.h"
+#include "types.h"
 #include <filesystem>
 #include <ostream>
 #include <string>
@@ -17,7 +17,7 @@ class shader {
      * @param source Source-code for the shader.
      * @throws GlError When the shader compilation fails.
      */
-    explicit shader(GLenum type, const char *source = nullptr);
+    explicit shader(shader_type_t type, const char *source = nullptr);
 
     /**
      * @brief Construct a new shader object, reads its source from the filesystem then compiles it. See
@@ -26,7 +26,7 @@ class shader {
      * @param type
      * @param shader_path
      */
-    shader(GLenum type, const std::filesystem::path &shader_path);
+    shader(shader_type_t type, const std::filesystem::path &shader_path);
 
     /**
      * @brief shader move-constructor.
@@ -56,12 +56,12 @@ class shader {
     /**
      * @brief Gets the internal OpenGL shader ID.
      *
-     * @return GLuint shader ID.
+     * @return identifier_t shader ID.
      */
-    [[nodiscard]] GLuint get_id() const;
+    [[nodiscard]] identifier_t get_id() const;
 
   private:
-    GLuint m_id{};
+    identifier_t m_id{};
 
     void compile(const char *source, bool free_on_error);
     void gl_delete();

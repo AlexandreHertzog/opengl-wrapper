@@ -18,6 +18,12 @@ enum class buffer_target_t {
     element_array = 0x8893
 };
 
+enum class shader_type_t {
+    undefined = -1,
+    fragment = 0x8B30,
+    vertex = 0x8B31
+};
+
 inline std::ostream &operator<<(std::ostream &os, buffer_target_t t) {
     return os << std::hex << "0x" << static_cast<int>(t);
 }

@@ -4,19 +4,18 @@
 #include "opengl-wrapper/utils/gl_error.h"
 #include "utils/utils.h"
 #include <array>
-#include <boost/log/trivial.hpp>
 #include <cassert>
 #include <fstream>
 
 namespace opengl_wrapper {
 
-shader::shader(GLenum type, const char *source) : m_id(graphics::instance().gl_create_shader(type)) {
+shader::shader(shader_type_t type, const char *source) : m_id(graphics::instance().gl_create_shader(type)) {
     if (source != nullptr) {
         compile(source, true);
     }
 }
 
-shader::shader(GLenum type, const std::filesystem::path &shader_path) {
+shader::shader(shader_type_t type, const std::filesystem::path &shader_path) {
     std::ifstream shader_file(shader_path);
     if (!shader_file.is_open()) {
         throw exception("shader file not found: " + shader_path.string());

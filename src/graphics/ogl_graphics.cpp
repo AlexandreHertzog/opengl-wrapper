@@ -72,8 +72,8 @@ GLuint ogl_graphics::gl_create_program() {
     return glCreateProgram();
 }
 
-GLuint ogl_graphics::gl_create_shader(GLenum shader_type) {
-    return glCreateShader(shader_type);
+GLuint ogl_graphics::gl_create_shader(shader_type_t type) {
+    return glCreateShader(static_cast<GLenum>(type));
 }
 
 void ogl_graphics::gl_delete_buffers(GLsizei n, const GLuint *buffers) {

@@ -250,8 +250,10 @@ void integration::shape_debug_ui(opengl_wrapper::shape &s) {
 
 std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
     auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/object.vert")));
-    ret->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/object.frag")));
+    ret->add_shader(
+        opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, std::filesystem::path("shaders/object.vert")));
+    ret->add_shader(
+        opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, std::filesystem::path("shaders/object.frag")));
     ret->link();
 
     ret->set_use_callback(m_default_callback);
@@ -260,8 +262,10 @@ std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
 
 std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
     auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(opengl_wrapper::shader(GL_VERTEX_SHADER, std::filesystem::path("shaders/light.vert")));
-    ret->add_shader(opengl_wrapper::shader(GL_FRAGMENT_SHADER, std::filesystem::path("shaders/light.frag")));
+    ret->add_shader(
+        opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, std::filesystem::path("shaders/light.vert")));
+    ret->add_shader(
+        opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, std::filesystem::path("shaders/light.frag")));
     ret->link();
 
     ret->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {

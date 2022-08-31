@@ -116,7 +116,7 @@ class graphics {
     /**
      * @brief Creates a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml
-     * @param shader_type Specifies the type of shader to be created. Must be one of GL_COMPUTE_SHADER,
+     * @param type Specifies the type of shader to be created. Must be one of GL_COMPUTE_SHADER,
      * GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER, or GL_FRAGMENT_SHADER.
      * @return creates an empty shader object and returns a non-zero value by which it can be referenced. A shader
      * object is used to maintain the source code strings that define a shader. shader_type indicates the type of shader
@@ -129,7 +129,7 @@ class graphics {
      * geometry processor. A shader of type GL_FRAGMENT_SHADER is a shader that is intended to run on the programmable
      * fragment processor.
      */
-    virtual GLuint gl_create_shader(GLenum shader_type) = 0;
+    virtual GLuint gl_create_shader(shader_type_t type) = 0;
 
     /**
      * @brief delete named buffer objects.

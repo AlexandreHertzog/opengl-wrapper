@@ -24,7 +24,7 @@ class ogl_graphics : public graphics {
     void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) override;
     void gl_compile_shader(GLuint shader) override;
     GLuint gl_create_program() override;
-    GLuint gl_create_shader(GLenum shader_type) override;
+    GLuint gl_create_shader(shader_type_t type) override;
     void gl_delete_buffers(GLsizei n, const GLuint *buffers) override;
     void gl_delete_program(GLuint program) override;
     void gl_delete_shader(GLuint shader) override;
