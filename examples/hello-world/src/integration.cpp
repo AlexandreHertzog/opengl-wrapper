@@ -127,7 +127,7 @@ void integration::build_shapes() {
     for (auto &s : m_shapes) {
         s.set_uniform("uniform_material.texture1", 0);
         s.set_uniform("uniform_material.texture2", 1);
-        s.set_uniform("uniform_material.texture_mix", 0.8F);
+        s.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
     }
 }
 
@@ -292,8 +292,11 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
 
     ret.set_program(object_program);
 
-    ret.add_texture(base_texture);
-    ret.add_texture(opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1));
+    opengl_wrapper::material mat;
+    mat.m_texture1 = base_texture;
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1);
+
+    ret.set_material(std::move(mat));
     return ret;
 }
 
@@ -308,8 +311,11 @@ opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::p
 
     ret.set_transform(t);
     ret.set_program(object_program);
-    ret.add_texture(base_texture);
-    ret.add_texture(opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1));
+
+    opengl_wrapper::material mat;
+    mat.m_texture1 = base_texture;
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1);
+    ret.set_material(std::move(mat));
     return ret;
 }
 
@@ -325,16 +331,15 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
     ret.set_transform(t);
     ret.set_program(object_program);
 
-    ret.add_texture(base_texture);
-    ret.add_texture(opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1));
+    opengl_wrapper::material mat;
+    mat.m_ambient = {0.1F, 0.1F, 0.1F};
+    mat.m_diffuse = {0.1F, 0.1F, 0.1F};
+    mat.m_shininess = 32.0F;
+    mat.m_specular = {2.0F, 2.0F, 2.0F};
+    mat.m_texture1 = base_texture;
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1);
 
-    opengl_wrapper::material m;
-    m.m_ambient = {0.1F, 0.1F, 0.1F};
-    m.m_diffuse = {0.1F, 0.1F, 0.1F};
-    m.m_shininess = 32.0F;
-    m.m_specular = {2.0F, 2.0F, 2.0F};
-
-    ret.set_material(m);
+    ret.set_material(std::move(mat));
 
     return ret;
 }
@@ -354,16 +359,15 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 
     ret.set_program(object_program);
 
-    ret.add_texture(base_texture);
-    ret.add_texture(opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1));
+    opengl_wrapper::material mat;
+    mat.m_ambient = {1.0F, 1.0F, 1.0F};
+    mat.m_diffuse = {1.0F, 1.0F, 1.0F};
+    mat.m_shininess = 2.0F;
+    mat.m_diffuse = {0.1F, 0.1F, 0.1F};
+    mat.m_texture1 = base_texture;
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1);
 
-    opengl_wrapper::material m;
-    m.m_ambient = {1.0F, 1.0F, 1.0F};
-    m.m_diffuse = {1.0F, 1.0F, 1.0F};
-    m.m_shininess = 2.0F;
-    m.m_diffuse = {0.1F, 0.1F, 0.1F};
-
-    ret.set_material(m);
+    ret.set_material(std::move(mat));
 
     return ret;
 }
@@ -377,7 +381,11 @@ opengl_wrapper::light integration::build_light(std::shared_ptr<opengl_wrapper::p
 
     ret.m_shape.set_transform(t);
     ret.m_shape.set_program(light_program);
-    ret.m_shape.add_texture(opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0));
+
+    opengl_wrapper::material mat;
+    mat.m_texture1 = opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0);
+
+    ret.m_shape.set_material(std::move(mat));
     return ret;
 }
 

@@ -20,8 +20,6 @@ class program;
 
 class shape {
   public:
-    using textures_t = std::vector<texture::pointer_t>;
-
     explicit shape(vertex_array va = vertex_array());
     shape(const shape &other);
     shape(shape &&other) noexcept;
@@ -31,9 +29,6 @@ class shape {
     shape &operator=(shape &&other) noexcept;
 
     void set_program(std::shared_ptr<program> p);
-    void set_textures(textures_t t);
-    void add_texture(texture::pointer_t t);
-    [[nodiscard]] const textures_t &get_textures() const;
 
     void load_vertices();
     void bind();
@@ -62,7 +57,6 @@ class shape {
 
     vertex_array m_vertex_array;
     std::shared_ptr<program> m_program;
-    textures_t m_textures;
 };
 
 } // namespace opengl_wrapper

@@ -11,13 +11,11 @@ shape::shape(vertex_array va) : m_vertex_array(std::move(va)) {
 
 shape::shape(opengl_wrapper::shape &&other) noexcept
     : m_mesh(std::move(other.m_mesh)), m_transform(std::move(other.m_transform)),
-      m_material(std::move(other.m_material)), m_program(std::move(other.m_program)),
-      m_textures(std::move(other.m_textures)) {
+      m_material(std::move(other.m_material)), m_program(std::move(other.m_program)) {
 }
 
 shape::shape(const opengl_wrapper::shape &other)
-    : m_mesh(other.m_mesh), m_transform(other.m_transform), m_material(other.m_material), m_program(other.m_program),
-      m_textures(other.m_textures) {
+    : m_mesh(other.m_mesh), m_transform(other.m_transform), m_material(other.m_material), m_program(other.m_program) {
 }
 
 shape &shape::operator=(shape &&other) noexcept {
@@ -26,7 +24,6 @@ shape &shape::operator=(shape &&other) noexcept {
     m_material = std::move(other.m_material);
     m_vertex_array = std::move(other.m_vertex_array);
     m_program = std::move(other.m_program);
-    m_textures = std::move(other.m_textures);
     return *this;
 }
 
@@ -37,7 +34,6 @@ shape &shape::operator=(const shape &other) {
         m_material = other.m_material;
         m_vertex_array = vertex_array();
         m_program = other.m_program;
-        m_textures = other.m_textures;
     }
 
     return *this;
@@ -59,32 +55,21 @@ void shape::set_program(std::shared_ptr<program> p) {
     m_program = std::move(p);
 }
 
-void shape::set_textures(textures_t t) {
-    m_textures = std::move(t);
-}
-
-void shape::add_texture(opengl_wrapper::texture::pointer_t t) {
-    m_textures.emplace_back(std::move(t));
-}
-
-const shape::textures_t &shape::get_textures() const {
-    return m_textures;
-}
-
 void shape::load_vertices() {
     m_vertex_array.load(m_mesh.get_vertices(), serialize_draw_order(), GL_STATIC_DRAW);
 }
 
 void shape::bind() {
     assert(m_program);
-    assert(!m_textures.empty());
+    m_program->use(*this);
 
-    for (auto &t : m_textures) {
-        assert(t);
-        t->bind();
+    if (m_material.m_texture1) {
+        m_material.m_texture1->bind();
+    }
+    if (m_material.m_texture2) {
+        m_material.m_texture2->bind();
     }
 
-    m_program->use(*this);
     m_vertex_array.bind();
 }
 
