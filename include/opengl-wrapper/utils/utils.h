@@ -58,6 +58,13 @@ template <class TYPE> std::istream &operator>>(std::istream &is, std::vector<TYP
     return is;
 }
 
+template <class TYPE, size_t SIZE> std::istream &operator>>(std::istream &is, std::array<TYPE, SIZE> &out) {
+    for (auto &o : out) {
+        is >> o;
+    }
+    return is;
+}
+
 inline int to_int(const char *s, size_t len, int base = 10) {
     assert(nullptr != s);
     assert(len > 0);

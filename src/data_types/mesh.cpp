@@ -61,13 +61,6 @@ mesh::mesh(opengl_wrapper::mesh &&other) noexcept
     other.m_smooth_shading = false;
 }
 
-mesh::mesh(const mesh &other)
-    : m_material_library(other.m_material_library), m_name(other.m_name), m_vertices(other.m_vertices),
-      m_texture_coords(other.m_texture_coords), m_vertex_normals(other.m_vertex_normals),
-      m_used_material(other.m_used_material), m_smooth_shading(other.m_smooth_shading), m_faces(other.m_faces),
-      m_cached_vertices(other.m_cached_vertices) {
-}
-
 mesh &mesh::operator=(opengl_wrapper::mesh &&other) noexcept {
     std::swap(m_material_library, other.m_material_library);
     std::swap(m_name, other.m_name);

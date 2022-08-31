@@ -1,7 +1,7 @@
 #pragma once
 
 #include "face_vertex_indices.h"
-#include "glm/glm.hpp"
+#include "types.h"
 #include "vertex.h"
 #include <filesystem>
 #include <string>
@@ -14,7 +14,7 @@ class mesh {
     mesh() = default;
     explicit mesh(const std::filesystem::path &wavefront_object_path);
     mesh(mesh &&other) noexcept;
-    mesh(const mesh &other);
+    mesh(const mesh &other) = default;
     ~mesh() = default;
 
     mesh &operator=(mesh &&other) noexcept;
@@ -25,9 +25,9 @@ class mesh {
   private:
     std::string m_material_library{"mtllib_undefined"};
     std::string m_name{"name_undefined"};
-    std::vector<glm::vec3> m_vertices;
-    std::vector<glm::vec2> m_texture_coords;
-    std::vector<glm::vec3> m_vertex_normals;
+    std::vector<position_t> m_vertices;
+    std::vector<tex_coord_t> m_texture_coords;
+    std::vector<direction_t> m_vertex_normals;
     std::string m_used_material{"usemtl_undefined"};
     bool m_smooth_shading{false};
     std::vector<std::vector<face_t>> m_faces;
