@@ -10,7 +10,7 @@
 
 namespace opengl_wrapper {
 
-program::program() : m_shader_count(0), m_id(graphics::instance().gl_create_program()), m_linked(false) {
+program::program() : m_shader_count(0), m_id(graphics::instance().new_program()), m_linked(false) {
 }
 
 program::program(program &&other) noexcept
@@ -24,7 +24,7 @@ program::program(program &&other) noexcept
 
 program::~program() {
     if (0 != m_id) {
-        graphics::instance().gl_delete_program(m_id);
+        graphics::instance().delete_program(m_id);
     }
 }
 
@@ -49,29 +49,23 @@ bool program::operator==(const opengl_wrapper::program &other) const {
 
 void program::add_shader(shader shader) {
     if (0 == m_id) {
-        m_id = graphics::instance().gl_create_program();
+        m_id = graphics::instance().new_program();
         assert(0 == m_shader_count);
     }
 
-    graphics::instance().gl_attach_shader(m_id, shader.get_id());
+    graphics::instance().attach_shader(*this, shader);
     m_shaders.emplace_back(std::move(shader));
     m_shader_count++;
 }
 
 void program::link() {
-    constexpr auto error_string_length = 512;
-
     assert(0 != m_id);
 
-    graphics::instance().gl_link_program(m_id);
+    graphics::instance().link(*this);
 
-    int success = 0;
-    std::array<char, error_string_length> message = {'\0'};
-
-    graphics::instance().gl_get_programiv(m_id, GL_LINK_STATUS, &success);
+    const auto success = graphics::instance().get_parameter(*this, program_parameter_t::link_status);
     if (GL_FALSE == success) {
-        graphics::instance().gl_get_program_info_log(m_id, message.size(), nullptr, message.data());
-        throw gl_error(message.data());
+        throw gl_error(graphics::instance().get_info_log(*this));
     }
 
     m_shaders.clear();
@@ -83,35 +77,35 @@ void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
 }
 
 int program::get_uniform_location(const char *var_name) const {
-    return graphics::instance().gl_get_uniform_location(m_id, var_name);
+    return graphics::instance().get_uniform_location(*this, var_name);
 }
 
 void program::set_uniform(const char *var_name, float value) {
-    graphics::instance().gl_uniform(get_uniform_location(var_name), value);
+    graphics::instance().set_uniform(get_uniform_location(var_name), value);
 }
 
 void program::set_uniform(const char *var_name, const glm::vec3 &vec) {
-    graphics::instance().gl_uniform(get_uniform_location(var_name), vec.x, vec.y, vec.z);
+    graphics::instance().set_uniform(get_uniform_location(var_name), std::array<float, 3>{vec.x, vec.y, vec.z});
 }
 
-void program::set_uniform(const char *var_name, float v0, float v1, float v2) {
-    graphics::instance().gl_uniform(get_uniform_location(var_name), v0, v1, v2);
+void program::set_uniform(const char *var_name, const std::array<float, 3> &v) {
+    graphics::instance().set_uniform(get_uniform_location(var_name), v);
 }
 
-void program::set_uniform(const char *var_name, float v0, float v1, float v2, float v3) {
-    graphics::instance().gl_uniform(get_uniform_location(var_name), v0, v1, v2, v3);
+void program::set_uniform(const char *var_name, const std::array<float, 4> v) {
+    graphics::instance().set_uniform(get_uniform_location(var_name), v);
 }
 
 void program::set_uniform(const char *var_name, int value) {
-    graphics::instance().gl_uniform(get_uniform_location(var_name), value);
+    graphics::instance().set_uniform(get_uniform_location(var_name), value);
 }
 
 void program::set_uniform(const char *var_name, const float *value) {
-    graphics::instance().gl_uniform_matrix_4fv(get_uniform_location(var_name), 1, GL_FALSE, value);
+    graphics::instance().set_matrix4_uniform(get_uniform_location(var_name), 1, value);
 }
 
 void program::use(shape &s) { // NOLINT(readability-make-member-function-const)
-    graphics::instance().gl_use_program(m_id);
+    graphics::instance().use(*this);
     if (m_use_callback) {
         m_use_callback(*this, s);
     }
@@ -121,7 +115,7 @@ const std::vector<shader> &program::get_shaders() const {
     return m_shaders;
 }
 
-GLuint program::get_id() const {
+identifier_t program::get_id() const {
     return m_id;
 }
 

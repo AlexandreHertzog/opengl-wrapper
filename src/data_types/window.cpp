@@ -144,32 +144,32 @@ void window::register_callbacks() {
     graphics::instance().glfw_set_cursor_pos_callback(m_window, manager::callback_cursor_pos);
 }
 
-void window::set_viewport(int width, int height) { // NOLINT(readability-convert-member-functions-to-static)
-    graphics::instance().gl_viewport(0, 0, width, height);
+void window::set_viewport(size_t width, size_t height) { // NOLINT(readability-convert-member-functions-to-static)
+    graphics::instance().set_viewport(width, height);
 }
 
 void window::set_wireframe_mode(bool enable) { // NOLINT(readability-convert-member-functions-to-static)
     if (enable) {
-        graphics::instance().gl_polygon_mode(GL_FRONT_AND_BACK, GL_LINE);
+        graphics::instance().polygon_mode(polygon_mode_t::line);
     } else {
-        graphics::instance().gl_polygon_mode(GL_FRONT_AND_BACK, GL_FILL);
+        graphics::instance().polygon_mode(polygon_mode_t::fill);
     }
 }
 
 void window::set_depth_test(bool enable) { // NOLINT(readability-convert-member-functions-to-static)
     if (enable) {
-        graphics::instance().gl_enable(GL_DEPTH_TEST);
+        graphics::instance().enable(graphics_feature_t::depth_test);
     } else {
-        graphics::instance().gl_disable(GL_DEPTH_TEST);
+        graphics::instance().disable(graphics_feature_t::depth_test);
     }
 }
 
-void window::set_clear_color(float red, float green, float blue, float alpha) { // NOLINT(*-functions-to-static)
-    graphics::instance().gl_clear_color(red, green, blue, alpha);
+void window::set_clear_color(const color_alpha_t &c) {
+    graphics::instance().set_clear_color(c);
 }
 
 void window::clear() {
-    graphics::instance().gl_clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    graphics::instance().clear();
 }
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window &w) {

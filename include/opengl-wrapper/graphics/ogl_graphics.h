@@ -14,51 +14,62 @@ class ogl_graphics : public graphics {
     ogl_graphics &operator=(ogl_graphics &&) = delete;
     ogl_graphics &operator=(const ogl_graphics &) = delete;
 
-    void gl_activate_texture(GLenum texture) override;
-    void gl_attach_shader(GLuint program, GLuint shader) override;
-    void gl_bind_buffer(buffer_target_t target, GLuint buffer) override;
-    void gl_bind_texture(texture_target_t target, GLuint texture) override;
-    void gl_bind_vertex_array(GLuint array) override;
-    void gl_buffer_data(buffer_target_t target, size_t size, const void *data) override;
-    void gl_clear(GLbitfield mask) override;
-    void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) override;
-    void gl_compile_shader(GLuint shader) override;
-    GLuint gl_create_program() override;
-    GLuint gl_create_shader(shader_type_t type) override;
-    void gl_delete_buffers(GLsizei n, const GLuint *buffers) override;
-    void gl_delete_program(GLuint program) override;
-    void gl_delete_shader(GLuint shader) override;
-    void gl_delete_textures(GLsizei n, const GLuint *textures) override;
-    void gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays) override;
-    void gl_disable(GLenum cap) override;
-    void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) override;
-    void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) override;
-    void gl_enable(GLenum cap) override;
-    void gl_enable_vertex_attrib_array(GLuint index) override;
-    std::vector<identifier_t> gl_gen_buffers(size_t n) override;
-    std::vector<GLuint> gl_gen_textures(GLsizei n) override;
-    std::vector<identifier_t> gl_gen_vertex_arrays(size_t amount) override;
-    void gl_generate_mipmap(texture_target_t target) override;
-    void gl_get_integerv(GLenum pname, GLint *data) override;
-    void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log) override;
-    void gl_get_programiv(GLuint program, GLenum pname, GLint *params) override;
-    void gl_get_shader_info_log(GLuint shader, GLsizei max_length, GLsizei *length, GLchar *info_log) override;
-    void gl_get_shaderiv(GLuint shader, GLenum pname, GLint *params) override;
-    int gl_get_uniform_location(GLuint program, const GLchar *name) override;
-    void gl_link_program(GLuint program) override;
-    void gl_polygon_mode(GLenum face, GLenum mode) override;
-    void gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) override;
-    void gl_tex_image_2d(texture_target_t target, size_t width, size_t height, texture_format_t format,
-                         const unsigned char *data) override;
-    void gl_tex_parameter(texture_target_t target, texture_parameter_t name, texture_parameter_values_t value) override;
-    void gl_uniform(GLint location, GLfloat v0) override;
-    void gl_uniform(GLint location, GLint v0) override;
-    void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) override;
-    void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) override;
-    void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) override;
-    void gl_use_program(GLuint program) override;
-    void gl_vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) override;
-    void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height) override;
+    // Allocators and deleters
+    identifier_t new_program() override;
+    identifier_t new_shader(shader_type_t type) override;
+    std::vector<identifier_t> new_buffers(size_t n) override;
+    std::vector<identifier_t> new_textures(size_t n) override;
+    std::vector<identifier_t> new_vertex_arrays(size_t amount) override;
+    void delete_buffers(size_t n, const identifier_t *buffers) override;
+    void delete_program(identifier_t program) override;
+    void delete_shader(identifier_t shader) override;
+    void delete_textures(size_t n, const identifier_t *textures) override;
+    void delete_vertex_arrays(size_t n, const identifier_t *arrays) override;
+
+    // Texture functions
+    void activate(const texture &tex) override;
+    void bind(const texture &t) override;
+    void generate_mipmap(const texture &t) override;
+    void set_image(size_t width, size_t height, texture_format_t format, const unsigned char *data) override;
+    void set_parameter(texture_parameter_t name, texture_parameter_values_t value) override;
+
+    // Program functions
+    void attach_shader(const program &p, const shader &s) override;
+    std::string get_info_log(const program &p) override;
+    int get_parameter(const program &p, program_parameter_t param) override;
+    int get_uniform_location(const program &p, const char *name) override;
+    void link(const program &p) override;
+    void use(const program &p) override;
+    void set_uniform(int location, float v0) override;
+    void set_uniform(int location, int v0) override;
+    void set_uniform(int location, const std::array<float, 3> &v) override;
+    void set_uniform(int location, const std::array<float, 4> &v) override;
+    void set_matrix4_uniform(int location, size_t count, const float *value) override;
+
+    // Buffer functions
+    void bind(const buffer &b) override;
+    void buffer_data(const buffer &b, size_t size, const void *data) override;
+
+    // Vertex array functions
+    void bind(const vertex_array &va) override;
+    void enable_vertex_attrib_array(unsigned index) override;
+    void vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) override;
+
+    // Shader functions
+    void compile(const shader &s) override;
+    std::string get_info_log(const shader &s) override;
+    int get_parameter(const shader &s, shader_parameter_t param) override;
+    void set_sources(const shader &s, size_t num_sources, const char **sources) override;
+
+    void clear() override;
+    void set_clear_color(const color_alpha_t &c) override;
+    void disable(graphics_feature_t cap) override;
+    void draw_arrays(int first, size_t count) override;
+    void draw_elements(const std::vector<unsigned> &indices) override;
+    void enable(graphics_feature_t cap) override;
+    void polygon_mode(polygon_mode_t mode) override;
+    void set_viewport(size_t width, size_t height) override;
+
     GLFWwindow *glfw_create_window(int width, int height, const char *title, GLFWmonitor *monitor,
                                    GLFWwindow *share) override;
     void glfw_destroy_window(GLFWwindow *window) override;

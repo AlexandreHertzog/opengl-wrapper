@@ -132,8 +132,10 @@ void integration::build_shapes() {
 }
 
 void integration::prepare_render_loop() {
+    constexpr opengl_wrapper::color_alpha_t clear_color = {0.2F, 0.2F, 0.2F, 1.0F};
+
     m_window.set_depth_test(true);
-    m_window.set_clear_color(0.2F, 0.2F, 0.2F, 1.0F);
+    m_window.set_clear_color(clear_color);
 
     for (auto &shape : m_shapes) {
         shape.load_vertices();

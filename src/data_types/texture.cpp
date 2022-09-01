@@ -4,11 +4,11 @@
 
 namespace opengl_wrapper {
 
-texture::texture(int unit, texture_target_t target, GLuint id) : m_id(id), m_target(target), m_unit(unit) {
+texture::texture(int unit, texture_target_t target, identifier_t id) : m_id(id), m_target(target), m_unit(unit) {
     assert(0 != unit);
 
     if (0 == m_id) {
-        m_id = graphics::instance().gl_gen_textures(1)[0];
+        m_id = graphics::instance().new_textures(1)[0];
     }
 }
 
@@ -45,21 +45,21 @@ void texture::bind() { // NOLINT(readability-make-member-function-const)
     assert(texture_target_t::undefined != m_target);
     assert(0 != m_unit);
 
-    graphics::instance().gl_activate_texture(m_unit);
-    graphics::instance().gl_bind_texture(m_target, m_id);
+    graphics::instance().activate(*this);
+    graphics::instance().bind(*this);
 }
 
 void texture::set_image(size_t width, size_t height, texture_format_t format, const unsigned char *data) {
     assert(0 != m_id);
     assert(texture_target_t::undefined != m_target);
 
-    graphics::instance().gl_tex_image_2d(m_target, width, height, format, data);
+    graphics::instance().set_image(width, height, format, data);
 }
 
 void texture::generate_mipmap() { // NOLINT(readability-make-member-function-const)
     assert(0 != m_id);
     assert(texture_target_t::undefined != m_target);
-    graphics::instance().gl_generate_mipmap(m_target);
+    graphics::instance().generate_mipmap(*this);
 }
 
 void texture::set_image_from_path(const std::filesystem::path &path) {
@@ -78,7 +78,7 @@ void texture::set_image_from_path(const std::filesystem::path &path) {
     generate_mipmap();
 }
 
-GLuint texture::get_id() const {
+identifier_t texture::get_id() const {
     return m_id;
 }
 
@@ -92,7 +92,7 @@ int texture::get_unit() const {
 
 void texture::gl_delete() {
     if (0 != m_id) {
-        graphics::instance().gl_delete_textures(1, &m_id);
+        graphics::instance().delete_textures(1, &m_id);
 
         m_id = 0;
         m_target = texture_target_t::undefined;

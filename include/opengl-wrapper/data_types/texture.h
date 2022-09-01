@@ -51,18 +51,6 @@ class texture {
     void bind();
 
     /**
-     * @brief Sets a texture parameter. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
-     * @param param Parameter name.
-     * @param value Parameter value.
-     */
-    template <class T> void set_parameter(texture_parameter_t param, T value) {
-        assert(m_id != 0);
-        assert(m_target != texture_target_t::undefined);
-        graphics::instance().gl_tex_parameter(m_target, param, value);
-    }
-
-    /**
      * @brief Sets the texture image. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
      * @param width Specifies the width of the texture_coord image.
@@ -90,6 +78,18 @@ class texture {
     int m_unit{};
 
     void gl_delete();
+
+    /**
+     * @brief Sets a texture parameter. See
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
+     * @param param Parameter name.
+     * @param value Parameter value.
+     */
+    template <class T> void set_parameter(texture_parameter_t param, T value) {
+        assert(m_id != 0);
+        assert(m_target != texture_target_t::undefined);
+        graphics::instance().set_parameter(param, value);
+    }
 };
 
 std::ostream &operator<<(std::ostream &os, const texture &t);

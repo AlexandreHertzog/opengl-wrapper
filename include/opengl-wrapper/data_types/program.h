@@ -112,17 +112,17 @@ class program {
      * @brief Sets the value for a  uniform variable. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
      * @param var_name Uniform name.
-     * @param value Uniform value.
+     * @param v Uniform value.
      */
-    void set_uniform(const char *var_name, float v0, float v1, float v2);
+    void set_uniform(const char *var_name, const std::array<float, 3> &v);
 
     /**
      * @brief Sets the value for a  uniform variable. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
      * @param var_name Uniform name.
-     * @param value Uniform value.
+     * @param v Uniform value.
      */
-    void set_uniform(const char *var_name, float v0, float v1, float v2, float v3);
+    void set_uniform(const char *var_name, const std::array<float, 4> &v);
 
     /**
      * @brief Sets the value for a  uniform variable. See
@@ -150,7 +150,7 @@ class program {
      * @brief Gets the program id.
      * @return Program id.
      */
-    [[nodiscard]] GLuint get_id() const;
+    [[nodiscard]] identifier_t get_id() const;
 
     /**
      * @brief Gets whether or not the program has been linked already.
@@ -167,7 +167,7 @@ class program {
   private:
     std::vector<shader> m_shaders;
     unsigned int m_shader_count;
-    GLuint m_id;
+    identifier_t m_id;
     bool m_linked;
     use_callback m_use_callback;
 };

@@ -121,9 +121,9 @@ class window {
 
         const auto draw_order = shape.serialize_draw_order();
         if (!draw_order.empty()) {
-            graphics::instance().gl_draw_elements(GL_TRIANGLES, draw_order.size(), GL_UNSIGNED_INT, nullptr);
+            graphics::instance().draw_elements(draw_order);
         } else {
-            graphics::instance().gl_draw_arrays(GL_TRIANGLES, 0, shape.get_mesh().get_vertices().size());
+            graphics::instance().draw_arrays(0, shape.get_mesh().get_vertices().size());
         }
     }
 
@@ -132,7 +132,7 @@ class window {
      * @param width Viewport width.
      * @param height Viewport height.
      */
-    void set_viewport(int width, int height);
+    void set_viewport(size_t width, size_t height);
 
     /**
      * @brief Sets the wireframe mode the window.
@@ -148,12 +148,9 @@ class window {
 
     /**
      * @brief Sets the background color.
-     * @param red Red color component.
-     * @param green Green component.
-     * @param blue Blue component.
-     * @param alpha Alpha component.
+     * @param c Color components.
      */
-    void set_clear_color(float red, float green, float blue, float alpha);
+    void set_clear_color(const color_alpha_t &c);
 
     void clear();
 

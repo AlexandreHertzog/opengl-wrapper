@@ -63,7 +63,7 @@ class buffer {
      * @param usage Expected usage pattern of the data store.
      */
     template <class TYPE> void load(const std::vector<TYPE> &data) {
-        graphics::instance().gl_buffer_data(m_target, data.size() * sizeof(TYPE), data.data());
+        graphics::instance().buffer_data(*this, data.size() * sizeof(TYPE), data.data());
     }
 
     /**

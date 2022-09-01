@@ -39,7 +39,7 @@ target_include_directories(opengl-wrapper-graphics
 
 target_link_libraries(opengl-wrapper-graphics
         PUBLIC glad glfw
-        PRIVATE Boost::log opengl-wrapper-utils
+        PRIVATE Boost::log opengl-wrapper-utils glm
         )
 
 add_library(opengl-wrapper-data-types

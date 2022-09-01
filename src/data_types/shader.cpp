@@ -9,7 +9,7 @@
 
 namespace opengl_wrapper {
 
-shader::shader(shader_type_t type, const char *source) : m_id(graphics::instance().gl_create_shader(type)) {
+shader::shader(shader_type_t type, const char *source) : m_id(graphics::instance().new_shader(type)) {
     if (source != nullptr) {
         compile(source, true);
     }
@@ -26,7 +26,7 @@ shader::shader(shader_type_t type, const std::filesystem::path &shader_path) {
 
     std::string code = shader_stream.str();
 
-    m_id = graphics::instance().gl_create_shader(type);
+    m_id = graphics::instance().new_shader(type);
     compile(code.c_str(), false);
 }
 
@@ -45,7 +45,7 @@ shader &shader::operator=(shader &&other) noexcept {
     return *this;
 }
 
-GLuint shader::get_id() const {
+identifier_t shader::get_id() const {
     return m_id;
 }
 
@@ -54,27 +54,24 @@ void shader::compile(const char *source, bool free_on_error) { // NOLINT(readabi
 
     constexpr auto error_string_length = 512;
 
-    graphics::instance().gl_shader_source(m_id, 1, &source, nullptr);
-    graphics::instance().gl_compile_shader(m_id);
+    graphics::instance().set_sources(*this, 1, &source);
+    graphics::instance().compile(*this);
 
-    int success = 0;
-    std::array<char, error_string_length> message = {'\0'};
-
-    graphics::instance().gl_get_shaderiv(m_id, GL_COMPILE_STATUS, &success);
+    const auto success = graphics::instance().get_parameter(*this, shader_parameter_t::compile_status);
     if (GL_FALSE == success) {
-        graphics::instance().gl_get_shader_info_log(m_id, message.size(), nullptr, message.data());
+        const auto log = graphics::instance().get_info_log(*this);
 
         if (free_on_error) {
             gl_delete();
         }
 
-        throw gl_error(message.data());
+        throw gl_error(log);
     }
 }
 
 void shader::gl_delete() {
     if (0 != m_id) {
-        graphics::instance().gl_delete_shader(m_id);
+        graphics::instance().delete_shader(m_id);
         m_id = 0;
     }
 }

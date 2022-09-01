@@ -8,7 +8,7 @@ namespace opengl_wrapper {
 std::vector<buffer> buffer::build(size_t amount) {
     assert(amount > 0);
 
-    const auto ids = graphics::instance().gl_gen_buffers(amount);
+    const auto ids = graphics::instance().new_buffers(amount);
 
     std::vector<buffer> ret;
     ret.reserve(amount);
@@ -20,7 +20,7 @@ std::vector<buffer> buffer::build(size_t amount) {
 
 buffer::buffer(identifier_t id, buffer_target_t target) : m_target(target), m_id(id) {
     if (0 == m_id) {
-        m_id = graphics::instance().gl_gen_buffers(1)[0];
+        m_id = graphics::instance().new_buffers(1)[0];
     }
 }
 
@@ -31,7 +31,7 @@ buffer::buffer(buffer &&other) noexcept : m_target(other.m_target), m_id(other.m
 
 buffer::~buffer() {
     if (0 != m_id) {
-        graphics::instance().gl_delete_buffers(1, &m_id);
+        graphics::instance().delete_buffers(1, &m_id);
     }
 }
 
@@ -47,7 +47,7 @@ buffer &buffer::operator=(buffer &&other) noexcept {
 void buffer::bind() {
     assert(0 != m_id);
     assert(buffer_target_t::undefined != m_target);
-    graphics::instance().gl_bind_buffer(m_target, m_id);
+    graphics::instance().bind(*this);
 }
 
 identifier_t buffer::get_id() const {

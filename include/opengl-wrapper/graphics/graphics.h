@@ -9,6 +9,13 @@
 
 namespace opengl_wrapper {
 
+class buffer;
+class texture;
+class program;
+class shader;
+class texture;
+class vertex_array;
+
 class graphics {
   public:
     virtual ~graphics() = default;
@@ -18,89 +25,71 @@ class graphics {
 
     /**
      * @brief select active texture unit
-     * @param texture Specifies which texture unit to make active. The number of texture units is implementation
+     * @param tex Specifies which texture unit to make active. The number of texture units is implementation
      * dependent, but must be at least 80. texture must be one of GL_TEXTUREi, where i ranges from zero to the value of
      * GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS minus one. The initial value is GL_TEXTURE0.
      */
-    virtual void gl_activate_texture(GLenum texture) = 0;
+    virtual void activate(const texture &tex) = 0;
 
     /**
      * @brief Attaches a shader object to a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glAttachShader.xhtml
-     * @param program Specifies the program object to which a shader object will be attached.
-     * @param shader Specifies the shader object that is to be attached.
+     * @param p Specifies the program object to which a shader object will be attached.
+     * @param s Specifies the shader object that is to be attached.
      */
-    virtual void gl_attach_shader(GLuint program, GLuint shader) = 0;
+    virtual void attach_shader(const program &p, const shader &s) = 0;
 
     /**
      * @brief bind a named buffer object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml
-     * @param target Specifies the target to which the buffer object is bound, which must be one of the buffer binding
-     * targets in the following table:
-     * @param buffer Specifies the name of a buffer object.
+     * @param b Specifies the name of a buffer object.
      */
-    virtual void gl_bind_buffer(buffer_target_t target, GLuint buffer) = 0;
+    virtual void bind(const buffer &b) = 0;
 
     /**
      * @brief bind a named texture_coord to a texturing target
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindTexture.xhtml
-     * @param target Specifies the target to which the texture_coord is bound. Must be one of GL_TEXTURE_1D,
-     * GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_RECTANGLE,
-     * GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BUFFER, GL_TEXTURE_2D_MULTISAMPLE or
-     * GL_TEXTURE_2D_MULTISAMPLE_ARRAY.
-     * @param texture Specifies the name of a texture_coord.
+     * @param t Texture to be bound.
      */
-    virtual void gl_bind_texture(texture_target_t target, GLuint texture) = 0;
+    virtual void bind(const texture &t) = 0;
 
     /**
      * @brief bind a vertex array object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindVertexArray.xhtml
-     * @param array Specifies the name of the vertex array to bind
+     * @param va Vertex array to be bound.
      */
-    virtual void gl_bind_vertex_array(GLuint array) = 0;
+    virtual void bind(const vertex_array &va) = 0;
 
     /**
      * @brief creates and initializes a buffer object's data store.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml
-     * @param target Specifies the target to which the buffer object is bound for glBufferData, which must be one of the
-     * buffer binding targets in the following table:
+     * @param b Buffer target
      * @param size Specifies the size in bytes of the buffer object's new data store.
      * @param data Specifies a pointer to data that will be copied into the data store for initialization, or NULL if no
      * data is to be copied.
-     * @param usage Specifies the expected usage pattern of the data store. The symbolic constant must be
-     * GL_STREAM_DRAW, GL_STREAM_READ, GL_STREAM_COPY, GL_STATIC_DRAW, GL_STATIC_READ, GL_STATIC_COPY, GL_DYNAMIC_DRAW,
-     * GL_DYNAMIC_READ, or GL_DYNAMIC_COPY.
      */
-    virtual void gl_buffer_data(buffer_target_t target, size_t size, const void *data) = 0;
+    virtual void buffer_data(const buffer &b, size_t size, const void *data) = 0;
 
     /**
      * @brief clear buffers to preset values.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glClear.xhtml
-     * @param mask Bitwise OR of masks that indicate the buffers to be cleared. The three masks are GL_COLOR_BUFFER_BIT,
-     * GL_DEPTH_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
      */
-    virtual void gl_clear(GLbitfield mask) = 0;
+    virtual void clear() = 0;
 
     /**
      * @brief specify clear values for the color buffers.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glClearColor.xhtml
-     * @param red Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial
-     * values are all 0.
-     * @param green Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial
-     * values are all 0.
-     * @param blue Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial
-     * values are all 0.
-     * @param alpha Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial
+     * @param c Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial
      * values are all 0.
      */
-    virtual void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) = 0;
+    virtual void set_clear_color(const color_alpha_t &c) = 0;
 
     /**
      * @brief Compiles a shader object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml
-     * @param shader Specifies the shader object to be compiled.
+     * @param s Specifies the shader object to be compiled.
      */
-    virtual void gl_compile_shader(GLuint shader) = 0;
+    virtual void compile(const shader &s) = 0;
 
     /**
      * @brief Creates a program object.
@@ -111,7 +100,7 @@ class graphics {
      * will be used to create a program (for instance, checking the compatibility between a vertex shader and a fragment
      * shader). When no longer needed as part of a program object, shader objects can be detached.
      */
-    virtual GLuint gl_create_program() = 0;
+    virtual identifier_t new_program() = 0;
 
     /**
      * @brief Creates a shader object
@@ -129,7 +118,7 @@ class graphics {
      * geometry processor. A shader of type GL_FRAGMENT_SHADER is a shader that is intended to run on the programmable
      * fragment processor.
      */
-    virtual GLuint gl_create_shader(shader_type_t type) = 0;
+    virtual identifier_t new_shader(shader_type_t type) = 0;
 
     /**
      * @brief delete named buffer objects.
@@ -137,21 +126,21 @@ class graphics {
      * @param n Specifies the number of buffer objects to be deleted.
      * @param buffers Specifies an array of buffer objects to be deleted.
      */
-    virtual void gl_delete_buffers(GLsizei n, const GLuint *buffers) = 0;
+    virtual void delete_buffers(size_t n, const identifier_t *buffers) = 0;
 
     /**
      * @brief Deletes a program object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteProgram.xhtml
      * @param program Specifies the program object to be deleted.
      */
-    virtual void gl_delete_program(GLuint program) = 0;
+    virtual void delete_program(identifier_t program) = 0;
 
     /**
      * @brief Deletes a shader object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml
      * @param shader Specifies the shader object to be deleted.
      */
-    virtual void gl_delete_shader(GLuint shader) = 0;
+    virtual void delete_shader(identifier_t shader) = 0;
 
     /**
      * @brief delete named textures
@@ -159,7 +148,7 @@ class graphics {
      * @param n Specifies the number of textures to be deleted.
      * @param textures Specifies an array of textures to be deleted.
      */
-    virtual void gl_delete_textures(GLsizei n, const GLuint *textures) = 0;
+    virtual void delete_textures(size_t n, const identifier_t *textures) = 0;
 
     /**
      * @brief delete vertex array objects.
@@ -167,68 +156,59 @@ class graphics {
      * @param n Specifies the number of vertex array objects to be deleted.
      * @param arrays Specifies the address of an array containing the n names of the objects to be deleted.
      */
-    virtual void gl_delete_vertex_arrays(GLsizei n, const GLuint *arrays) = 0;
+    virtual void delete_vertex_arrays(size_t n, const identifier_t *arrays) = 0;
 
     /**
      * @brief enable or disable server-side GL capabilities. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
      * @param cap Specifies a symbolic constant indicating a GL capability.
      */
-    virtual void gl_disable(GLenum cap) = 0;
+    virtual void disable(graphics_feature_t cap) = 0;
 
     /**
      * @brief render primitives from array data. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArrays.xhtml
-     * @param mode Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP,
-     * GL_LINE_LOOP, GL_LINES, GL_LINE_STRIP_ADJACENCY, GL_LINES_ADJACENCY, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN,
-     * GL_TRIANGLES, GL_TRIANGLE_STRIP_ADJACENCY, GL_TRIANGLES_ADJACENCY and GL_PATCHES are accepted.
      * @param first Specifies the starting index in the enabled arrays.
      * @param count Specifies the number of indices to be rendered.
      */
-    virtual void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) = 0;
+    virtual void draw_arrays(int first, size_t count) = 0;
 
     /**
      * @brief render primitives from array data.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml
-     * @param mode Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP,
-     * GL_LINE_LOOP, GL_LINES, GL_LINE_STRIP_ADJACENCY, GL_LINES_ADJACENCY, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN,
-     * GL_TRIANGLES, GL_TRIANGLE_STRIP_ADJACENCY, GL_TRIANGLES_ADJACENCY and GL_PATCHES are accepted.
-     * @param count Specifies the number of elements to be rendered.
-     * @param type Specifies the type of the values in indices. Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or
-     * GL_UNSIGNED_INT.
      * @param indices Specifies a pointer to the location where the indices are stored.
      */
-    virtual void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) = 0;
+    virtual void draw_elements(const std::vector<unsigned> &indices) = 0;
 
     /**
      * @brief enable or disable server-side GL capabilities. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml
      * @param cap Specifies a symbolic constant indicating a GL capability.
      */
-    virtual void gl_enable(GLenum cap) = 0;
+    virtual void enable(graphics_feature_t cap) = 0;
 
     /**
      * @brief Enable or disable a generic vertex attribute array
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml
      * @param index Specifies the index of the generic vertex attribute to be enabled or disabled.
      */
-    virtual void gl_enable_vertex_attrib_array(GLuint index) = 0;
+    virtual void enable_vertex_attrib_array(unsigned index) = 0;
 
     /**
      * @brief generate buffer object names
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml
      * @param n Specifies the number of buffer object names to be generated.
-     * @param buffers Specifies an array in which the generated buffer object names are stored.
+     * @return Generated buffer object.
      */
-    virtual std::vector<identifier_t> gl_gen_buffers(size_t n) = 0;
+    virtual std::vector<identifier_t> new_buffers(size_t n) = 0;
 
     /**
      * @brief generate texture_coord names
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenTextures.xhtml
      * @param n Specifies the number of texture_coord names to be generated.
-     * @param textures Specifies an array in which the generated texture_coord names are stored.
+     * @return Generated textures.
      */
-    virtual std::vector<GLuint> gl_gen_textures(GLsizei n) = 0;
+    virtual std::vector<identifier_t> new_textures(size_t n) = 0;
 
     /**
      * @brief generate vertex array object names
@@ -236,115 +216,92 @@ class graphics {
      * @param amount Specifies the number of vertex array object names to generate.
      * @return Vertex vector with indices.
      */
-    [[nodiscard]] virtual std::vector<identifier_t> gl_gen_vertex_arrays(size_t amount) = 0;
+    [[nodiscard]] virtual std::vector<identifier_t> new_vertex_arrays(size_t amount) = 0;
 
     /**
      * @brief generate mipmaps for a specified texture_coord object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenerateMipmap.xhtml
-     * @param target Specifies the target to which the texture_coord object is bound for glGenerateMipmap. Must be one
-     * of GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_CUBE_MAP, or
-     * GL_TEXTURE_CUBE_MAP_ARRAY.
+     * @param t Texture to have its mipmap generated.
      */
-    virtual void gl_generate_mipmap(texture_target_t target) = 0;
-
-    /**
-     * @brief return the value or values of a selected parameter.
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGet.xhtml
-     * @param pname Specifies the parameter value to be returned for non-indexed versions of glGet. The symbolic
-     * constants in the list below are accepted.
-     * @param data Returns the value or values of the specified parameter.
-     */
-    virtual void gl_get_integerv(GLenum pname, GLint *data) = 0;
+    virtual void generate_mipmap(const texture &t) = 0;
 
     /**
      * @brief Returns the information log for a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgramInfoLog.xhtml
-     * @param program Specifies the program object whose information log is to be queried.
-     * @param max_lenght Specifies the size of the character buffer for storing the returned information log.
-     * @param length Returns the length of the string returned in info_log (excluding the null terminator).
-     * @param info_log Specifies an array of characters that is used to return the information log.
+     * @param p Specifies the program object whose information log is to be queried.
+     * @return Information log.
      */
-    virtual void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log) = 0;
+    virtual std::string get_info_log(const program &p) = 0;
 
     /**
      * @brief Returns a parameter from a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgram.xhtml
-     * @param program Specifies the program object to be queried.
-     * @param pname Specifies the object parameter. Accepted symbolic names are GL_DELETE_STATUS, GL_LINK_STATUS,
+     * @param p Specifies the program object to be queried.
+     * @param param Specifies the object parameter. Accepted symbolic names are GL_DELETE_STATUS, GL_LINK_STATUS,
      * GL_VALIDATE_STATUS, GL_INFO_LOG_LENGTH, GL_ATTACHED_SHADERS, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS,
      * GL_ACTIVE_ATTRIBUTES, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, GL_ACTIVE_UNIFORMS, GL_ACTIVE_UNIFORM_BLOCKS,
      * GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, GL_ACTIVE_UNIFORM_MAX_LENGTH, GL_COMPUTE_WORK_GROUP_SIZE,
      * GL_PROGRAM_BINARY_LENGTH, GL_TRANSFORM_FEEDBACK_BUFFER_MODE, GL_TRANSFORM_FEEDBACK_VARYINGS,
      * GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH, GL_GEOMETRY_VERTICES_OUT, GL_GEOMETRY_INPUT_TYPE, and
      * GL_GEOMETRY_OUTPUT_TYPE.
-     * @param params Returns the requested object parameter.
+     * @return Requested object parameter.
      */
-    virtual void gl_get_programiv(GLuint program, GLenum pname, GLint *params) = 0;
+    virtual int get_parameter(const program &p, program_parameter_t param) = 0;
 
     /**
      * @brief Returns the information log for a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml
-     * @param shader Specifies the shader object whose information log is to be queried.
-     * @param max_length Specifies the size of the character buffer for storing the returned information log.
-     * @param length Returns the length of the string returned in info_log (excluding the null terminator).
-     * @param info_log Specifies an array of characters that is used to return the information log.
+     * @param s Specifies the shader object whose information log is to be queried.
+     * @return Information log.
      */
-    virtual void gl_get_shader_info_log(GLuint shader, GLsizei max_length, GLsizei *length, GLchar *info_log) = 0;
+    virtual std::string get_info_log(const shader &s) = 0;
 
     /**
      * @brief Returns a parameter from a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml
-     * @param shader Specifies the shader object to be queried.
-     * @param pname Specifies the object parameter. Accepted symbolic names are GL_SHADER_TYPE, GL_DELETE_STATUS,
+     * @param s Specifies the shader object to be queried.
+     * @param param Specifies the object parameter. Accepted symbolic names are GL_SHADER_TYPE, GL_DELETE_STATUS,
      * GL_COMPILE_STATUS, GL_INFO_LOG_LENGTH, GL_SHADER_SOURCE_LENGTH.
-     * @param params Returns the requested object parameter.
+     * @return Requested object parameter.
      */
-    virtual void gl_get_shaderiv(GLuint shader, GLenum pname, GLint *params) = 0;
+    virtual int get_parameter(const shader &s, shader_parameter_t param) = 0;
 
     /**
      * @brief Returns the location of a uniform variable
-     * @param program Specifies the program object to be queried.
+     * @param p Specifies the program object to be queried.
      * @param name Points to a null terminated string containing the name of the uniform variable whose location is to
      * be queried.
      * @return an integer that represents the location of a specific uniform variable within a program object.
      */
-    virtual int gl_get_uniform_location(GLuint program, const GLchar *name) = 0;
+    virtual int get_uniform_location(const program &p, const char *name) = 0;
 
     /**
      * @brief Links a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml
-     * @param program Specifies the handle of the program object to be linked.
+     * @param p Specifies the handle of the program object to be linked.
      */
-    virtual void gl_link_program(GLuint program) = 0;
+    virtual void link(const program &p) = 0;
 
     /**
      * @brief select a polygon rasterization mode. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPolygonMode.xhtml
-     * @param face Specifies the polygons that mode applies to. Must be GL_FRONT_AND_BACK for front- and back-facing
-     * polygons.
      * @param mode Specifies how polygons will be rasterized. Accepted values are GL_POINT, GL_LINE, and GL_FILL. The
      * initial value is GL_FILL for both front- and back-facing polygons.
      */
-    virtual void gl_polygon_mode(GLenum face, GLenum mode) = 0;
+    virtual void polygon_mode(polygon_mode_t mode) = 0;
 
     /**
      * @brief Replaces the source code in a shader object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml
      * @param shader Specifies the handle of the shader object whose source code is to be replaced.
-     * @param count Specifies the number of elements in the string and length arrays.
+     * @param num_sources Specifies the number of elements in the string and length arrays.
      * @param string Specifies an array of pointers to strings containing the source code to be loaded into the shader.
-     * @param length Specifies an array of string lengths.
      */
-    virtual void gl_shader_source(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) = 0;
+    virtual void set_sources(const shader &s, size_t num_sources, const char **sources) = 0;
 
     /**
      * @brief specify a two-dimensional texture_coord image
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml
-     * @param target Specifies the target texture_coord. Must be GL_TEXTURE_2D, GL_PROXY_TEXTURE_2D,
-     * GL_TEXTURE_1D_ARRAY, GL_PROXY_TEXTURE_1D_ARRAY, GL_TEXTURE_RECTANGLE, GL_PROXY_TEXTURE_RECTANGLE,
-     * GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-     * GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, or
-     * GL_PROXY_TEXTURE_CUBE_MAP.
      * @param width Specifies the width of the texture_coord image. All implementations support texture_coord images
      * that are at least 1024 texels wide.
      * @param height Specifies the height of the texture_coord image, or the number of layers in a texture_coord array,
@@ -356,13 +313,11 @@ class graphics {
      * GL_BGRA_INTEGER, GL_STENCIL_INDEX, GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL.
      * @param data Specifies a pointer to the image data in memory.
      */
-    virtual void gl_tex_image_2d(texture_target_t target, size_t width, size_t height, texture_format_t format,
-                                 const unsigned char *data) = 0;
+    virtual void set_image(size_t width, size_t height, texture_format_t format, const unsigned char *data) = 0;
 
     /**
      * @brief set texture_coord parameters
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
-     * @param target Specifies the texture_coord object name for glTextureParameter functions.
      * @param name Specifies the symbolic name of a single-valued texture_coord parameter. pname can be one of the
 following: GL_DEPTH_STENCIL_TEXTURE_MODE, GL_TEXTURE_BASE_LEVEL, GL_TEXTURE_COMPARE_FUNC, GL_TEXTURE_COMPARE_MODE,
 GL_TEXTURE_LOD_BIAS, GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_LOD, GL_TEXTURE_MAX_LOD,
@@ -371,8 +326,7 @@ GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, or GL_TEXTURE_WRAP_R. For the vector comma
 be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param value For the scalar commands, specifies the value of pname.
      */
-    virtual void gl_tex_parameter(texture_target_t target, texture_parameter_t name,
-                                  texture_parameter_values_t value) = 0;
+    virtual void set_parameter(texture_parameter_t name, texture_parameter_values_t value) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -380,7 +334,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param location Specifies the location of the uniform variable to be modified.
      * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform(GLint location, GLfloat v0) = 0;
+    virtual void set_uniform(int location, float v0) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -388,28 +342,23 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param location Specifies the location of the uniform variable to be modified.
      * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform(GLint location, GLint v0) = 0;
+    virtual void set_uniform(int location, int v0) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
      * @param location Specifies the location of the uniform variable to be modified.
-     * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
-     * @param v1 For the scalar commands, specifies the new values to be used for the specified uniform variable.
-     * @param v2 For the scalar commands, specifies the new values to be used for the specified uniform variable.
+     * @param v For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) = 0;
+    virtual void set_uniform(int location, const std::array<float, 3> &v) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
      * @param location Specifies the location of the uniform variable to be modified.
-     * @param v0 For the scalar commands, specifies the new values to be used for the specified uniform variable.
-     * @param v1 For the scalar commands, specifies the new values to be used for the specified uniform variable.
-     * @param v2 For the scalar commands, specifies the new values to be used for the specified uniform variable.
-     * @param v3 For the scalar commands, specifies the new values to be used for the specified uniform variable.
+     * @param v For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
-    virtual void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) = 0;
+    virtual void set_uniform(int location, const std::array<float, 4> &v) = 0;
 
     /**
      * @brief Specify the value of a uniform variable for the current program object.
@@ -419,12 +368,10 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * This should be 1 if the targeted uniform variable is not an array, and 1 or more if it is an array. For the
      * matrix (glUniformMatrix*) commands, specifies the number of matrices that are to be modified. This should be 1 if
      * the targeted uniform variable is not an array of matrices, and 1 or more if it is an array of matrices.
-     * @param transpose For the matrix commands, specifies whether to transpose the matrix as the values are loaded into
-     * the uniform variable.
      * @param value For the vector and matrix commands, specifies a pointer to an array of count values that will be
      * used to update the specified uniform variable.
      */
-    virtual void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) = 0;
+    virtual void set_matrix4_uniform(int location, size_t count, const float *value) = 0;
 
     /**
      * @brief Installs a program object as part of current rendering state
@@ -432,7 +379,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param program Specifies the handle of the program object whose executables are to be used as part of current
      * rendering state.
      */
-    virtual void gl_use_program(GLuint program) = 0;
+    virtual void use(const program &p) = 0;
 
     /**
      * @brief define an array of generic vertex attribute data
@@ -445,19 +392,17 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param offset Specifies a offset of the first component of the first generic vertex attribute in the array in
      * the data store of the buffer currently bound to the GL_ARRAY_BUFFER target. The initial value is 0.
      */
-    virtual void gl_vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) = 0;
+    virtual void vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) = 0;
 
     /**
      * @brief set the viewport
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glViewport.xhtml
-     * @param x Specify the lower left corner of the viewport rectangle, in pixels. The initial value is (0,0).
-     * @param y Specify the lower left corner of the viewport rectangle, in pixels. The initial value is (0,0).
      * @param width Specify the width and height of the viewport. When a GL context is first attached to a window, width
      * and height are set to the dimensions of that window.
      * @param height Specify the width and height of the viewport. When a GL context is first attached to a window,
      * width and height are set to the dimensions of that window.
      */
-    virtual void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height) = 0;
+    virtual void set_viewport(size_t width, size_t height) = 0;
 
     /**
      * @brief This function creates a window and its associated OpenGL or OpenGL ES context.
