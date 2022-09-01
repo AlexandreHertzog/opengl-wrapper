@@ -56,7 +56,7 @@ void shape::set_program(std::shared_ptr<program> p) {
 }
 
 void shape::load_vertices() {
-    m_vertex_array.load(m_mesh.get_vertices(), serialize_draw_order(), GL_STATIC_DRAW);
+    m_vertex_array.load(m_mesh.get_vertices(), serialize_draw_order());
 }
 
 void shape::bind() {

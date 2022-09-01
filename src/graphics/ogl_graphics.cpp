@@ -128,8 +128,10 @@ std::vector<GLuint> ogl_graphics::gl_gen_textures(GLsizei n) {
     return ret;
 }
 
-void ogl_graphics::gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) {
-    glGenVertexArrays(n, arrays);
+std::vector<identifier_t> ogl_graphics::gl_gen_vertex_arrays(size_t amount) {
+    std::vector<identifier_t> ret(amount);
+    glGenVertexArrays(amount, ret.data());
+    return ret;
 }
 
 void ogl_graphics::gl_generate_mipmap(texture_target_t target) {
@@ -209,10 +211,8 @@ void ogl_graphics::gl_use_program(GLuint program) {
     glUseProgram(program);
 }
 
-void ogl_graphics::gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride,
-                                            const void *pointer) {
-
-    glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+void ogl_graphics::gl_vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) {
+    glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void *>(offset));
 }
 
 void ogl_graphics::gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height) {

@@ -22,7 +22,7 @@ class vertex_array {
      *
      * @param size Number of vertex arrays to be generated.
      */
-    explicit vertex_array(GLuint id = 0);
+    explicit vertex_array(identifier_t id = 0);
 
     /**
      * @brief vertex_arrays move-constructor.
@@ -55,13 +55,13 @@ class vertex_array {
      *
      * @param index Index of the VertexArray to be bound.
      */
-    void bind();
+    void bind() const;
 
     /**
      * @brief Gets the ids associated with this vertex_array.
      * @return Vertex array ids.
      */
-    [[nodiscard]] GLuint get_id() const;
+    [[nodiscard]] identifier_t get_id() const;
 
     /**
      * @brief Creates and initializes a buffer object data storage. See
@@ -70,10 +70,10 @@ class vertex_array {
      * @param data Data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    void load(const std::vector<vertex> &vertices, const std::vector<unsigned int> &indices, GLenum usage);
+    void load(const std::vector<vertex> &vertices, const std::vector<unsigned int> &indices);
 
   private:
-    GLuint m_id;
+    identifier_t m_id;
     std::vector<buffer> m_buffers;
 };
 

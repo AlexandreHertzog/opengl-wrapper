@@ -37,7 +37,7 @@ class ogl_graphics : public graphics {
     void gl_enable_vertex_attrib_array(GLuint index) override;
     std::vector<identifier_t> gl_gen_buffers(size_t n) override;
     std::vector<GLuint> gl_gen_textures(GLsizei n) override;
-    void gl_gen_vertex_arrays(GLsizei n, GLuint *arrays) override;
+    std::vector<identifier_t> gl_gen_vertex_arrays(size_t amount) override;
     void gl_generate_mipmap(texture_target_t target) override;
     void gl_get_integerv(GLenum pname, GLint *data) override;
     void gl_get_program_info_log(GLuint program, GLsizei max_lenght, GLsizei *length, GLchar *info_log) override;
@@ -57,8 +57,7 @@ class ogl_graphics : public graphics {
     void gl_uniform(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) override;
     void gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) override;
     void gl_use_program(GLuint program) override;
-    void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride,
-                                  const void *pointer) override;
+    void gl_vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) override;
     void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height) override;
     GLFWwindow *glfw_create_window(int width, int height, const char *title, GLFWmonitor *monitor,
                                    GLFWwindow *share) override;

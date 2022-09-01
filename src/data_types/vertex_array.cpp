@@ -7,8 +7,7 @@
 namespace opengl_wrapper {
 
 std::vector<vertex_array> vertex_array::build(size_t amount) {
-    std::vector<GLuint> ids(amount);
-    graphics::instance().gl_gen_vertex_arrays(amount, ids.data());
+    auto ids = graphics::instance().gl_gen_vertex_arrays(amount);
 
     std::vector<vertex_array> ret(amount);
     for (int i = 0; i < amount; ++i) {
@@ -17,9 +16,9 @@ std::vector<vertex_array> vertex_array::build(size_t amount) {
     return ret;
 }
 
-vertex_array::vertex_array(GLuint id) : m_id(id), m_buffers(buffer::build(2)) {
+vertex_array::vertex_array(identifier_t id) : m_id(id), m_buffers(buffer::build(2)) {
     if (0 == m_id) {
-        graphics::instance().gl_gen_vertex_arrays(1, &m_id);
+        m_id = graphics::instance().gl_gen_vertex_arrays(1)[0];
     }
 
     assert(m_buffers.size() == 2);
@@ -46,17 +45,16 @@ vertex_array &vertex_array::operator=(vertex_array &&other) noexcept {
     return *this;
 }
 
-void vertex_array::bind() {
+void vertex_array::bind() const {
     assert(0 != m_id);
-
     graphics::instance().gl_bind_vertex_array(m_id);
 }
 
-GLuint vertex_array::get_id() const {
+identifier_t vertex_array::get_id() const {
     return m_id;
 }
 
-void vertex_array::load(const std::vector<vertex> &vertices, const std::vector<unsigned int> &indices, GLenum usage) {
+void vertex_array::load(const std::vector<vertex> &vertices, const std::vector<unsigned int> &indices) {
     bind();
 
     m_buffers[0].bind();
@@ -65,17 +63,13 @@ void vertex_array::load(const std::vector<vertex> &vertices, const std::vector<u
     m_buffers[1].bind();
     m_buffers[1].load(indices);
 
-    graphics::instance().gl_vertex_attrib_pointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr);
+    graphics::instance().gl_vertex_attrib_pointer(0, 3, sizeof(vertex), 0);
     graphics::instance().gl_enable_vertex_attrib_array(0);
 
-    graphics::instance().gl_vertex_attrib_pointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertex),
-                                                  reinterpret_cast<void *>(sizeof(vertex::m_pos))); // NOLINT
+    graphics::instance().gl_vertex_attrib_pointer(1, 2, sizeof(vertex), sizeof(vertex::m_pos));
     graphics::instance().gl_enable_vertex_attrib_array(1);
 
-    graphics::instance().gl_vertex_attrib_pointer(
-        2, 3, GL_FLOAT, GL_FALSE, sizeof(vertex),
-        reinterpret_cast<void *>(sizeof(vertex::m_pos) + sizeof(vertex::m_tex))); // NOLINT
-
+    graphics::instance().gl_vertex_attrib_pointer(2, 3, sizeof(vertex), sizeof(vertex::m_pos) + sizeof(vertex::m_tex));
     graphics::instance().gl_enable_vertex_attrib_array(2);
 }
 
