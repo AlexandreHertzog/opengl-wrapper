@@ -92,7 +92,7 @@ void program::set_uniform(const char *var_name, const std::array<float, 3> &v) {
     graphics::instance().set_uniform(get_uniform_location(var_name), v);
 }
 
-void program::set_uniform(const char *var_name, const std::array<float, 4> v) {
+void program::set_uniform(const char *var_name, const std::array<float, 4> &v) {
     graphics::instance().set_uniform(get_uniform_location(var_name), v);
 }
 

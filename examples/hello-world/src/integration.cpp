@@ -31,8 +31,8 @@ integration::integration()
               p.set_uniform("uniform_light.diffuse", m_lights[0].m_diffuse);
               p.set_uniform("uniform_light.specular", m_lights[0].m_specular);
           }
+          p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
           p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
-          p.set_uniform("uniform_material.diffuse", s.get_material().m_diffuse);
           p.set_uniform("uniform_material.specular", s.get_material().m_specular);
           p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
       }) {
@@ -127,6 +127,7 @@ void integration::build_shapes() {
     for (auto &s : m_shapes) {
         s.set_uniform("uniform_material.texture1", 0);
         s.set_uniform("uniform_material.texture2", 1);
+        s.set_uniform("uniform_material.diffuse", 2);
         s.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
     }
 }
@@ -301,6 +302,7 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
     opengl_wrapper::material mat;
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1);
+    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", GL_TEXTURE2);
 
     ret.set_material(std::move(mat));
     return ret;
@@ -339,11 +341,11 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
 
     opengl_wrapper::material mat;
     mat.m_ambient = {0.1F, 0.1F, 0.1F};
-    mat.m_diffuse = {0.1F, 0.1F, 0.1F};
     mat.m_shininess = 32.0F;
     mat.m_specular = {2.0F, 2.0F, 2.0F};
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1);
+    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", GL_TEXTURE2);
 
     ret.set_material(std::move(mat));
 
@@ -367,9 +369,7 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 
     opengl_wrapper::material mat;
     mat.m_ambient = {1.0F, 1.0F, 1.0F};
-    mat.m_diffuse = {1.0F, 1.0F, 1.0F};
     mat.m_shininess = 2.0F;
-    mat.m_diffuse = {0.1F, 0.1F, 0.1F};
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1);
 

@@ -69,6 +69,9 @@ void shape::bind() {
     if (m_material.m_texture2) {
         m_material.m_texture2->bind();
     }
+    if (m_material.m_diffuse) {
+        m_material.m_diffuse->bind();
+    }
 
     m_vertex_array.bind();
 }

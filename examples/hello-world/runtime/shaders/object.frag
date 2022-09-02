@@ -14,7 +14,8 @@ struct light_t {
 
 struct material_t {
     vec3 ambient;
-    vec3 diffuse;
+    bool has_diffuse;
+    sampler2D diffuse;
     vec3 specular;
     float shininess;
     sampler2D texture1;
@@ -32,8 +33,12 @@ void main()
 
     vec3 normals = normalize(vert_out_normals);
     vec3 light_direction = normalize(uniform_light.position - vert_out_position);
+
     float diffuse_absolute = max(dot(normals, light_direction), 0.0);
-    vec3 diffuse_light = uniform_light.diffuse * (diffuse_absolute * uniform_material.diffuse);
+    vec3 diffuse_light = vec3(0.2, 0.2, 0.2);
+    if (uniform_material.has_diffuse) {
+        diffuse_light = uniform_light.diffuse * diffuse_absolute * vec3(texture(uniform_material.diffuse, vert_out_tex_coord));
+    }
 
     vec4 object_color = mix(texture(uniform_material.texture1, vert_out_tex_coord),
                             texture(uniform_material.texture2, vert_out_tex_coord),
