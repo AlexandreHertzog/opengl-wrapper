@@ -25,16 +25,23 @@ integration::integration()
           p.set_uniform("uniform_model", glm::value_ptr(model));
           p.set_uniform("uniform_view", glm::value_ptr(view));
           p.set_uniform("uniform_projection", glm::value_ptr(projection));
+
           if (!m_lights.empty()) {
               p.set_uniform("uniform_light.position", m_lights[0].m_shape.get_transform().m_translation);
               p.set_uniform("uniform_light.ambient", m_lights[0].m_ambient);
               p.set_uniform("uniform_light.diffuse", m_lights[0].m_diffuse);
               p.set_uniform("uniform_light.specular", m_lights[0].m_specular);
           }
+
           p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
           p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
-          p.set_uniform("uniform_material.specular", s.get_material().m_specular);
+          p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
           p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
+          p.set_uniform("uniform_material.texture1", 0);
+          p.set_uniform("uniform_material.texture2", 1);
+          p.set_uniform("uniform_material.diffuse", 2);
+          p.set_uniform("uniform_material.specular", 3);
+          p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
       }) {
 
     IMGUI_CHECKVERSION();
@@ -123,13 +130,6 @@ void integration::build_shapes() {
     m_shapes.emplace_back(build_torus(object_program, base_texture));
 
     m_lights.emplace_back(build_light(light_program));
-
-    for (auto &s : m_shapes) {
-        s.set_uniform("uniform_material.texture1", 0);
-        s.set_uniform("uniform_material.texture2", 1);
-        s.set_uniform("uniform_material.diffuse", 2);
-        s.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
-    }
 }
 
 void integration::prepare_render_loop() {
@@ -303,6 +303,7 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1);
     mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", GL_TEXTURE2);
+    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", GL_TEXTURE3);
 
     ret.set_material(std::move(mat));
     return ret;
@@ -323,6 +324,7 @@ opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::p
     opengl_wrapper::material mat;
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1);
+    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", GL_TEXTURE3);
     ret.set_material(std::move(mat));
     return ret;
 }
@@ -342,10 +344,10 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
     opengl_wrapper::material mat;
     mat.m_ambient = {0.1F, 0.1F, 0.1F};
     mat.m_shininess = 32.0F;
-    mat.m_specular = {2.0F, 2.0F, 2.0F};
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1);
     mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", GL_TEXTURE2);
+    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", GL_TEXTURE3);
 
     ret.set_material(std::move(mat));
 

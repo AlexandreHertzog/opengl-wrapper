@@ -72,6 +72,9 @@ void shape::bind() {
     if (m_material.m_diffuse) {
         m_material.m_diffuse->bind();
     }
+    if (m_material.m_specular) {
+        m_material.m_specular->bind();
+    }
 
     m_vertex_array.bind();
 }

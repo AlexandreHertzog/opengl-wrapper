@@ -8,7 +8,7 @@ namespace opengl_wrapper {
 struct material {
     glm::vec3 m_ambient{0.3F};
     texture::pointer_t m_diffuse;
-    glm::vec3 m_specular{0.5F};
+    texture::pointer_t m_specular;
     float m_shininess{32.0F};
     texture::pointer_t m_texture1;
     texture::pointer_t m_texture2;
