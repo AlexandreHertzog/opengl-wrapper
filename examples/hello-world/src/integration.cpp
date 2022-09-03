@@ -12,12 +12,28 @@ constexpr auto texture_layer_1 = 0;
 constexpr auto texture_layer_2 = 1;
 constexpr auto texture_diffuse = 2;
 constexpr auto texture_specular = 3;
+
+constexpr auto resolution_x = 1920;
+constexpr auto resolution_y = 1080;
+constexpr auto resolution_ratio = static_cast<float>(resolution_x) / resolution_y;
+constexpr auto default_fov = 45.0F;
+
+constexpr glm::vec3 default_camera_pos = {0.0, 3.0, 8.0};
+constexpr glm::vec3 default_camera_front = {0.0, -0.3, -1.0};
+constexpr glm::vec3 default_camera_up = {0.0, 1.0, 0.0};
+constexpr auto camera_max_angle = 89.0;
+constexpr auto camera_min_angle = 89.0;
+constexpr auto clipping_near = 0.1F;
+constexpr auto clipping_far = 100.0F;
+constexpr auto refresh_rate = 60;
+
 } // namespace
 
 namespace test_app {
 
 integration::integration()
-    : m_window(1920, 1080, "Test application"), m_camera({0.0, 3.0, 8.0}, {0.0, -0.3, -1.0}, {0.0, 1.0, 0.0}),
+    : m_window(resolution_x, resolution_y, "Test application"),
+      m_camera(default_camera_pos, default_camera_front, default_camera_up),
       m_default_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
           auto model = glm::mat4(1.0F);
           auto &transform = s.get_transform();
@@ -26,7 +42,7 @@ integration::integration()
           model = glm::scale(model, transform.m_scale);
 
           auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
-          auto projection = glm::perspective(glm::radians(45.0F), 1920.0F / 1080.0F, 0.1F, 100.0F);
+          auto projection = glm::perspective(glm::radians(default_fov), resolution_ratio, clipping_near, clipping_far);
 
           p.set_uniform("uniform_model", model);
           p.set_uniform("uniform_view", view);
@@ -43,10 +59,10 @@ integration::integration()
           p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
           p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
           p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
-          p.set_uniform("uniform_material.texture1", 0);
-          p.set_uniform("uniform_material.texture2", 1);
-          p.set_uniform("uniform_material.diffuse", 2);
-          p.set_uniform("uniform_material.specular", 3);
+          p.set_uniform("uniform_material.texture1", texture_layer_1);
+          p.set_uniform("uniform_material.texture2", texture_layer_2);
+          p.set_uniform("uniform_material.diffuse", texture_diffuse);
+          p.set_uniform("uniform_material.specular", texture_specular);
           p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
       }) {
 
@@ -119,7 +135,7 @@ void integration::init_callbacks() {
         m_last_cursor_ypos = ypos;
 
         m_yaw += xpos_offset;
-        m_pitch = std::max(std::min(m_pitch + ypos_offset, 89.0), -89.0);
+        m_pitch = std::max(std::min(m_pitch + ypos_offset, camera_max_angle), camera_min_angle);
 
         m_camera.set_front(m_pitch, m_yaw);
     });
@@ -155,7 +171,7 @@ void integration::prepare_render_loop() {
 
 void integration::render_loop() {
     constexpr auto s_to_us_multiplier = 1000000.0;
-    auto frame_time_us = s_to_us_multiplier / 60;
+    auto frame_time_us = s_to_us_multiplier / refresh_rate;
 
     while (!m_window.get_should_close()) {
         auto start_time = std::chrono::high_resolution_clock::now();
@@ -210,8 +226,8 @@ void integration::build_ui() {
             ImGui::EndDisabled();
         }
 
-        float min_material = 0.0F;
-        float max_material = 2.0F;
+        const float min_material = 0.0F;
+        const float max_material = 2.0F;
         ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &m_lights.front().m_ambient, 3, &min_material,
                              &max_material);
         ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &m_lights.front().m_diffuse, 3, &min_material,
@@ -239,20 +255,23 @@ void integration::build_ui() {
 }
 
 void integration::shape_debug_ui(opengl_wrapper::shape &s) {
-    float min_translation = -10.0F;
-    float max_translation = 10.0F;
+    const auto min_translation = -10.0F;
+    const auto max_translation = 10.0F;
+    const auto min_rotation_angle = -180.0F;
+    const auto max_rotation_angle = 180.0F;
+    const auto min_shininess = 0.0F;
+    const auto max_shininess = 64.0F;
+    const float min_material = 0.0F;
+    const float max_material = 2.0F;
 
     ImGui::SliderScalarN("Position", ImGuiDataType_Float, &s.get_transform().m_translation, 3, &min_translation,
                          &max_translation);
-    ImGui::SliderFloat("Rot angle", &s.get_transform().m_rotation_angle, -180.0F, 180.0F);
+    ImGui::SliderFloat("Rot angle", &s.get_transform().m_rotation_angle, min_rotation_angle, max_rotation_angle);
     ImGui::InputScalarN("Rot axis", ImGuiDataType_Float, &s.get_transform().m_rotation_axis, 3);
     ImGui::InputScalarN("Scale", ImGuiDataType_Float, &s.get_transform().m_scale, 3);
-
-    float min_material = 0.0F;
-    float max_material = 2.0F;
     ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &s.get_material().m_ambient, 3, &min_material, &max_material);
     ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &s.get_material().m_diffuse, 3, &min_material, &max_material);
-    ImGui::SliderFloat("Shininess", &s.get_material().m_shininess, 0.0F, 10.0F);
+    ImGui::SliderFloat("Shininess", &s.get_material().m_shininess, min_shininess, max_shininess);
     ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &s.get_material().m_specular, 3, &min_material,
                          &max_material);
 }
@@ -281,8 +300,8 @@ std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
         constexpr auto radius = 4.0F;
         auto &transform = s.get_transform();
         if (m_auto_rotate_light) {
-            transform.m_translation.x = radius * sin(glfwGetTime());
-            transform.m_translation.z = radius * cos(glfwGetTime());
+            transform.m_translation[0] = radius * sin(glfwGetTime());
+            transform.m_translation[2] = radius * cos(glfwGetTime());
         }
         p.set_uniform("uniform_view_pos", m_camera.get_position());
         m_default_callback(p, s);
