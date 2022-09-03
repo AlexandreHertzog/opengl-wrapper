@@ -7,7 +7,10 @@
 #include <boost/log/trivial.hpp>
 #include <csignal>
 
+using std::filesystem::path;
+
 namespace {
+
 constexpr auto texture_layer_1 = 0;
 constexpr auto texture_layer_2 = 1;
 constexpr auto texture_diffuse = 2;
@@ -22,7 +25,7 @@ constexpr glm::vec3 default_camera_pos = {0.0, 3.0, 8.0};
 constexpr glm::vec3 default_camera_front = {0.0, -0.3, -1.0};
 constexpr glm::vec3 default_camera_up = {0.0, 1.0, 0.0};
 constexpr auto camera_max_angle = 89.0;
-constexpr auto camera_min_angle = 89.0;
+constexpr auto camera_min_angle = -89.0;
 constexpr auto clipping_near = 0.1F;
 constexpr auto clipping_far = 100.0F;
 constexpr auto refresh_rate = 60;
@@ -35,8 +38,9 @@ integration::integration()
     : m_window(resolution_x, resolution_y, "Test application"),
       m_camera(default_camera_pos, default_camera_front, default_camera_up),
       m_default_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
-          auto model = glm::mat4(1.0F);
           auto &transform = s.get_transform();
+
+          auto model = glm::mat4(1.0F);
           model = glm::translate(model, transform.m_translation);
           model = glm::rotate(model, glm::radians(transform.m_rotation_angle), transform.m_rotation_axis);
           model = glm::scale(model, transform.m_scale);
@@ -48,22 +52,39 @@ integration::integration()
           p.set_uniform("uniform_view", view);
           p.set_uniform("uniform_projection", projection);
 
-          if (!m_lights.empty()) {
-              p.set_uniform("uniform_light.position", m_lights[0].m_shape.get_transform().m_translation);
-              p.set_uniform("uniform_light.ambient", m_lights[0].m_ambient);
-              p.set_uniform("uniform_light.diffuse", m_lights[0].m_diffuse);
-              p.set_uniform("uniform_light.specular", m_lights[0].m_specular);
-          }
-
           p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
-          p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
           p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
+          p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
           p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
           p.set_uniform("uniform_material.texture1", texture_layer_1);
           p.set_uniform("uniform_material.texture2", texture_layer_2);
           p.set_uniform("uniform_material.diffuse", texture_diffuse);
           p.set_uniform("uniform_material.specular", texture_specular);
           p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
+
+          if (m_light) {
+              p.set_uniform("uniform_light.position", m_light->m_shape.get_transform().m_translation);
+              p.set_uniform("uniform_light.ambient", m_light->m_ambient);
+              p.set_uniform("uniform_light.diffuse", m_light->m_diffuse);
+              p.set_uniform("uniform_light.specular", m_light->m_specular);
+              p.set_uniform("uniform_light.attenuation_constant", m_light->m_attenuation_constant);
+              p.set_uniform("uniform_light.attenuation_linear", m_light->m_attenuation_linear);
+              p.set_uniform("uniform_light.attenuation_quadratic", m_light->m_attenuation_quadratic);
+
+              auto *direction_light = dynamic_cast<opengl_wrapper::directional_light *>(m_light.get());
+              if (nullptr != direction_light) {
+                  p.set_uniform("uniform_light.type", static_cast<int>(light_type_t::directional));
+                  p.set_uniform("uniform_light.direction", direction_light->m_direction);
+              } else {
+                  auto *spot_light = dynamic_cast<opengl_wrapper::spot_light *>(m_light.get());
+                  if (nullptr != spot_light) {
+                      p.set_uniform("uniform_light.type", static_cast<int>(light_type_t::spot));
+                      p.set_uniform("uniform_light.direction", spot_light->m_direction);
+                      p.set_uniform("uniform_light.cutoff_begin", glm::cos(glm::radians(spot_light->m_cutoff_begin)));
+                      p.set_uniform("uniform_light.cutoff_end", glm::cos(glm::radians(spot_light->m_cutoff_end)));
+                  }
+              }
+          }
       }) {
 
     IMGUI_CHECKVERSION();
@@ -92,7 +113,7 @@ void integration::init_callbacks() {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
             w.set_should_close(1);
         }
-        if (GLFW_PRESS == action && GLFW_KEY_BACKSPACE == key) {
+        if (GLFW_PRESS == action && GLFW_KEY_F12 == key) {
             m_wireframe = !m_wireframe;
             w.set_wireframe_mode(m_wireframe);
         }
@@ -117,10 +138,6 @@ void integration::init_callbacks() {
     });
 
     m_window.set_cursor_pos_callback([&](opengl_wrapper::window &w, double xpos, double ypos) {
-        if (m_cursor_enabled) {
-            return;
-        }
-
         if (m_first_cursor_iteration) {
             m_last_cursor_xpos = xpos;
             m_last_cursor_ypos = ypos;
@@ -137,7 +154,9 @@ void integration::init_callbacks() {
         m_yaw += xpos_offset;
         m_pitch = std::max(std::min(m_pitch + ypos_offset, camera_max_angle), camera_min_angle);
 
-        m_camera.set_front(m_pitch, m_yaw);
+        if (!m_cursor_enabled) {
+            m_camera.set_front(m_pitch, m_yaw);
+        }
     });
 }
 
@@ -151,7 +170,7 @@ void integration::build_shapes() {
     m_shapes.emplace_back(build_sphere(object_program, base_texture));
     m_shapes.emplace_back(build_torus(object_program, base_texture));
 
-    m_lights.emplace_back(build_light(light_program));
+    m_light = build_light(light_program, light_type_t::spot);
 }
 
 void integration::prepare_render_loop() {
@@ -164,9 +183,8 @@ void integration::prepare_render_loop() {
         shape.load_vertices();
     }
 
-    for (auto &light : m_lights) {
-        light.m_shape.load_vertices();
-    }
+    assert(m_light);
+    m_light->m_shape.load_vertices();
 }
 
 void integration::render_loop() {
@@ -184,9 +202,8 @@ void integration::render_loop() {
             m_window.draw(s);
         }
 
-        for (auto &l : m_lights) {
-            m_window.draw(l.m_shape);
-        }
+        assert(m_light);
+        m_window.draw(m_light->m_shape);
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -216,24 +233,34 @@ void integration::build_ui() {
     ImGui::Begin("OpenGL Wrapper test app");
 
     if (ImGui::CollapsingHeader("Lights")) {
-        ImGui::Checkbox("Auto-rotate light", &m_auto_rotate_light);
-        if (m_auto_rotate_light) {
-            ImGui::BeginDisabled(true);
-        }
-        ImGui::InputScalarN("Light position", ImGuiDataType_Float,
-                            &m_lights.front().m_shape.get_transform().m_translation, 3);
-        if (m_auto_rotate_light) {
-            ImGui::EndDisabled();
+        assert(m_light);
+
+        ImGui::InputScalarN("Light position", ImGuiDataType_Float, &m_light->m_shape.get_transform().m_translation, 3);
+
+        auto *directional_light = dynamic_cast<opengl_wrapper::directional_light *>(m_light.get());
+        if (nullptr != directional_light) {
+            ImGui::InputScalarN("Direction", ImGuiDataType_Float, &directional_light->m_direction, 3);
+        } else {
+            auto *spot_light = dynamic_cast<opengl_wrapper::spot_light *>(m_light.get());
+            if (nullptr != spot_light) {
+                constexpr auto min_cutoff_begin = 5.0F;
+                constexpr auto max_cutoff_end = 120.0F;
+
+                ImGui::InputScalarN("Direction", ImGuiDataType_Float, &spot_light->m_direction, 3);
+                ImGui::SliderFloat("Cutoff begin", &spot_light->m_cutoff_begin, min_cutoff_begin,
+                                   spot_light->m_cutoff_end);
+                ImGui::SliderFloat("Cutoff end", &spot_light->m_cutoff_end, spot_light->m_cutoff_begin, max_cutoff_end);
+            }
         }
 
         const float min_material = 0.0F;
         const float max_material = 2.0F;
-        ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &m_lights.front().m_ambient, 3, &min_material,
-                             &max_material);
-        ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &m_lights.front().m_diffuse, 3, &min_material,
-                             &max_material);
-        ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &m_lights.front().m_specular, 3, &min_material,
-                             &max_material);
+        ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &m_light->m_ambient, 3, &min_material, &max_material);
+        ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &m_light->m_diffuse, 3, &min_material, &max_material);
+        ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &m_light->m_specular, 3, &min_material, &max_material);
+        ImGui::InputFloat("Constant attenuation", &m_light->m_attenuation_constant);
+        ImGui::InputFloat("Linear attenuation", &m_light->m_attenuation_linear);
+        ImGui::InputFloat("Linear quadratic", &m_light->m_attenuation_quadratic);
     }
 
     if (ImGui::CollapsingHeader("Cube")) {
@@ -292,10 +319,8 @@ void integration::shape_debug_ui(opengl_wrapper::shape &s) {
 
 std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
     auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(
-        opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, std::filesystem::path("shaders/object.vert")));
-    ret->add_shader(
-        opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, std::filesystem::path("shaders/object.frag")));
+    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, path("shaders/object.vert")));
+    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, path("shaders/object.frag")));
     ret->link();
 
     ret->set_use_callback(m_default_callback);
@@ -304,22 +329,11 @@ std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
 
 std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
     auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(
-        opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, std::filesystem::path("shaders/light.vert")));
-    ret->add_shader(
-        opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, std::filesystem::path("shaders/light.frag")));
+    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, path("shaders/light.vert")));
+    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, path("shaders/light.frag")));
     ret->link();
 
-    ret->set_use_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
-        constexpr auto radius = 4.0F;
-        auto &transform = s.get_transform();
-        if (m_auto_rotate_light) {
-            transform.m_translation[0] = radius * sin(glfwGetTime());
-            transform.m_translation[2] = radius * cos(glfwGetTime());
-        }
-        p.set_uniform("uniform_view_pos", m_camera.get_position());
-        m_default_callback(p, s);
-    });
+    ret->set_use_callback(m_default_callback);
     return ret;
 }
 
@@ -419,29 +433,70 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     return ret;
 }
 
-opengl_wrapper::light integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
+std::unique_ptr<opengl_wrapper::light> integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program,
+                                                                light_type_t type) {
     constexpr auto ambient = 0.2F;
     constexpr auto diffuse = 1.0F;
     constexpr auto specular = 0.2F;
     constexpr auto scale = 0.1F;
+    constexpr auto position = 2.0F;
+    constexpr auto direction_x = -1.0F;
+    constexpr auto direction_y = -2.0F;
+    constexpr auto direction_z = -2.0F;
+    constexpr auto attenuation_constant = 1.0F;
+    constexpr auto attenuation_linear = 0.09F;
+    constexpr auto attenuation_quadratic = 0.032F;
 
-    opengl_wrapper::light ret;
-    ret.m_ambient = glm::vec3(ambient);
-    ret.m_diffuse = glm::vec3(diffuse);
-    ret.m_specular = glm::vec3(specular);
+    std::unique_ptr<opengl_wrapper::light> ret = std::make_unique<opengl_wrapper::light>();
+    switch (type) {
+    case light_type_t::ambient:
+        ret = std::make_unique<opengl_wrapper::light>();
+        break;
+    case light_type_t::directional:
+        ret = std::make_unique<opengl_wrapper::directional_light>();
+        break;
+    case light_type_t::spot:
+        ret = std::make_unique<opengl_wrapper::spot_light>();
+        break;
+    }
 
-    ret.m_shape.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
+    ret->m_ambient = glm::vec3(ambient);
+    ret->m_diffuse = glm::vec3(diffuse);
+    ret->m_specular = glm::vec3(specular);
+    ret->m_attenuation_constant = attenuation_constant;
+    ret->m_attenuation_linear = attenuation_linear;
+    ret->m_attenuation_quadratic = attenuation_quadratic;
+
+    ret->m_shape.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
 
     opengl_wrapper::transform t;
+    t.m_translation = glm::vec3(position);
     t.m_scale = glm::vec3(scale);
 
-    ret.m_shape.set_transform(t);
-    ret.m_shape.set_program(light_program);
+    ret->m_shape.set_transform(t);
+    ret->m_shape.set_program(light_program);
 
     opengl_wrapper::material mat;
     mat.m_texture1 = opengl_wrapper::texture::build("./textures/white.png", texture_layer_1);
 
-    ret.m_shape.set_material(std::move(mat));
+    ret->m_shape.set_material(std::move(mat));
+
+    if (light_type_t::directional == type) {
+        auto &direction_light = dynamic_cast<opengl_wrapper::directional_light &>(*ret);
+        direction_light.m_direction = glm::vec3(direction_x, direction_y, direction_z);
+        ret->m_attenuation_constant = 1.0F;
+        ret->m_attenuation_linear = 0.0F;
+        ret->m_attenuation_quadratic = 0.0F;
+    } else if (light_type_t::spot == type) {
+        constexpr auto cutoff_begin = 25.0F;
+        constexpr auto cutoff_end = 35.0F;
+
+        auto &spot_light = dynamic_cast<opengl_wrapper::spot_light &>(*ret);
+        spot_light.m_direction = glm::vec3(direction_x, direction_y, direction_z);
+        spot_light.m_cutoff_begin = cutoff_begin;
+        spot_light.m_cutoff_end = cutoff_end;
+    }
+
     return ret;
 }
 

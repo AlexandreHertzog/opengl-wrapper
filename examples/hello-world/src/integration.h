@@ -22,9 +22,15 @@ class integration {
     void render_loop();
 
   private:
+    enum class light_type_t {
+        ambient = 0,
+        directional = 1,
+        spot = 2
+    };
+
     opengl_wrapper::window m_window;
     std::vector<opengl_wrapper::shape> m_shapes;
-    std::vector<opengl_wrapper::light> m_lights;
+    std::unique_ptr<opengl_wrapper::light> m_light;
     opengl_wrapper::camera m_camera;
 
     bool m_wireframe{};
@@ -34,8 +40,6 @@ class integration {
     double m_last_cursor_ypos = 0.0;
     double m_pitch = 0.0;
     double m_yaw = -90.0;
-
-    bool m_auto_rotate_light{true};
 
     const std::function<void(opengl_wrapper::program &, opengl_wrapper::shape &)> m_default_callback;
 
@@ -49,7 +53,8 @@ class integration {
                                               opengl_wrapper::texture::pointer_t &base_texture);
     static opengl_wrapper::shape build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
                                              opengl_wrapper::texture::pointer_t &base_texture);
-    static opengl_wrapper::light build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
+    static std::unique_ptr<opengl_wrapper::light> build_light(std::shared_ptr<opengl_wrapper::program> &light_program,
+                                                              light_type_t type);
     static void shape_debug_ui(opengl_wrapper::shape &s);
 };
 
