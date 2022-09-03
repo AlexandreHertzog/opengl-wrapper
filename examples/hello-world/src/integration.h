@@ -49,7 +49,7 @@ class integration {
                                               opengl_wrapper::texture::pointer_t &base_texture);
     static opengl_wrapper::shape build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
                                              opengl_wrapper::texture::pointer_t &base_texture);
-    opengl_wrapper::light build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
+    static opengl_wrapper::light build_light(std::shared_ptr<opengl_wrapper::program> &light_program);
     static void shape_debug_ui(opengl_wrapper::shape &s);
 };
 

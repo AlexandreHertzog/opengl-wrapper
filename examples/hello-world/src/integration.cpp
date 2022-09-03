@@ -420,11 +420,20 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
 }
 
 opengl_wrapper::light integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program) {
+    constexpr auto ambient = 0.2F;
+    constexpr auto diffuse = 1.0F;
+    constexpr auto specular = 0.2F;
+    constexpr auto scale = 0.1F;
+
     opengl_wrapper::light ret;
+    ret.m_ambient = glm::vec3(ambient);
+    ret.m_diffuse = glm::vec3(diffuse);
+    ret.m_specular = glm::vec3(specular);
+
     ret.m_shape.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
 
     opengl_wrapper::transform t;
-    t.m_scale = {0.1F, 0.1F, 0.1F};
+    t.m_scale = glm::vec3(scale);
 
     ret.m_shape.set_transform(t);
     ret.m_shape.set_program(light_program);

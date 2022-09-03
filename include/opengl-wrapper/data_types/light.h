@@ -6,9 +6,9 @@
 namespace opengl_wrapper {
 
 struct light {
-    glm::vec3 m_ambient{0.2F, 0.2F, 0.2F};
-    glm::vec3 m_diffuse{1.0F, 1.0F, 1.0F};
-    glm::vec3 m_specular{0.2F, 0.2F, 0.2F};
+    glm::vec3 m_ambient;
+    glm::vec3 m_diffuse;
+    glm::vec3 m_specular;
     shape m_shape;
 };
 
