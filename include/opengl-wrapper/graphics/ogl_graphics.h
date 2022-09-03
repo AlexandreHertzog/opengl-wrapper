@@ -44,7 +44,8 @@ class ogl_graphics : public graphics {
     void set_uniform(int location, int v0) override;
     void set_uniform(int location, const std::array<float, 3> &v) override;
     void set_uniform(int location, const std::array<float, 4> &v) override;
-    void set_matrix4_uniform(int location, size_t count, const float *value) override;
+    void set_uniform(int location, const glm::vec3 &value) override;
+    void set_uniform(int location, const glm::mat4 &value) override;
 
     // Buffer functions
     void bind(const buffer &b) override;

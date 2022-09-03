@@ -84,53 +84,9 @@ class program {
      */
     int get_uniform_location(const char *var_name) const;
 
-    /**
-     * @brief Sets the value for a  uniform variable. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
-     * @param var_name Uniform name.
-     * @param value Uniform value.
-     */
-    void set_uniform(const char *var_name, int value);
-
-    /**
-     * @brief Sets the value for a  uniform variable. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
-     * @param var_name Uniform name.
-     * @param value Uniform value.
-     */
-    void set_uniform(const char *var_name, float value);
-
-    /**
-     * @brief Sets the value for a  uniform variable. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
-     * @param var_name Uniform name.
-     * @param value Uniform value.
-     */
-    void set_uniform(const char *var_name, const glm::vec3 &vec);
-
-    /**
-     * @brief Sets the value for a  uniform variable. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
-     * @param var_name Uniform name.
-     * @param v Uniform value.
-     */
-    void set_uniform(const char *var_name, const std::array<float, 3> &v);
-
-    /**
-     * @brief Sets the value for a  uniform variable. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
-     * @param var_name Uniform name.
-     * @param v Uniform value.
-     */
-    void set_uniform(const char *var_name, const std::array<float, 4> &v);
-
-    /**
-     * @brief Sets the value for a  uniform variable. See
-     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
-     * @param var_name Uniform name.
-     * @param value Uniform value.
-     */
-    void set_uniform(const char *var_name, const float *value);
+    template <class... T> void set_uniform(const char *var_name, const T &...t) {
+        graphics::instance().set_uniform(get_uniform_location(var_name), t...);
+    }
 
     /**
      * @brief Uses this program. See

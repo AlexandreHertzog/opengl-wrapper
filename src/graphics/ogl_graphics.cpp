@@ -8,6 +8,7 @@
 #include "utils/formatter.h"
 #include "utils/glfw_error.h"
 #include <boost/log/trivial.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace opengl_wrapper {
 
@@ -204,12 +205,16 @@ void ogl_graphics::set_uniform(int location, const std::array<float, 3> &v) {
     glUniform3f(location, v[0], v[1], v[2]);
 }
 
+void ogl_graphics::set_uniform(int location, const glm::vec3 &v) {
+    glUniform3f(location, v[0], v[1], v[2]);
+}
+
 void ogl_graphics::set_uniform(int location, const std::array<float, 4> &v) {
     glUniform4f(location, v[0], v[1], v[2], v[3]);
 }
 
-void ogl_graphics::set_matrix4_uniform(int location, size_t count, const float *value) {
-    glUniformMatrix4fv(location, count, GL_FALSE, value);
+void ogl_graphics::set_uniform(int location, const glm::mat4 &value) {
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void ogl_graphics::use(const program &p) {

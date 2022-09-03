@@ -1,7 +1,6 @@
 #include "integration.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -22,9 +21,9 @@ integration::integration()
           auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
           auto projection = glm::perspective(glm::radians(45.0F), 1920.0F / 1080.0F, 0.1F, 100.0F);
 
-          p.set_uniform("uniform_model", glm::value_ptr(model));
-          p.set_uniform("uniform_view", glm::value_ptr(view));
-          p.set_uniform("uniform_projection", glm::value_ptr(projection));
+          p.set_uniform("uniform_model", model);
+          p.set_uniform("uniform_view", view);
+          p.set_uniform("uniform_projection", projection);
 
           if (!m_lights.empty()) {
               p.set_uniform("uniform_light.position", m_lights[0].m_shape.get_transform().m_translation);

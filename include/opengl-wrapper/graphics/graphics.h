@@ -4,6 +4,7 @@
 #include "opengl-wrapper/data_types/types.h"
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <memory>
 #include <vector>
 
@@ -350,6 +351,14 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param location Specifies the location of the uniform variable to be modified.
      * @param v For the scalar commands, specifies the new values to be used for the specified uniform variable.
      */
+    virtual void set_uniform(int location, const glm::vec3 &v) = 0;
+
+    /**
+     * @brief Specify the value of a uniform variable for the current program object.
+     * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml
+     * @param location Specifies the location of the uniform variable to be modified.
+     * @param v For the scalar commands, specifies the new values to be used for the specified uniform variable.
+     */
     virtual void set_uniform(int location, const std::array<float, 3> &v) = 0;
 
     /**
@@ -371,7 +380,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param value For the vector and matrix commands, specifies a pointer to an array of count values that will be
      * used to update the specified uniform variable.
      */
-    virtual void set_matrix4_uniform(int location, size_t count, const float *value) = 0;
+    virtual void set_uniform(int location, const glm::mat4 &value) = 0;
 
     /**
      * @brief Installs a program object as part of current rendering state

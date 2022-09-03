@@ -80,30 +80,6 @@ int program::get_uniform_location(const char *var_name) const {
     return graphics::instance().get_uniform_location(*this, var_name);
 }
 
-void program::set_uniform(const char *var_name, float value) {
-    graphics::instance().set_uniform(get_uniform_location(var_name), value);
-}
-
-void program::set_uniform(const char *var_name, const glm::vec3 &vec) {
-    graphics::instance().set_uniform(get_uniform_location(var_name), std::array<float, 3>{vec.x, vec.y, vec.z});
-}
-
-void program::set_uniform(const char *var_name, const std::array<float, 3> &v) {
-    graphics::instance().set_uniform(get_uniform_location(var_name), v);
-}
-
-void program::set_uniform(const char *var_name, const std::array<float, 4> &v) {
-    graphics::instance().set_uniform(get_uniform_location(var_name), v);
-}
-
-void program::set_uniform(const char *var_name, int value) {
-    graphics::instance().set_uniform(get_uniform_location(var_name), value);
-}
-
-void program::set_uniform(const char *var_name, const float *value) {
-    graphics::instance().set_matrix4_uniform(get_uniform_location(var_name), 1, value);
-}
-
 void program::use(shape &s) { // NOLINT(readability-make-member-function-const)
     graphics::instance().use(*this);
     if (m_use_callback) {
