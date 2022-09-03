@@ -80,6 +80,10 @@ class program {
         graphics::instance().set_uniform(get_uniform_location(var_name), t...);
     }
 
+    template <class... T> void set_uniform(const std::string &var_name, const T &...t) {
+        set_uniform(var_name.c_str(), t...);
+    }
+
     /**
      * @brief Uses this program. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml

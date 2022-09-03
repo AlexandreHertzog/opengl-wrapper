@@ -10,6 +10,8 @@
 
 namespace test_app {
 
+constexpr auto LIGHT_COUNT = 10;
+
 class integration {
   public:
     integration();
@@ -29,14 +31,15 @@ class integration {
     using light_pointer_t = std::unique_ptr<opengl_wrapper::light>;
 
     enum class light_type_t {
-        ambient = 0,
-        directional = 1,
-        spot = 2
+        deactivated = 0,
+        ambient = 1,
+        directional = 2,
+        spot = 3
     };
 
     opengl_wrapper::window m_window;
     std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
-    light_pointer_t m_light;
+    std::array<light_pointer_t, LIGHT_COUNT> m_lights;
     opengl_wrapper::camera m_camera;
 
     bool m_wireframe{};
@@ -58,9 +61,10 @@ class integration {
     static opengl_wrapper::shape build_plane(opengl_wrapper::texture::pointer_t &base_texture);
     static opengl_wrapper::shape build_sphere(opengl_wrapper::texture::pointer_t &base_texture);
     static opengl_wrapper::shape build_torus(opengl_wrapper::texture::pointer_t &base_texture);
-    static light_pointer_t build_light(light_type_t type);
+    static integration::light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
     static void shape_debug_ui(opengl_wrapper::shape &s);
     static void update_shape_uniforms(opengl_wrapper::program &p, opengl_wrapper::shape &s);
+    static std::string build_light_uniform_prefix(int i);
 };
 
 } // namespace test_app

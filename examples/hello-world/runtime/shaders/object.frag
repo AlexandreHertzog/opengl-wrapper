@@ -1,13 +1,17 @@
 #version 330 core
+
+#define LIGHT_DEACTIVATED 0
+#define LIGHT_AMBIENT 1
+#define LIGHT_DIRECTIONAL 2
+#define LIGHT_SPOT 3
+
+#define LIGHT_COUNT 10
+
 out vec4 frag_out_color;
 
 in vec2 vert_out_tex_coord;
 in vec3 vert_out_normals;
 in vec3 vert_out_position;
-
-#define LIGHT_AMBIENT 0
-#define LIGHT_DIRECTIONAL 1
-#define LIGHT_SPOT 2
 
 struct light_t {
     int type;
@@ -37,15 +41,15 @@ struct material_t {
 
 uniform vec3 uniform_view_pos;
 uniform material_t uniform_material;
-uniform light_t uniform_light;
+uniform light_t uniform_light[LIGHT_COUNT];
 
-vec3 build_light_ambient(float attenuation);
-vec3 build_light_diffuse(vec3 normals, vec3 light_direction, float attenuation);
-vec3 build_light_specular(vec3 normals, vec3 light_direction, float attenuation);
+vec3 build_light_ambient(light_t light, float attenuation);
+vec3 build_light_diffuse(light_t light, vec3 normals, vec3 light_direction, float attenuation);
+vec3 build_light_specular(light_t light, vec3 normals, vec3 light_direction, float attenuation);
 
-vec3 calculate_light_direction();
-float calculate_attenuation();
-float calculate_light_intensity(vec3 light_direction);
+vec3 calculate_light_direction(light_t light);
+float calculate_attenuation(light_t light);
+float calculate_light_intensity(light_t light, vec3 light_direction);
 
 void main()
 {
@@ -53,64 +57,74 @@ void main()
                             texture(uniform_material.texture2, vert_out_tex_coord),
                             uniform_material.texture_mix);
 
-    vec3 light_direction = calculate_light_direction();
-    float light_intensity = calculate_light_intensity(light_direction);
+    vec3 result = vec3(0.0);
 
-    if (light_intensity > 0.0) {
-        vec3 normals = normalize(vert_out_normals);
-        float light_attenuation = calculate_attenuation() * light_intensity;
-        vec3 ambient_light = build_light_ambient(light_attenuation);
-        vec3 diffuse_light = build_light_diffuse(normals, light_direction, light_attenuation);
-        vec3 specular_light = build_light_specular(normals, light_direction, light_attenuation);
-        frag_out_color = vec4(ambient_light + diffuse_light + specular_light, 1.0) * object_color;
+    for (int i = 0; i < LIGHT_COUNT; i++) {
+        if (uniform_light[i].type == LIGHT_DEACTIVATED) {
+            continue;
+        }
+
+        vec3 light_direction = calculate_light_direction(uniform_light[i]);
+        float light_intensity = calculate_light_intensity(uniform_light[i], light_direction);
+
+        if (light_intensity > 0.0) {
+            vec3 normals = normalize(vert_out_normals);
+            float light_attenuation = calculate_attenuation(uniform_light[i]) * light_intensity;
+            vec3 ambient_light = build_light_ambient(uniform_light[i], light_attenuation);
+            vec3 diffuse_light = build_light_diffuse(uniform_light[i], normals, light_direction, light_attenuation);
+            vec3 specular_light = build_light_specular(uniform_light[i], normals, light_direction, light_attenuation);
+            result += ambient_light + diffuse_light + specular_light;
+        }
     }
+
+    frag_out_color = vec4(result, 1.0) * object_color;
 }
 
-vec3 build_light_ambient(float attenuation) {
-    return uniform_light.ambient * uniform_material.ambient * attenuation;
+vec3 build_light_ambient(light_t light, float attenuation) {
+    return light.ambient * uniform_material.ambient * attenuation;
 }
 
-vec3 build_light_diffuse(vec3 normals, vec3 light_direction, float attenuation) {
+vec3 build_light_diffuse(light_t light, vec3 normals, vec3 light_direction, float attenuation) {
     float absolute = max(dot(normals, light_direction), 0.0);
-    vec3 ret = uniform_light.diffuse * absolute;
+    vec3 ret = light.diffuse * absolute;
     if (uniform_material.has_diffuse) {
         ret *= vec3(texture(uniform_material.diffuse, vert_out_tex_coord));
     }
     return ret * attenuation;
 }
 
-vec3 build_light_specular(vec3 normals, vec3 light_direction, float attenuation) {
+vec3 build_light_specular(light_t light, vec3 normals, vec3 light_direction, float attenuation) {
     vec3 view_direction = normalize(uniform_view_pos - vert_out_position);
     vec3 reflect_direction = reflect(-light_direction, normals);
 
     float absolute = pow(max(dot(view_direction, reflect_direction), 0.0), uniform_material.shininess);
-    vec3 ret = uniform_light.specular * absolute;
+    vec3 ret = light.specular * absolute;
     if (uniform_material.has_specular) {
         ret *= vec3(texture(uniform_material.specular, vert_out_tex_coord));
     }
     return ret * attenuation;
 }
 
-vec3 calculate_light_direction() {
-    if (uniform_light.type == LIGHT_DIRECTIONAL) {
-        return normalize(-uniform_light.direction);
+vec3 calculate_light_direction(light_t light) {
+    if (light.type == LIGHT_DIRECTIONAL) {
+        return normalize(-light.direction);
     }
-    return normalize(uniform_light.position - vert_out_position);
+    return normalize(light.position - vert_out_position);
 }
 
-float calculate_attenuation() {
-    float distance = length(uniform_light.position - vert_out_position);
-    return 1.0 / (uniform_light.attenuation_constant +
-                  uniform_light.attenuation_linear * distance +
-                  uniform_light.attenuation_quadratic * (distance * distance));
+float calculate_attenuation(light_t light) {
+    float distance = length(light.position - vert_out_position);
+    return 1.0 / (light.attenuation_constant +
+                  light.attenuation_linear * distance +
+                  light.attenuation_quadratic * (distance * distance));
 }
 
-float calculate_light_intensity(vec3 direction) {
-    if (uniform_light.type != LIGHT_SPOT) {
+float calculate_light_intensity(light_t light, vec3 direction) {
+    if (light.type != LIGHT_SPOT) {
         return 1.0;
     }
 
-    float light_angle = dot(direction, normalize(-uniform_light.direction));
-    float smooth_cutoff = uniform_light.cutoff_begin - uniform_light.cutoff_end;
-    return clamp((light_angle - uniform_light.cutoff_end) / smooth_cutoff, 0.0, 1.0);
+    float light_angle = dot(direction, normalize(-light.direction));
+    float smooth_cutoff = light.cutoff_begin - light.cutoff_end;
+    return clamp((light_angle - light.cutoff_end) / smooth_cutoff, 0.0, 1.0);
 }
