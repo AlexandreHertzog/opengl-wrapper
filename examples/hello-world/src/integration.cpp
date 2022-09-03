@@ -270,10 +270,24 @@ void integration::shape_debug_ui(opengl_wrapper::shape &s) {
     ImGui::InputScalarN("Rot axis", ImGuiDataType_Float, &s.get_transform().m_rotation_axis, 3);
     ImGui::InputScalarN("Scale", ImGuiDataType_Float, &s.get_transform().m_scale, 3);
     ImGui::SliderScalarN("Ambient", ImGuiDataType_Float, &s.get_material().m_ambient, 3, &min_material, &max_material);
-    ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &s.get_material().m_diffuse, 3, &min_material, &max_material);
     ImGui::SliderFloat("Shininess", &s.get_material().m_shininess, min_shininess, max_shininess);
+
+    if (s.get_material().m_diffuse) {
+        ImGui::BeginDisabled(true);
+    }
+    ImGui::SliderScalarN("Diffuse", ImGuiDataType_Float, &s.get_material().m_diffuse, 3, &min_material, &max_material);
+    if (s.get_material().m_diffuse) {
+        ImGui::EndDisabled();
+    }
+
+    if (s.get_material().m_specular) {
+        ImGui::BeginDisabled(true);
+    }
     ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &s.get_material().m_specular, 3, &min_material,
                          &max_material);
+    if (s.get_material().m_specular) {
+        ImGui::EndDisabled();
+    }
 }
 
 std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
