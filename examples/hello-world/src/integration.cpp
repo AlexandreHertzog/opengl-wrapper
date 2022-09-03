@@ -1,10 +1,11 @@
 #include "integration.h"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+
 #include <boost/log/trivial.hpp>
 #include <csignal>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 using std::filesystem::path;
 
@@ -57,7 +58,7 @@ void integration::init_callbacks() {
         render();
     });
 
-    m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int scancode, int action, int mods) {
+    m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int action) {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
             w.set_should_close(1);
         }
@@ -85,22 +86,22 @@ void integration::init_callbacks() {
         }
     });
 
-    m_window.set_cursor_pos_callback([&](opengl_wrapper::window &w, double xpos, double ypos) {
+    m_window.set_cursor_pos_callback([&](double position_x, double position_y) {
         if (m_first_cursor_iteration) {
-            m_last_cursor_xpos = xpos;
-            m_last_cursor_ypos = ypos;
+            m_last_cursor_position_x = position_x;
+            m_last_cursor_position_y = position_y;
             m_first_cursor_iteration = false;
         }
 
         constexpr auto sensitivity = 0.1;
-        const auto xpos_offset = (xpos - m_last_cursor_xpos) * sensitivity;
-        const auto ypos_offset = (m_last_cursor_ypos - ypos) * sensitivity;
+        const auto offset_position_x = (position_x - m_last_cursor_position_x) * sensitivity;
+        const auto offset_position_y = (m_last_cursor_position_y - position_y) * sensitivity;
 
-        m_last_cursor_xpos = xpos;
-        m_last_cursor_ypos = ypos;
+        m_last_cursor_position_x = position_x;
+        m_last_cursor_position_y = position_y;
 
-        m_yaw += xpos_offset;
-        m_pitch = std::max(std::min(m_pitch + ypos_offset, camera_max_angle), camera_min_angle);
+        m_yaw += offset_position_x;
+        m_pitch = std::max(std::min(m_pitch + offset_position_y, camera_max_angle), camera_min_angle);
 
         if (!m_cursor_enabled) {
             m_camera.set_front(m_pitch, m_yaw);
@@ -142,10 +143,13 @@ void integration::render_loop() {
     }
 }
 void integration::render() {
+    using std::chrono::duration;
+    using std::chrono::high_resolution_clock;
+
     constexpr auto s_to_us_multiplier = 1000000.0;
     auto frame_time_us = s_to_us_multiplier / refresh_rate;
 
-    auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = high_resolution_clock::now();
 
     build_ui();
 
@@ -170,7 +174,7 @@ void integration::render() {
 
     m_window.poll_events();
 
-    std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
+    duration<double, std::micro> loop_time_us = high_resolution_clock::now() - start_time;
 
     if (loop_time_us.count() < frame_time_us) {
         const auto wait_time_us = frame_time_us - loop_time_us.count();
@@ -320,30 +324,39 @@ void integration::shape_debug_ui(opengl_wrapper::shape &s) {
 }
 
 std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
+    using opengl_wrapper::shader;
+    using opengl_wrapper::shader_type_t;
+
     auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, path("shaders/object.vert")));
-    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, path("shaders/object.frag")));
+    ret->add_shader(shader(shader_type_t::vertex, path("shaders/object.vert")));
+    ret->add_shader(shader(shader_type_t::fragment, path("shaders/object.frag")));
     ret->link();
     return ret;
 }
 
 std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
+    using opengl_wrapper::shader;
+    using opengl_wrapper::shader_type_t;
+
     auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, path("shaders/light.vert")));
-    ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, path("shaders/light.frag")));
+    ret->add_shader(shader(shader_type_t::vertex, path("shaders/light.vert")));
+    ret->add_shader(shader(shader_type_t::fragment, path("shaders/light.frag")));
     ret->link();
     return ret;
 }
 
 opengl_wrapper::shape integration::build_cube(opengl_wrapper::texture::pointer_t &base_texture) {
+    constexpr auto rotation_angle = 45.0F;
+    constexpr auto scale = 0.5F;
+
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/cube.obj"));
 
     opengl_wrapper::transform t;
     t.m_translation = {0.0F, 0.0F, -1.0F};
-    t.m_rotation_angle = 45.0F;
+    t.m_rotation_angle = rotation_angle;
     t.m_rotation_axis = {0.0F, 1.0F, 0.0F};
-    t.m_scale = {0.5F, 0.5F, 0.5F};
+    t.m_scale = glm::vec3(scale);
     ret.set_transform(t);
 
     opengl_wrapper::material mat;
@@ -357,12 +370,15 @@ opengl_wrapper::shape integration::build_cube(opengl_wrapper::texture::pointer_t
 }
 
 opengl_wrapper::shape integration::build_plane(opengl_wrapper::texture::pointer_t &base_texture) {
+    constexpr auto scale = 10.0F;
+    constexpr glm::vec3 position = {0.0F, -0.5F, 0.0F};
+
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/plane.obj"));
 
     opengl_wrapper::transform t;
-    t.m_translation = {0.0F, -0.5F, 0.0F};
-    t.m_scale = {10.0F, 10.0F, 10.0F};
+    t.m_translation = position;
+    t.m_scale = glm::vec3(scale);
     ret.set_transform(t);
 
     opengl_wrapper::material mat;
@@ -374,17 +390,22 @@ opengl_wrapper::shape integration::build_plane(opengl_wrapper::texture::pointer_
 }
 
 opengl_wrapper::shape integration::build_sphere(opengl_wrapper::texture::pointer_t &base_texture) {
+    constexpr auto scale = 0.6F;
+    constexpr auto ambient = 0.1F;
+    constexpr auto shininess = 32.0F;
+    constexpr glm::vec3 position = {1.5F, 0.0F, -1.0F};
+
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
 
     opengl_wrapper::transform t;
-    t.m_translation = {1.5F, 0.0F, -1.0F};
-    t.m_scale = {0.6F, 0.6F, 0.6F};
+    t.m_translation = position;
+    t.m_scale = glm::vec3(scale);
     ret.set_transform(t);
 
     opengl_wrapper::material mat;
-    mat.m_ambient = {0.1F, 0.1F, 0.1F};
-    mat.m_shininess = 32.0F;
+    mat.m_ambient = glm::vec3(ambient);
+    mat.m_shininess = shininess;
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", texture_layer_2);
     mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", texture_diffuse);
@@ -396,19 +417,23 @@ opengl_wrapper::shape integration::build_sphere(opengl_wrapper::texture::pointer
 }
 
 opengl_wrapper::shape integration::build_torus(opengl_wrapper::texture::pointer_t &base_texture) {
+    constexpr auto scale = 0.6F;
+    constexpr auto shininess = 2.0F;
+    constexpr auto rotation_angle = 45.0F;
+
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/torus.obj"));
 
     opengl_wrapper::transform t;
     t.m_translation = {-1.0F, 0.0F, -1.0F};
     t.m_rotation_axis = {0.0F, 0.0F, 1.0F};
-    t.m_rotation_angle = 45.0F;
-    t.m_scale = {0.6F, 0.6F, 0.6F};
+    t.m_rotation_angle = rotation_angle;
+    t.m_scale = glm::vec3(scale);
     ret.set_transform(t);
 
     opengl_wrapper::material mat;
     mat.m_ambient = {1.0F, 1.0F, 1.0F};
-    mat.m_shininess = 2.0F;
+    mat.m_shininess = shininess;
     mat.m_texture1 = base_texture;
     mat.m_texture2 = opengl_wrapper::texture::build("./textures/green.png", texture_layer_2);
 
@@ -417,7 +442,7 @@ opengl_wrapper::shape integration::build_torus(opengl_wrapper::texture::pointer_
     return ret;
 }
 
-std::unique_ptr<opengl_wrapper::light> integration::build_light(light_type_t type) {
+integration::light_pointer_t integration::build_light(light_type_t type) {
     constexpr auto ambient = 0.2F;
     constexpr auto diffuse = 1.0F;
     constexpr auto specular = 0.2F;
@@ -430,7 +455,7 @@ std::unique_ptr<opengl_wrapper::light> integration::build_light(light_type_t typ
     constexpr auto attenuation_linear = 0.09F;
     constexpr auto attenuation_quadratic = 0.032F;
 
-    std::unique_ptr<opengl_wrapper::light> ret = std::make_unique<opengl_wrapper::light>();
+    light_pointer_t ret = std::make_unique<opengl_wrapper::light>();
     switch (type) {
     case light_type_t::ambient:
         ret = std::make_unique<opengl_wrapper::light>();

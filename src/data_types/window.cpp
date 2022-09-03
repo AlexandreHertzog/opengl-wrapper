@@ -23,7 +23,7 @@ class window::manager {
 
         auto &window = *window_it->second;
         if (window.m_cursor_pos_callback) {
-            window.m_cursor_pos_callback(window, xpos, ypos);
+            window.m_cursor_pos_callback(xpos, ypos);
         }
     }
 
@@ -36,13 +36,13 @@ class window::manager {
         window.m_framebuffer_callback(window, width, height);
     }
 
-    static void callback_key(GLFWwindow *glfw_window, int key, int scancode, int action, int mods) {
+    static void callback_key(GLFWwindow *glfw_window, int key, int, int action, int) {
         auto window_it = m_window_map.find(glfw_window);
         assert(m_window_map.end() != window_it);
         assert(nullptr != window_it->second);
 
         auto &window = *window_it->second;
-        window.m_key_callback(window, key, scancode, action, mods);
+        window.m_key_callback(window, key, action);
     }
 };
 

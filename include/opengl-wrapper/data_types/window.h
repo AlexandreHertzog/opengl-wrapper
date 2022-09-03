@@ -11,9 +11,9 @@ namespace opengl_wrapper {
 
 class window {
   public:
-    using cursor_pos_cb_t = std::function<void(window &, double, double)>;
+    using cursor_pos_cb_t = std::function<void(double, double)>;
     using framebuffer_cb_t = std::function<void(window &, int, int)>;
-    using key_cb_t = std::function<void(window &, int, int, int, int)>;
+    using key_cb_t = std::function<void(window &, int, int)>;
 
     /**
      * @brief Constructs a window object.
