@@ -42,14 +42,6 @@ class shape {
     material &get_material();
     void set_material(material m);
 
-    [[nodiscard]] std::vector<unsigned> serialize_draw_order() const;
-
-    template <class... T> void set_uniform(const char *name, T... value) {
-        assert(m_program);
-        m_program->use(*this);
-        m_program->set_uniform(name, value...);
-    }
-
   private:
     mesh m_mesh;
     transform m_transform;

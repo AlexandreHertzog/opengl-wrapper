@@ -1,12 +1,6 @@
 #include "camera.h"
 #include "glm/ext/matrix_transform.hpp"
 
-namespace {
-
-constexpr auto absolute_up = glm::vec3(0.0, 1.0, 0.0);
-
-} // namespace
-
 namespace opengl_wrapper {
 
 camera::camera(glm::vec3 position, glm::vec3 front, glm::vec3 up) : m_position(position), m_front(front), m_up(up) {

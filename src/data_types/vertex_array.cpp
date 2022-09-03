@@ -54,14 +54,14 @@ identifier_t vertex_array::get_id() const {
     return m_id;
 }
 
-void vertex_array::load(const std::vector<vertex> &vertices, const std::vector<unsigned int> &indices) {
+void vertex_array::load(const std::vector<vertex> &vertices) {
     bind();
 
     m_buffers[0].bind();
     m_buffers[0].load(vertices);
 
-    m_buffers[1].bind();
-    m_buffers[1].load(indices);
+    //    m_buffers[1].bind(); Disable as we don't support element drawing for now.
+    //    m_buffers[1].load(indices);
 
     graphics::instance().vertex_attrib_pointer(0, 3, sizeof(vertex), 0);
     graphics::instance().enable_vertex_attrib_array(0);

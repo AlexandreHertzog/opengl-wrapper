@@ -39,24 +39,12 @@ shape &shape::operator=(const shape &other) {
     return *this;
 }
 
-std::vector<unsigned> shape::serialize_draw_order() const {
-    std::vector<unsigned> ret;
-    // TODO: Reenable when a way to properly serialize this is figured out.
-    //    ret.reserve(m_faces.size() * m_faces[0].size());
-    //    for (const auto &face : m_faces) {
-    //        for (const auto &subface : face) {
-    //            ret.emplace_back(subface.m_vertex_index);
-    //        }
-    //    }
-    return ret;
-}
-
 void shape::set_program(std::shared_ptr<program> p) {
     m_program = std::move(p);
 }
 
 void shape::load_vertices() {
-    m_vertex_array.load(m_mesh.get_vertices(), serialize_draw_order());
+    m_vertex_array.load(m_mesh.get_vertices());
 }
 
 void shape::bind() {

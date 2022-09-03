@@ -70,7 +70,7 @@ class vertex_array {
      * @param data Data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    void load(const std::vector<vertex> &vertices, const std::vector<unsigned int> &indices);
+    void load(const std::vector<vertex> &vertices);
 
   private:
     identifier_t m_id;

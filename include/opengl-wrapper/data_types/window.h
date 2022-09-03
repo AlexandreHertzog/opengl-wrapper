@@ -116,16 +116,7 @@ class window {
      */
     void set_input_mode(int mode, int value);
 
-    template <typename TYPE> void draw(TYPE &shape) {
-        shape.bind();
-
-        const auto draw_order = shape.serialize_draw_order();
-        if (!draw_order.empty()) {
-            graphics::instance().draw_elements(draw_order);
-        } else {
-            graphics::instance().draw_arrays(0, shape.get_mesh().get_vertices().size());
-        }
-    }
+    void draw(shape &s);
 
     /**
      * @brief Sets the dimensions of the window viewport.

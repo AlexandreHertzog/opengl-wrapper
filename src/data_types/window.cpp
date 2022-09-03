@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include "graphics/graphics.h"
+#include "shape.h"
 #include "utils/glad_error.h"
 #include "utils/glfw_error.h"
 #include "utils/utils.h"
@@ -132,6 +133,11 @@ void window::poll_events() {
 void window::set_input_mode(int mode, int value) {
     assert(nullptr != m_window);
     graphics::instance().glfw_set_input_mode(m_window, mode, value);
+}
+
+void window::draw(opengl_wrapper::shape &s) {
+    s.bind();
+    graphics::instance().draw_arrays(0, s.get_mesh().get_vertices().size());
 }
 
 GLFWwindow *window::get_window() const {
