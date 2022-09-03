@@ -28,10 +28,9 @@ class shape {
     shape &operator=(const shape &other);
     shape &operator=(shape &&other) noexcept;
 
-    void set_program(std::shared_ptr<program> p);
-
     void load_vertices();
     void bind();
+    [[nodiscard]] glm::mat4 model_transformations() const;
 
     mesh &get_mesh();
     void set_mesh(mesh m);
@@ -46,9 +45,7 @@ class shape {
     mesh m_mesh;
     transform m_transform;
     material m_material;
-
     vertex_array m_vertex_array;
-    std::shared_ptr<program> m_program;
 };
 
 } // namespace opengl_wrapper

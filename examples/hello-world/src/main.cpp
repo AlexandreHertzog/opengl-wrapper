@@ -7,7 +7,6 @@ int main() {
         app.init_callbacks();
 
         app.build_shapes();
-        app.prepare_render_loop();
         app.render_loop();
         return 0;
     } catch (const std::runtime_error &e) {

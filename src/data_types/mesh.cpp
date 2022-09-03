@@ -93,6 +93,10 @@ const std::vector<vertex> &mesh::get_vertices() const {
     return m_cached_vertices;
 }
 
+const std::string &mesh::get_name() const {
+    return m_name;
+}
+
 void mesh::cache_vertices() {
     m_cached_vertices.clear();
     m_cached_vertices.reserve(m_faces.size() * 3);

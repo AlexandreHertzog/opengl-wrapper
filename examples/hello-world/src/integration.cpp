@@ -1,6 +1,5 @@
 #include "integration.h"
 #include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -36,56 +35,7 @@ namespace test_app {
 
 integration::integration()
     : m_window(resolution_x, resolution_y, "Test application"),
-      m_camera(default_camera_pos, default_camera_front, default_camera_up),
-      m_default_callback([&](opengl_wrapper::program &p, opengl_wrapper::shape &s) {
-          auto &transform = s.get_transform();
-
-          auto model = glm::mat4(1.0F);
-          model = glm::translate(model, transform.m_translation);
-          model = glm::rotate(model, glm::radians(transform.m_rotation_angle), transform.m_rotation_axis);
-          model = glm::scale(model, transform.m_scale);
-
-          auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
-          auto projection = glm::perspective(glm::radians(default_fov), resolution_ratio, clipping_near, clipping_far);
-
-          p.set_uniform("uniform_model", model);
-          p.set_uniform("uniform_view", view);
-          p.set_uniform("uniform_projection", projection);
-
-          p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
-          p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
-          p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
-          p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
-          p.set_uniform("uniform_material.texture1", texture_layer_1);
-          p.set_uniform("uniform_material.texture2", texture_layer_2);
-          p.set_uniform("uniform_material.diffuse", texture_diffuse);
-          p.set_uniform("uniform_material.specular", texture_specular);
-          p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
-
-          if (m_light) {
-              p.set_uniform("uniform_light.position", m_light->m_shape.get_transform().m_translation);
-              p.set_uniform("uniform_light.ambient", m_light->m_ambient);
-              p.set_uniform("uniform_light.diffuse", m_light->m_diffuse);
-              p.set_uniform("uniform_light.specular", m_light->m_specular);
-              p.set_uniform("uniform_light.attenuation_constant", m_light->m_attenuation_constant);
-              p.set_uniform("uniform_light.attenuation_linear", m_light->m_attenuation_linear);
-              p.set_uniform("uniform_light.attenuation_quadratic", m_light->m_attenuation_quadratic);
-
-              auto *direction_light = dynamic_cast<opengl_wrapper::directional_light *>(m_light.get());
-              if (nullptr != direction_light) {
-                  p.set_uniform("uniform_light.type", static_cast<int>(light_type_t::directional));
-                  p.set_uniform("uniform_light.direction", direction_light->m_direction);
-              } else {
-                  auto *spot_light = dynamic_cast<opengl_wrapper::spot_light *>(m_light.get());
-                  if (nullptr != spot_light) {
-                      p.set_uniform("uniform_light.type", static_cast<int>(light_type_t::spot));
-                      p.set_uniform("uniform_light.direction", spot_light->m_direction);
-                      p.set_uniform("uniform_light.cutoff_begin", glm::cos(glm::radians(spot_light->m_cutoff_begin)));
-                      p.set_uniform("uniform_light.cutoff_end", glm::cos(glm::radians(spot_light->m_cutoff_end)));
-                  }
-              }
-          }
-      }) {
+      m_camera(default_camera_pos, default_camera_front, default_camera_up) {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -104,9 +54,7 @@ void integration::init_callbacks() {
 
     m_window.set_framebuffer_callback([&](opengl_wrapper::window &w, int width, int height) {
         w.set_viewport(width, height);
-        for (auto &s : m_shapes) {
-            w.draw(s);
-        }
+        render();
     });
 
     m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int scancode, int action, int mods) {
@@ -165,62 +113,74 @@ void integration::build_shapes() {
     auto light_program = build_light_program();
     auto base_texture = opengl_wrapper::texture::build("./textures/checker.png", texture_layer_1);
 
-    m_shapes.emplace_back(build_cube(object_program, base_texture));
-    m_shapes.emplace_back(build_plane(object_program, base_texture));
-    m_shapes.emplace_back(build_sphere(object_program, base_texture));
-    m_shapes.emplace_back(build_torus(object_program, base_texture));
+    m_program_shape_map[object_program].emplace_back(build_cube(base_texture));
+    m_program_shape_map[object_program].emplace_back(build_plane(base_texture));
+    m_program_shape_map[object_program].emplace_back(build_sphere(base_texture));
+    m_program_shape_map[object_program].emplace_back(build_torus(base_texture));
 
-    m_light = build_light(light_program, light_type_t::spot);
+    m_light = build_light(light_type_t::spot);
+    m_program_shape_map[light_program].emplace_back(m_light->m_shape);
 }
 
-void integration::prepare_render_loop() {
+void integration::render_loop() {
     constexpr opengl_wrapper::color_alpha_t clear_color = {0.2F, 0.2F, 0.2F, 1.0F};
 
     m_window.set_depth_test(true);
     m_window.set_clear_color(clear_color);
 
-    for (auto &shape : m_shapes) {
-        shape.load_vertices();
+    for (auto &program_shapes : m_program_shape_map) {
+        for (auto &shape : program_shapes.second) {
+            shape.load_vertices();
+        }
     }
 
     assert(m_light);
     m_light->m_shape.load_vertices();
-}
 
-void integration::render_loop() {
+    while (!m_window.get_should_close()) {
+        render();
+    }
+}
+void integration::render() {
     constexpr auto s_to_us_multiplier = 1000000.0;
     auto frame_time_us = s_to_us_multiplier / refresh_rate;
 
-    while (!m_window.get_should_close()) {
-        auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::high_resolution_clock::now();
 
-        build_ui();
+    build_ui();
 
-        m_window.clear();
+    m_window.clear();
 
-        for (auto &s : m_shapes) {
-            m_window.draw(s);
+    for (auto &program_shape : m_program_shape_map) {
+        assert(program_shape.first);
+        program_shape.first->use();
+
+        update_projection_uniforms(*program_shape.first);
+        update_light_uniforms(*program_shape.first);
+
+        for (auto &shape : program_shape.second) {
+            update_shape_uniforms(*program_shape.first, shape);
+            m_window.draw(shape);
         }
-
-        assert(m_light);
-        m_window.draw(m_light->m_shape);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        m_window.poll_events();
-
-        std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
-
-        if (loop_time_us.count() < frame_time_us) {
-            const auto wait_time_us = frame_time_us - loop_time_us.count();
-            BOOST_LOG_TRIVIAL(debug) << "Waiting " << wait_time_us << "ms to fill frame_time";
-            usleep(static_cast<unsigned int>(wait_time_us));
-        } else {
-            BOOST_LOG_TRIVIAL(debug) << "loop_time too large, skipping time filler";
-        }
-
-        m_window.swap_buffers();
     }
+
+    assert(m_light);
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    m_window.poll_events();
+
+    std::chrono::duration<double, std::micro> loop_time_us = std::chrono::high_resolution_clock::now() - start_time;
+
+    if (loop_time_us.count() < frame_time_us) {
+        const auto wait_time_us = frame_time_us - loop_time_us.count();
+        BOOST_LOG_TRIVIAL(debug) << "Waiting " << wait_time_us << "ms to fill frame_time";
+        usleep(static_cast<unsigned int>(wait_time_us));
+    } else {
+        BOOST_LOG_TRIVIAL(debug) << "loop_time too large, skipping time filler";
+    }
+
+    m_window.swap_buffers();
 }
 
 void integration::build_ui() {
@@ -263,22 +223,64 @@ void integration::build_ui() {
         ImGui::InputFloat("Linear quadratic", &m_light->m_attenuation_quadratic);
     }
 
-    if (ImGui::CollapsingHeader("Cube")) {
-        shape_debug_ui(m_shapes[0]);
-    }
-    if (ImGui::CollapsingHeader("Plane")) {
-        shape_debug_ui(m_shapes[1]);
-    }
-    if (ImGui::CollapsingHeader("Sphere")) {
-        shape_debug_ui(m_shapes[2]);
-    }
-    if (ImGui::CollapsingHeader("Torus")) {
-        shape_debug_ui(m_shapes[3]);
+    for (auto &program_shapes : m_program_shape_map) {
+        for (auto &shape : program_shapes.second) {
+            if (ImGui::CollapsingHeader(shape.get_mesh().get_name().c_str())) {
+                shape_debug_ui(shape);
+            }
+        }
     }
 
     ImGui::End();
 
     ImGui::Render();
+}
+
+void integration::update_light_uniforms(opengl_wrapper::program &p) {
+    if (m_light) {
+        p.set_uniform("uniform_light.position", m_light->m_shape.get_transform().m_translation);
+        p.set_uniform("uniform_light.ambient", m_light->m_ambient);
+        p.set_uniform("uniform_light.diffuse", m_light->m_diffuse);
+        p.set_uniform("uniform_light.specular", m_light->m_specular);
+        p.set_uniform("uniform_light.attenuation_constant", m_light->m_attenuation_constant);
+        p.set_uniform("uniform_light.attenuation_linear", m_light->m_attenuation_linear);
+        p.set_uniform("uniform_light.attenuation_quadratic", m_light->m_attenuation_quadratic);
+
+        auto *direction_light = dynamic_cast<opengl_wrapper::directional_light *>(m_light.get());
+        if (nullptr != direction_light) {
+            p.set_uniform("uniform_light.type", static_cast<int>(light_type_t::directional));
+            p.set_uniform("uniform_light.direction", direction_light->m_direction);
+        } else {
+            auto *spot_light = dynamic_cast<opengl_wrapper::spot_light *>(m_light.get());
+            if (nullptr != spot_light) {
+                p.set_uniform("uniform_light.type", static_cast<int>(light_type_t::spot));
+                p.set_uniform("uniform_light.direction", spot_light->m_direction);
+                p.set_uniform("uniform_light.cutoff_begin", glm::cos(glm::radians(spot_light->m_cutoff_begin)));
+                p.set_uniform("uniform_light.cutoff_end", glm::cos(glm::radians(spot_light->m_cutoff_end)));
+            }
+        }
+    }
+}
+
+void integration::update_projection_uniforms(opengl_wrapper::program &p) {
+    auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
+    p.set_uniform("uniform_view", view);
+
+    auto projection = glm::perspective(glm::radians(default_fov), resolution_ratio, clipping_near, clipping_far);
+    p.set_uniform("uniform_projection", projection);
+}
+
+void integration::update_shape_uniforms(opengl_wrapper::program &p, opengl_wrapper::shape &s) {
+    p.set_uniform("uniform_model", s.model_transformations());
+    p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
+    p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
+    p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
+    p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
+    p.set_uniform("uniform_material.texture1", texture_layer_1);
+    p.set_uniform("uniform_material.texture2", texture_layer_2);
+    p.set_uniform("uniform_material.diffuse", texture_diffuse);
+    p.set_uniform("uniform_material.specular", texture_specular);
+    p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
 }
 
 void integration::shape_debug_ui(opengl_wrapper::shape &s) {
@@ -322,8 +324,6 @@ std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
     ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, path("shaders/object.vert")));
     ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, path("shaders/object.frag")));
     ret->link();
-
-    ret->set_use_callback(m_default_callback);
     return ret;
 }
 
@@ -332,13 +332,10 @@ std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
     ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::vertex, path("shaders/light.vert")));
     ret->add_shader(opengl_wrapper::shader(opengl_wrapper::shader_type_t::fragment, path("shaders/light.frag")));
     ret->link();
-
-    ret->set_use_callback(m_default_callback);
     return ret;
 }
 
-opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                              opengl_wrapper::texture::pointer_t &base_texture) {
+opengl_wrapper::shape integration::build_cube(opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/cube.obj"));
 
@@ -347,10 +344,7 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
     t.m_rotation_angle = 45.0F;
     t.m_rotation_axis = {0.0F, 1.0F, 0.0F};
     t.m_scale = {0.5F, 0.5F, 0.5F};
-
     ret.set_transform(t);
-
-    ret.set_program(object_program);
 
     opengl_wrapper::material mat;
     mat.m_texture1 = base_texture;
@@ -362,17 +356,14 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
     return ret;
 }
 
-opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                               opengl_wrapper::texture::pointer_t &base_texture) {
+opengl_wrapper::shape integration::build_plane(opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/plane.obj"));
 
     opengl_wrapper::transform t;
     t.m_translation = {0.0F, -0.5F, 0.0F};
     t.m_scale = {10.0F, 10.0F, 10.0F};
-
     ret.set_transform(t);
-    ret.set_program(object_program);
 
     opengl_wrapper::material mat;
     mat.m_texture1 = base_texture;
@@ -382,17 +373,14 @@ opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::p
     return ret;
 }
 
-opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                                opengl_wrapper::texture::pointer_t &base_texture) {
+opengl_wrapper::shape integration::build_sphere(opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
 
     opengl_wrapper::transform t;
     t.m_translation = {1.5F, 0.0F, -1.0F};
     t.m_scale = {0.6F, 0.6F, 0.6F};
-
     ret.set_transform(t);
-    ret.set_program(object_program);
 
     opengl_wrapper::material mat;
     mat.m_ambient = {0.1F, 0.1F, 0.1F};
@@ -407,8 +395,7 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
     return ret;
 }
 
-opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                               opengl_wrapper::texture::pointer_t &base_texture) {
+opengl_wrapper::shape integration::build_torus(opengl_wrapper::texture::pointer_t &base_texture) {
     opengl_wrapper::shape ret;
     ret.set_mesh(opengl_wrapper::mesh("./objects/torus.obj"));
 
@@ -417,10 +404,7 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     t.m_rotation_axis = {0.0F, 0.0F, 1.0F};
     t.m_rotation_angle = 45.0F;
     t.m_scale = {0.6F, 0.6F, 0.6F};
-
     ret.set_transform(t);
-
-    ret.set_program(object_program);
 
     opengl_wrapper::material mat;
     mat.m_ambient = {1.0F, 1.0F, 1.0F};
@@ -433,8 +417,7 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     return ret;
 }
 
-std::unique_ptr<opengl_wrapper::light> integration::build_light(std::shared_ptr<opengl_wrapper::program> &light_program,
-                                                                light_type_t type) {
+std::unique_ptr<opengl_wrapper::light> integration::build_light(light_type_t type) {
     constexpr auto ambient = 0.2F;
     constexpr auto diffuse = 1.0F;
     constexpr auto specular = 0.2F;
@@ -472,9 +455,7 @@ std::unique_ptr<opengl_wrapper::light> integration::build_light(std::shared_ptr<
     opengl_wrapper::transform t;
     t.m_translation = glm::vec3(position);
     t.m_scale = glm::vec3(scale);
-
     ret->m_shape.set_transform(t);
-    ret->m_shape.set_program(light_program);
 
     opengl_wrapper::material mat;
     mat.m_texture1 = opengl_wrapper::texture::build("./textures/white.png", texture_layer_1);

@@ -15,13 +15,13 @@ class integration {
     integration();
     ~integration();
     void init_callbacks();
-    std::shared_ptr<opengl_wrapper::program> build_object_program();
-    std::shared_ptr<opengl_wrapper::program> build_light_program();
     void build_shapes();
-    void prepare_render_loop();
     void render_loop();
 
   private:
+    using shape_vector_t = std::vector<opengl_wrapper::shape>;
+    using program_pointer_t = std::shared_ptr<opengl_wrapper::program>;
+
     enum class light_type_t {
         ambient = 0,
         directional = 1,
@@ -29,7 +29,7 @@ class integration {
     };
 
     opengl_wrapper::window m_window;
-    std::vector<opengl_wrapper::shape> m_shapes;
+    std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
     std::unique_ptr<opengl_wrapper::light> m_light;
     opengl_wrapper::camera m_camera;
 
@@ -41,21 +41,20 @@ class integration {
     double m_pitch = 0.0;
     double m_yaw = -90.0;
 
-    const std::function<void(opengl_wrapper::program &, opengl_wrapper::shape &)> m_default_callback;
-
     void build_ui();
+    program_pointer_t build_object_program();
+    program_pointer_t build_light_program();
+    void update_light_uniforms(opengl_wrapper::program &p);
+    void update_projection_uniforms(opengl_wrapper::program &p);
+    void render();
 
-    static opengl_wrapper::shape build_cube(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                            opengl_wrapper::texture::pointer_t &base_texture);
-    static opengl_wrapper::shape build_plane(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                             opengl_wrapper::texture::pointer_t &base_texture);
-    static opengl_wrapper::shape build_sphere(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                              opengl_wrapper::texture::pointer_t &base_texture);
-    static opengl_wrapper::shape build_torus(std::shared_ptr<opengl_wrapper::program> &object_program,
-                                             opengl_wrapper::texture::pointer_t &base_texture);
-    static std::unique_ptr<opengl_wrapper::light> build_light(std::shared_ptr<opengl_wrapper::program> &light_program,
-                                                              light_type_t type);
+    static opengl_wrapper::shape build_cube(opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_plane(opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_sphere(opengl_wrapper::texture::pointer_t &base_texture);
+    static opengl_wrapper::shape build_torus(opengl_wrapper::texture::pointer_t &base_texture);
+    static std::unique_ptr<opengl_wrapper::light> build_light(light_type_t type);
     static void shape_debug_ui(opengl_wrapper::shape &s);
+    static void update_shape_uniforms(opengl_wrapper::program &p, opengl_wrapper::shape &s);
 };
 
 } // namespace test_app

@@ -13,8 +13,6 @@ class shape;
 
 class program {
   public:
-    using use_callback = std::function<void(program &program, shape &shape)>;
-
     /**
      * @brief Construct a new program object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml
@@ -71,12 +69,6 @@ class program {
     void link();
 
     /**
-     * @brief Sets the callback to be used after each time the program is activated.
-     * @param callback Callback function.
-     */
-    void set_use_callback(use_callback callback);
-
-    /**
      * @brief Gets the reference for a Uniform variable in OpenGL. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml
      * @param var_name Variable name.
@@ -93,7 +85,7 @@ class program {
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml
      *
      */
-    void use(shape &s);
+    void use();
 
     /**
      * @brief Gets the shaders associated with the program. Only valid before linking, after that it returns an empty
@@ -114,18 +106,11 @@ class program {
      */
     [[nodiscard]] bool get_linked() const;
 
-    /**
-     * @brief Gets the program callback whenever use() is called.
-     * @return Program use callback.
-     */
-    [[nodiscard]] const use_callback &get_use_callback() const;
-
   private:
     std::vector<shader> m_shaders;
     unsigned int m_shader_count;
     identifier_t m_id;
     bool m_linked;
-    use_callback m_use_callback;
 };
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p);

@@ -72,19 +72,12 @@ void program::link() {
     m_linked = true;
 }
 
-void program::set_use_callback(opengl_wrapper::program::use_callback callback) {
-    m_use_callback = std::move(callback);
-}
-
 int program::get_uniform_location(const char *var_name) const {
     return graphics::instance().get_uniform_location(*this, var_name);
 }
 
-void program::use(shape &s) { // NOLINT(readability-make-member-function-const)
+void program::use() {
     graphics::instance().use(*this);
-    if (m_use_callback) {
-        m_use_callback(*this, s);
-    }
 }
 
 const std::vector<shader> &program::get_shaders() const {
@@ -99,13 +92,9 @@ bool program::get_linked() const {
     return m_linked;
 }
 
-const program::use_callback &program::get_use_callback() const {
-    return m_use_callback;
-}
-
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p) {
     return os << "program" << parenthesis(&p) << " shaders=" << p.get_shaders() << ", id=" << p.get_id()
-              << ", linked=" << p.get_linked() << ", callback=" << &p.get_use_callback();
+              << ", linked=" << p.get_linked();
 }
 
 } // namespace opengl_wrapper

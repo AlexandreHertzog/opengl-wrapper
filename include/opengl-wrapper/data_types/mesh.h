@@ -21,6 +21,7 @@ class mesh {
     mesh &operator=(const mesh &other);
 
     [[nodiscard]] const std::vector<vertex> &get_vertices() const;
+    [[nodiscard]] const std::string &get_name() const;
 
   private:
     std::string m_material_library{"mtllib_undefined"};
