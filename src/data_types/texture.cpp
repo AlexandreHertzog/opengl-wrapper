@@ -5,7 +5,7 @@
 namespace opengl_wrapper {
 
 texture::texture(int unit, texture_target_t target, identifier_t id) : m_id(id), m_target(target), m_unit(unit) {
-    assert(0 != unit);
+    assert(0 <= unit);
 
     if (0 == m_id) {
         m_id = graphics::instance().new_textures(1)[0];
@@ -43,7 +43,7 @@ texture::pointer_t texture::build(const std::filesystem::path &path, int unit) {
 void texture::bind() { // NOLINT(readability-make-member-function-const)
     assert(0 != m_id);
     assert(texture_target_t::undefined != m_target);
-    assert(0 != m_unit);
+    assert(0 <= m_unit);
 
     graphics::instance().activate(*this);
     graphics::instance().bind(*this);
@@ -96,7 +96,7 @@ void texture::gl_delete() {
 
         m_id = 0;
         m_target = texture_target_t::undefined;
-        m_unit = 0;
+        m_unit = -1;
     }
 }
 

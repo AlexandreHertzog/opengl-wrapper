@@ -38,7 +38,7 @@ ogl_graphics::~ogl_graphics() {
 }
 
 void ogl_graphics::activate(const texture &tex) {
-    glActiveTexture(tex.get_unit());
+    glActiveTexture(tex.get_unit() + GL_TEXTURE0);
 }
 
 void ogl_graphics::attach_shader(const program &p, const shader &s) {

@@ -7,6 +7,13 @@
 #include <boost/log/trivial.hpp>
 #include <csignal>
 
+namespace {
+constexpr auto texture_layer_1 = 0;
+constexpr auto texture_layer_2 = 1;
+constexpr auto texture_diffuse = 2;
+constexpr auto texture_specular = 3;
+} // namespace
+
 namespace test_app {
 
 integration::integration()
@@ -121,7 +128,7 @@ void integration::init_callbacks() {
 void integration::build_shapes() {
     auto object_program = build_object_program();
     auto light_program = build_light_program();
-    auto base_texture = opengl_wrapper::texture::build("./textures/checker.png", GL_TEXTURE0);
+    auto base_texture = opengl_wrapper::texture::build("./textures/checker.png", texture_layer_1);
 
     m_shapes.emplace_back(build_cube(object_program, base_texture));
     m_shapes.emplace_back(build_plane(object_program, base_texture));
@@ -300,9 +307,9 @@ opengl_wrapper::shape integration::build_cube(std::shared_ptr<opengl_wrapper::pr
 
     opengl_wrapper::material mat;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/blue.png", GL_TEXTURE1);
-    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", GL_TEXTURE2);
-    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", GL_TEXTURE3);
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/blue.png", texture_layer_2);
+    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", texture_diffuse);
+    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", texture_specular);
 
     ret.set_material(std::move(mat));
     return ret;
@@ -322,8 +329,8 @@ opengl_wrapper::shape integration::build_plane(std::shared_ptr<opengl_wrapper::p
 
     opengl_wrapper::material mat;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/orange.png", GL_TEXTURE1);
-    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", GL_TEXTURE3);
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/orange.png", texture_layer_2);
+    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", texture_specular);
     ret.set_material(std::move(mat));
     return ret;
 }
@@ -344,9 +351,9 @@ opengl_wrapper::shape integration::build_sphere(std::shared_ptr<opengl_wrapper::
     mat.m_ambient = {0.1F, 0.1F, 0.1F};
     mat.m_shininess = 32.0F;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", GL_TEXTURE1);
-    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", GL_TEXTURE2);
-    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", GL_TEXTURE3);
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", texture_layer_2);
+    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", texture_diffuse);
+    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", texture_specular);
 
     ret.set_material(std::move(mat));
 
@@ -372,7 +379,7 @@ opengl_wrapper::shape integration::build_torus(std::shared_ptr<opengl_wrapper::p
     mat.m_ambient = {1.0F, 1.0F, 1.0F};
     mat.m_shininess = 2.0F;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/green.png", GL_TEXTURE1);
+    mat.m_texture2 = opengl_wrapper::texture::build("./textures/green.png", texture_layer_2);
 
     ret.set_material(std::move(mat));
 
@@ -390,7 +397,7 @@ opengl_wrapper::light integration::build_light(std::shared_ptr<opengl_wrapper::p
     ret.m_shape.set_program(light_program);
 
     opengl_wrapper::material mat;
-    mat.m_texture1 = opengl_wrapper::texture::build("./textures/white.png", GL_TEXTURE0);
+    mat.m_texture1 = opengl_wrapper::texture::build("./textures/white.png", texture_layer_1);
 
     ret.m_shape.set_material(std::move(mat));
     return ret;

@@ -75,7 +75,7 @@ class texture {
   private:
     identifier_t m_id{};
     texture_target_t m_target{};
-    int m_unit{};
+    int m_unit{-1};
 
     void gl_delete();
 
