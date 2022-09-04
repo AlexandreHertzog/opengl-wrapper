@@ -5,10 +5,10 @@
 
 namespace opengl_wrapper_test {
 
-class mock_graphics : opengl_wrapper::graphics {
+class mock_graphics : opengl_wrapper::graphics_t {
   public:
     mock_graphics() {
-        opengl_wrapper::graphics::set_instance(this);
+        opengl_wrapper::graphics_t::set_instance(this);
     }
 
     MOCK_METHOD(void, gl_activate_texture, (GLenum texture), (override));

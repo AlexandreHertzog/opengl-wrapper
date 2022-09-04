@@ -9,28 +9,28 @@
 
 namespace opengl_wrapper {
 
-template <typename TYPE> std::string between(const TYPE &t, char begin, char end) {
+template <typename type_t> std::string between(const type_t &t, char begin, char end) {
     std::stringstream out_stream;
     out_stream << begin << t << end;
     return out_stream.str();
 }
 
-template <typename TYPE> std::string braces(const TYPE &t) {
+template <typename type_t> std::string braces(const type_t &t) {
     return between(t, '{', '}');
 }
 
-template <typename TYPE> std::string parenthesis(const TYPE &t) {
+template <typename type_t> std::string parenthesis(const type_t &t) {
     return between(t, '(', ')');
 }
 
-template <typename TYPE> std::ostream &operator<<(std::ostream &stream, const std::vector<TYPE> &vector) {
+template <typename type_t> std::ostream &operator<<(std::ostream &stream, const std::vector<type_t> &vector) {
     using opengl_wrapper::operator<<;
 
     std::stringstream res;
 
     bool first = true;
 
-    std::for_each(vector.begin(), vector.end(), [&](const TYPE &value) {
+    std::for_each(vector.begin(), vector.end(), [&](const type_t &value) {
         if (!first) {
             res << ", ";
         }
@@ -42,37 +42,37 @@ template <typename TYPE> std::ostream &operator<<(std::ostream &stream, const st
 }
 
 inline std::istream &operator>>(std::istream &is, glm::vec2 &vec) {
-    return is >> vec.x >> vec.y;
+    return is >> vec.x >> vec.y; // NOLINT(cppcoreguidelines-pro-type-union-access)
 }
 
 inline std::istream &operator>>(std::istream &is, glm::vec3 &vec) {
-    return is >> vec.x >> vec.y >> vec.z;
+    return is >> vec.x >> vec.y >> vec.z; // NOLINT(cppcoreguidelines-pro-type-union-access)
 }
 
-template <class TYPE> std::istream &operator>>(std::istream &is, std::vector<TYPE> &out) {
+template <class type_t> std::istream &operator>>(std::istream &is, std::vector<type_t> &out) {
     while (!is.eof()) {
-        TYPE data;
+        type_t data;
         is >> data;
         out.emplace_back(std::move(data));
     }
     return is;
 }
 
-template <class TYPE, size_t SIZE> std::istream &operator>>(std::istream &is, std::array<TYPE, SIZE> &out) {
+template <class type_t, size_t size> std::istream &operator>>(std::istream &is, std::array<type_t, size> &out) {
     for (auto &o : out) {
         is >> o;
     }
     return is;
 }
 
-inline int to_int(const char *s, size_t len, int base = 10) {
+inline int to_int(const char *s, size_t len, int base = 10) { // NOLINT(cppcoreguidelines-avoid-magic-numbers)
     assert(nullptr != s);
     assert(len > 0);
 
     char *end{};
-    const int ret = std::strtol(s, &end, base);
+    const auto ret = static_cast<int>(std::strtol(s, &end, base));
     if (end == s) {
-        throw exception("Invalid to_int parameter: " + std::string(s));
+        throw exception_t("Invalid to_int parameter: " + std::string(s));
     }
     return ret;
 }

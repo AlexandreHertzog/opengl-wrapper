@@ -6,19 +6,19 @@
 
 namespace opengl_wrapper {
 
-std::vector<vertex_array> vertex_array::build(size_t amount) {
-    auto ids = graphics::instance().new_vertex_arrays(amount);
+std::vector<vertex_array_t> vertex_array_t::build(size_t amount) {
+    auto ids = graphics_t::instance().new_vertex_arrays(amount);
 
-    std::vector<vertex_array> ret(amount);
+    std::vector<vertex_array_t> ret(amount);
     for (int i = 0; i < amount; ++i) {
-        ret[i] = vertex_array(ids[i]);
+        ret[i] = vertex_array_t(ids[i]);
     }
     return ret;
 }
 
-vertex_array::vertex_array(identifier_t id) : m_id(id), m_buffers(buffer::build(2)) {
+vertex_array_t::vertex_array_t(identifier_t id) : m_id(id), m_buffers(buffer_t::build(2)) {
     if (0 == m_id) {
-        m_id = graphics::instance().new_vertex_arrays(1)[0];
+        m_id = graphics_t::instance().new_vertex_arrays(1)[0];
     }
 
     assert(m_buffers.size() == 2);
@@ -27,17 +27,18 @@ vertex_array::vertex_array(identifier_t id) : m_id(id), m_buffers(buffer::build(
     m_buffers[1].set_target(buffer_target_t::element_array);
 }
 
-vertex_array::vertex_array(vertex_array &&other) noexcept : m_id(other.m_id), m_buffers(std::move(other.m_buffers)) {
+vertex_array_t::vertex_array_t(vertex_array_t &&other) noexcept
+    : m_id(other.m_id), m_buffers(std::move(other.m_buffers)) {
     other.m_id = 0;
 }
 
-vertex_array::~vertex_array() {
+vertex_array_t::~vertex_array_t() {
     if (0 != m_id) {
-        graphics::instance().delete_vertex_arrays(1, &m_id);
+        graphics_t::instance().delete_vertex_arrays(1, &m_id);
     }
 }
 
-vertex_array &vertex_array::operator=(vertex_array &&other) noexcept {
+vertex_array_t &vertex_array_t::operator=(vertex_array_t &&other) noexcept {
     m_id = other.m_id;
     other.m_id = 0;
 
@@ -45,16 +46,16 @@ vertex_array &vertex_array::operator=(vertex_array &&other) noexcept {
     return *this;
 }
 
-void vertex_array::bind() const {
+void vertex_array_t::bind() const {
     assert(0 != m_id);
-    graphics::instance().bind(*this);
+    graphics_t::instance().bind(*this);
 }
 
-identifier_t vertex_array::get_id() const {
+identifier_t vertex_array_t::get_id() const {
     return m_id;
 }
 
-void vertex_array::load(const std::vector<vertex> &vertices) {
+void vertex_array_t::load(const std::vector<vertex_t> &vertices) {
     bind();
 
     m_buffers[0].bind();
@@ -63,17 +64,18 @@ void vertex_array::load(const std::vector<vertex> &vertices) {
     //    m_buffers[1].bind(); Disable as we don't support element drawing for now.
     //    m_buffers[1].load(indices);
 
-    graphics::instance().vertex_attrib_pointer(0, 3, sizeof(vertex), 0);
-    graphics::instance().enable_vertex_attrib_array(0);
+    graphics_t::instance().vertex_attrib_pointer(0, 3, sizeof(vertex_t), 0);
+    graphics_t::instance().enable_vertex_attrib_array(0);
 
-    graphics::instance().vertex_attrib_pointer(1, 2, sizeof(vertex), sizeof(vertex::m_pos));
-    graphics::instance().enable_vertex_attrib_array(1);
+    graphics_t::instance().vertex_attrib_pointer(1, 2, sizeof(vertex_t), sizeof(vertex_t::m_pos));
+    graphics_t::instance().enable_vertex_attrib_array(1);
 
-    graphics::instance().vertex_attrib_pointer(2, 3, sizeof(vertex), sizeof(vertex::m_pos) + sizeof(vertex::m_tex));
-    graphics::instance().enable_vertex_attrib_array(2);
+    graphics_t::instance().vertex_attrib_pointer(2, 3, sizeof(vertex_t),
+                                                 sizeof(vertex_t::m_pos) + sizeof(vertex_t::m_tex));
+    graphics_t::instance().enable_vertex_attrib_array(2);
 }
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_array &va) {
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_array_t &va) {
     return os << "vertex_array" << parenthesis(&va) << " id=" << va.get_id();
 }
 

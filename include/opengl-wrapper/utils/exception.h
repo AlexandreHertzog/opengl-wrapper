@@ -4,9 +4,9 @@
 
 namespace opengl_wrapper {
 
-class exception : public std::runtime_error {
+class exception_t : public std::runtime_error {
   public:
-    explicit exception(const std::string &description);
+    explicit exception_t(const std::string &description);
 };
 
 } // namespace opengl_wrapper

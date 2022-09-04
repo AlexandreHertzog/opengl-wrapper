@@ -7,7 +7,7 @@
 
 namespace opengl_wrapper {
 
-class shader {
+class shader_t {
   public:
     /**
      * @brief Construct a new shader object then compiles it. See
@@ -17,7 +17,7 @@ class shader {
      * @param source Source-code for the shader.
      * @throws GlError When the shader compilation fails.
      */
-    explicit shader(shader_type_t type, const char *source = nullptr);
+    explicit shader_t(shader_type_t type, const char *source = nullptr);
 
     /**
      * @brief Construct a new shader object, reads its source from the filesystem then compiles it. See
@@ -26,24 +26,24 @@ class shader {
      * @param type
      * @param shader_path
      */
-    shader(shader_type_t type, const std::filesystem::path &shader_path);
+    shader_t(shader_type_t type, const std::filesystem::path &shader_path);
 
     /**
      * @brief shader move-constructor.
      *
      * @param other shader to be emptied.
      */
-    shader(shader &&other) noexcept;
+    shader_t(shader_t &&other) noexcept;
 
-    shader(const shader &) = delete;
-    shader &operator=(const shader &) = delete;
+    shader_t(const shader_t &) = delete;
+    shader_t &operator=(const shader_t &) = delete;
 
     /**
      * @brief Destroy the shader object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml
      *
      */
-    ~shader();
+    ~shader_t();
 
     /**
      * @brief shader move-assignment operator.
@@ -51,7 +51,7 @@ class shader {
      * @param other shader to be emptied.
      * @return shader& Reference to this.
      */
-    shader &operator=(shader &&other) noexcept;
+    shader_t &operator=(shader_t &&other) noexcept;
 
     /**
      * @brief Gets the internal OpenGL shader ID.
@@ -67,6 +67,6 @@ class shader {
     void gl_delete();
 };
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::shader &s);
+std::ostream &operator<<(std::ostream &os, const shader_t &s);
 
 } // namespace opengl_wrapper

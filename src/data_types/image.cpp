@@ -7,15 +7,15 @@
 
 namespace opengl_wrapper {
 
-image::image(const std::filesystem::path &path) {
-    stbi_set_flip_vertically_on_load(true);
+image_t::image_t(const std::filesystem::path &path) {
+    stbi_set_flip_vertically_on_load(1);
     m_data = stbi_load(path.c_str(), &m_width, &m_height, &m_num_channels, 0);
     if (nullptr == m_data) {
-        throw exception("failed to open image: " + path.string());
+        throw exception_t("failed to open image: " + path.string());
     }
 }
 
-image::image(opengl_wrapper::image &&other) noexcept
+image_t::image_t(image_t &&other) noexcept
     : m_width(other.m_width), m_height(other.m_height), m_num_channels(other.m_num_channels), m_data(other.m_data) {
 
     other.m_width = 0;
@@ -24,11 +24,11 @@ image::image(opengl_wrapper::image &&other) noexcept
     other.m_data = nullptr;
 }
 
-image::~image() {
+image_t::~image_t() {
     stbi_image_free(m_data);
 }
 
-image &image::operator=(opengl_wrapper::image &&other) noexcept {
+image_t &image_t::operator=(image_t &&other) noexcept {
     m_width = other.m_width;
     other.m_width = 0;
 
@@ -43,19 +43,19 @@ image &image::operator=(opengl_wrapper::image &&other) noexcept {
     return *this;
 }
 
-int image::get_width() const {
+int image_t::get_width() const {
     return m_width;
 }
 
-int image::get_height() const {
+int image_t::get_height() const {
     return m_height;
 }
 
-const unsigned char *image::get_data() const {
+const unsigned char *image_t::get_data() const {
     return m_data;
 }
 
-bool image::has_alpha() const {
+bool image_t::has_alpha() const {
     return m_num_channels == 4;
 }
 } // namespace opengl_wrapper

@@ -30,11 +30,15 @@ constexpr auto clipping_near = 0.1F;
 constexpr auto clipping_far = 100.0F;
 constexpr auto refresh_rate = 60;
 
+constexpr auto default_ambient = 0.2F;
+constexpr auto default_shininess = 32.0F;
+constexpr auto default_texture_mix = 0.8F;
+
 } // namespace
 
 namespace test_app {
 
-integration::integration()
+integration_t::integration_t()
     : m_window(resolution_x, resolution_y, "Test application"),
       m_camera(default_camera_pos, default_camera_front, default_camera_up) {
 
@@ -44,21 +48,21 @@ integration::integration()
     ImGui_ImplOpenGL3_Init("#version 130");
 }
 
-integration::~integration() {
+integration_t::~integration_t() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-void integration::init_callbacks() {
+void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-complexity)
     constexpr auto camera_speed = 0.1F;
 
-    m_window.set_framebuffer_callback([&](opengl_wrapper::window &w, int width, int height) {
+    m_window.set_framebuffer_callback([&](opengl_wrapper::window_t &w, int width, int height) {
         w.set_viewport(width, height);
         render();
     });
 
-    m_window.set_key_callback([&](opengl_wrapper::window &w, int key, int action) {
+    m_window.set_key_callback([&](opengl_wrapper::window_t &w, int key, int action) {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
             w.set_should_close(1);
         }
@@ -109,10 +113,10 @@ void integration::init_callbacks() {
     });
 }
 
-void integration::build_shapes() {
+void integration_t::build_shapes() {
     auto object_program = build_object_program();
     auto light_program = build_light_program();
-    auto base_texture = opengl_wrapper::texture::build("./textures/checker.png", texture_layer_1);
+    auto base_texture = opengl_wrapper::texture_t::build("./textures/checker.png", texture_layer_1);
 
     m_program_shape_map[object_program].emplace_back(build_cube(base_texture));
     m_program_shape_map[object_program].emplace_back(build_plane(base_texture));
@@ -126,19 +130,21 @@ void integration::build_shapes() {
     constexpr glm::vec3 light2_pos = glm::vec3(-3.0F, 2.0F, -3.0F);
     constexpr auto diffuse = 0.2F;
 
+    auto light_texture = opengl_wrapper::texture_t::build("./textures/white.png", texture_layer_1);
+
     m_lights[0] = build_light(light_type_t::spot, light0_pos, light0_dir);
-    m_program_shape_map[light_program].emplace_back(m_lights[0]->m_shape);
+    m_program_shape_map[light_program].emplace_back(build_light_shape(m_lights[0], light_texture));
 
     m_lights[1] = build_light(light_type_t::directional, light1_pos, light1_dir);
     m_lights[1]->m_diffuse = glm::vec3(diffuse);
-    m_program_shape_map[light_program].emplace_back(m_lights[1]->m_shape);
+    m_program_shape_map[light_program].emplace_back(build_light_shape(m_lights[1], light_texture));
 
     m_lights[2] = build_light(light_type_t::directional, light2_pos, glm::vec3());
     m_lights[2]->m_diffuse = glm::vec3(diffuse);
-    m_program_shape_map[light_program].emplace_back(m_lights[2]->m_shape);
+    m_program_shape_map[light_program].emplace_back(build_light_shape(m_lights[2], light_texture));
 }
 
-void integration::render_loop() {
+void integration_t::render_loop() {
     constexpr opengl_wrapper::color_alpha_t clear_color = {0.2F, 0.2F, 0.2F, 1.0F};
 
     m_window.set_depth_test(true);
@@ -146,22 +152,16 @@ void integration::render_loop() {
 
     for (auto &program_shapes : m_program_shape_map) {
         for (auto &shape : program_shapes.second) {
-            shape.load_vertices();
+            assert(shape);
+            shape->load_vertices();
         }
-    }
-
-    for (auto &light : m_lights) {
-        if (!light) {
-            continue;
-        }
-        light->m_shape.load_vertices();
     }
 
     while (!m_window.get_should_close()) {
         render();
     }
 }
-void integration::render() {
+void integration_t::render() {
     using std::chrono::duration;
     using std::chrono::high_resolution_clock;
 
@@ -182,8 +182,9 @@ void integration::render() {
         update_light_uniforms(*program_shape.first);
 
         for (auto &shape : program_shape.second) {
-            update_shape_uniforms(*program_shape.first, shape);
-            m_window.draw(shape);
+            assert(shape);
+            update_shape_uniforms(*program_shape.first, *shape);
+            m_window.draw(*shape);
         }
     }
 
@@ -204,7 +205,7 @@ void integration::render() {
     m_window.swap_buffers();
 }
 
-void integration::build_ui() {
+void integration_t::build_ui() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -223,13 +224,13 @@ void integration::build_ui() {
 
         if (ImGui::CollapsingHeader(name.c_str())) {
 
-            ImGui::InputScalarN("Position", ImGuiDataType_Float, &light->m_shape.get_transform().m_translation, 3);
+            ImGui::InputScalarN("Position", ImGuiDataType_Float, &light->m_position, 3);
 
-            auto *directional_light = dynamic_cast<opengl_wrapper::directional_light *>(light.get());
+            auto *directional_light = dynamic_cast<opengl_wrapper::directional_light_t *>(light.get());
             if (nullptr != directional_light) {
                 ImGui::InputScalarN("Direction", ImGuiDataType_Float, &directional_light->m_direction, 3);
             } else {
-                auto *spot_light = dynamic_cast<opengl_wrapper::spot_light *>(light.get());
+                auto *spot_light = dynamic_cast<opengl_wrapper::spot_light_t *>(light.get());
                 if (nullptr != spot_light) {
                     constexpr auto min_cutoff_begin = 5.0F;
                     constexpr auto max_cutoff_end = 120.0F;
@@ -255,8 +256,9 @@ void integration::build_ui() {
 
     for (auto &program_shapes : m_program_shape_map) {
         for (auto &shape : program_shapes.second) {
-            if (ImGui::CollapsingHeader(shape.get_mesh().get_name().c_str())) {
-                shape_debug_ui(shape);
+            assert(shape);
+            if (ImGui::CollapsingHeader(shape->get_mesh().get_name().c_str())) {
+                shape_debug_ui(*shape);
             }
         }
     }
@@ -266,7 +268,7 @@ void integration::build_ui() {
     ImGui::Render();
 }
 
-void integration::update_light_uniforms(opengl_wrapper::program &p) {
+void integration_t::update_light_uniforms(opengl_wrapper::program_t &p) {
     int i = 0;
     for (auto &light : m_lights) {
         const auto prefix = build_light_uniform_prefix(i++);
@@ -275,7 +277,7 @@ void integration::update_light_uniforms(opengl_wrapper::program &p) {
             continue;
         }
 
-        p.set_uniform(prefix + "position", light->m_shape.get_transform().m_translation);
+        p.set_uniform(prefix + "position", light->m_position);
         p.set_uniform(prefix + "ambient", light->m_ambient);
         p.set_uniform(prefix + "diffuse", light->m_diffuse);
         p.set_uniform(prefix + "specular", light->m_specular);
@@ -283,12 +285,12 @@ void integration::update_light_uniforms(opengl_wrapper::program &p) {
         p.set_uniform(prefix + "attenuation_linear", light->m_attenuation_linear);
         p.set_uniform(prefix + "attenuation_quadratic", light->m_attenuation_quadratic);
 
-        auto *direction_light = dynamic_cast<opengl_wrapper::directional_light *>(light.get());
+        auto *direction_light = dynamic_cast<opengl_wrapper::directional_light_t *>(light.get());
         if (nullptr != direction_light) {
             p.set_uniform(prefix + "type", static_cast<int>(light_type_t::directional));
             p.set_uniform(prefix + "direction", direction_light->m_direction);
         } else {
-            auto *spot_light = dynamic_cast<opengl_wrapper::spot_light *>(light.get());
+            auto *spot_light = dynamic_cast<opengl_wrapper::spot_light_t *>(light.get());
             if (nullptr != spot_light) {
                 p.set_uniform(prefix + "type", static_cast<int>(light_type_t::spot));
                 p.set_uniform(prefix + "direction", spot_light->m_direction);
@@ -301,11 +303,11 @@ void integration::update_light_uniforms(opengl_wrapper::program &p) {
     }
 }
 
-std::string integration::build_light_uniform_prefix(int i) {
+std::string integration_t::build_light_uniform_prefix(int i) {
     return "uniform_light[" + std::to_string(i) + "].";
 }
 
-void integration::update_projection_uniforms(opengl_wrapper::program &p) {
+void integration_t::update_projection_uniforms(opengl_wrapper::program_t &p) {
     auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
     p.set_uniform("uniform_view", view);
 
@@ -313,7 +315,7 @@ void integration::update_projection_uniforms(opengl_wrapper::program &p) {
     p.set_uniform("uniform_projection", projection);
 }
 
-void integration::update_shape_uniforms(opengl_wrapper::program &p, opengl_wrapper::shape &s) {
+void integration_t::update_shape_uniforms(opengl_wrapper::program_t &p, opengl_wrapper::shape_t &s) {
     p.set_uniform("uniform_model", s.model_transformations());
     p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
     p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
@@ -326,7 +328,7 @@ void integration::update_shape_uniforms(opengl_wrapper::program &p, opengl_wrapp
     p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
 }
 
-void integration::shape_debug_ui(opengl_wrapper::shape &s) {
+void integration_t::shape_debug_ui(opengl_wrapper::shape_t &s) {
     const auto min_translation = -10.0F;
     const auto max_translation = 10.0F;
     const auto min_rotation_angle = -180.0F;
@@ -338,6 +340,7 @@ void integration::shape_debug_ui(opengl_wrapper::shape &s) {
 
     ImGui::SliderScalarN("Position", ImGuiDataType_Float, &s.get_transform().m_translation, 3, &min_translation,
                          &max_translation);
+
     ImGui::SliderFloat("Rot angle", &s.get_transform().m_rotation_angle, min_rotation_angle, max_rotation_angle);
     ImGui::InputScalarN("Rot axis", ImGuiDataType_Float, &s.get_transform().m_rotation_axis, 3);
     ImGui::InputScalarN("Scale", ImGuiDataType_Float, &s.get_transform().m_scale, 3);
@@ -355,156 +358,186 @@ void integration::shape_debug_ui(opengl_wrapper::shape &s) {
     if (s.get_material().m_specular) {
         ImGui::BeginDisabled(true);
     }
+
     ImGui::SliderScalarN("Specular", ImGuiDataType_Float, &s.get_material().m_specular, 3, &min_material,
                          &max_material);
+
     if (s.get_material().m_specular) {
         ImGui::EndDisabled();
     }
 }
 
-std::shared_ptr<opengl_wrapper::program> integration::build_object_program() {
-    using opengl_wrapper::shader;
+std::shared_ptr<opengl_wrapper::program_t> integration_t::build_object_program() {
+    using opengl_wrapper::shader_t;
     using opengl_wrapper::shader_type_t;
 
-    auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(shader(shader_type_t::vertex, path("shaders/object.vert")));
-    ret->add_shader(shader(shader_type_t::fragment, path("shaders/object.frag")));
+    auto ret = std::make_shared<opengl_wrapper::program_t>();
+    ret->add_shader(shader_t(shader_type_t::vertex, path("shaders/object.vert")));
+    ret->add_shader(shader_t(shader_type_t::fragment, path("shaders/object.frag")));
     ret->link();
     return ret;
 }
 
-std::shared_ptr<opengl_wrapper::program> integration::build_light_program() {
-    using opengl_wrapper::shader;
+std::shared_ptr<opengl_wrapper::program_t> integration_t::build_light_program() {
+    using opengl_wrapper::shader_t;
     using opengl_wrapper::shader_type_t;
 
-    auto ret = std::make_shared<opengl_wrapper::program>();
-    ret->add_shader(shader(shader_type_t::vertex, path("shaders/light.vert")));
-    ret->add_shader(shader(shader_type_t::fragment, path("shaders/light.frag")));
+    auto ret = std::make_shared<opengl_wrapper::program_t>();
+    ret->add_shader(shader_t(shader_type_t::vertex, path("shaders/light.vert")));
+    ret->add_shader(shader_t(shader_type_t::fragment, path("shaders/light.frag")));
     ret->link();
     return ret;
 }
 
-opengl_wrapper::shape integration::build_cube(opengl_wrapper::texture::pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_cube(opengl_wrapper::texture_t::pointer_t &base_texture) {
     constexpr auto rotation_angle = 45.0F;
     constexpr auto scale = 0.5F;
 
-    opengl_wrapper::shape ret;
-    ret.set_mesh(opengl_wrapper::mesh("./objects/cube.obj"));
+    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>();
+    ret->set_mesh(opengl_wrapper::mesh_t("./objects/cube.obj"));
 
-    opengl_wrapper::transform t;
+    opengl_wrapper::transform_t t;
     t.m_translation = {0.0F, 0.0F, -1.0F};
     t.m_rotation_angle = rotation_angle;
     t.m_rotation_axis = {0.0F, 1.0F, 0.0F};
     t.m_scale = glm::vec3(scale);
-    ret.set_transform(t);
+    ret->set_transform(t);
 
-    opengl_wrapper::material mat;
+    opengl_wrapper::material_t mat;
+    mat.m_ambient = glm::vec3(default_ambient);
+    mat.m_shininess = default_shininess;
+    mat.m_texture_mix = default_texture_mix;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/blue.png", texture_layer_2);
-    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", texture_diffuse);
-    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", texture_specular);
+    mat.m_texture2 = opengl_wrapper::texture_t::build("./textures/blue.png", texture_layer_2);
+    mat.m_diffuse = opengl_wrapper::texture_t::build("./textures/diffuse.png", texture_diffuse);
+    mat.m_specular = opengl_wrapper::texture_t::build("./textures/specular.png", texture_specular);
 
-    ret.set_material(std::move(mat));
+    ret->set_material(std::move(mat));
     return ret;
 }
 
-opengl_wrapper::shape integration::build_plane(opengl_wrapper::texture::pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_plane(opengl_wrapper::texture_t::pointer_t &base_texture) {
     constexpr auto scale = 10.0F;
     constexpr glm::vec3 position = {0.0F, -0.5F, 0.0F};
 
-    opengl_wrapper::shape ret;
-    ret.set_mesh(opengl_wrapper::mesh("./objects/plane.obj"));
+    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>();
+    ret->set_mesh(opengl_wrapper::mesh_t("./objects/plane.obj"));
 
-    opengl_wrapper::transform t;
+    opengl_wrapper::transform_t t;
     t.m_translation = position;
     t.m_scale = glm::vec3(scale);
-    ret.set_transform(t);
+    ret->set_transform(t);
 
-    opengl_wrapper::material mat;
+    opengl_wrapper::material_t mat;
+    mat.m_ambient = glm::vec3(default_ambient);
+    mat.m_shininess = default_shininess;
+    mat.m_texture_mix = default_texture_mix;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/orange.png", texture_layer_2);
-    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", texture_specular);
-    ret.set_material(std::move(mat));
+    mat.m_texture2 = opengl_wrapper::texture_t::build("./textures/orange.png", texture_layer_2);
+    mat.m_specular = opengl_wrapper::texture_t::build("./textures/specular.png", texture_specular);
+    ret->set_material(std::move(mat));
     return ret;
 }
 
-opengl_wrapper::shape integration::build_sphere(opengl_wrapper::texture::pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_sphere(opengl_wrapper::texture_t::pointer_t &base_texture) {
     constexpr auto scale = 0.6F;
     constexpr auto ambient = 0.1F;
     constexpr auto shininess = 32.0F;
     constexpr glm::vec3 position = {1.5F, 0.0F, -1.0F};
 
-    opengl_wrapper::shape ret;
-    ret.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
+    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>();
+    ret->set_mesh(opengl_wrapper::mesh_t("./objects/sphere.obj"));
 
-    opengl_wrapper::transform t;
+    opengl_wrapper::transform_t t;
     t.m_translation = position;
     t.m_scale = glm::vec3(scale);
-    ret.set_transform(t);
+    ret->set_transform(t);
 
-    opengl_wrapper::material mat;
+    opengl_wrapper::material_t mat;
     mat.m_ambient = glm::vec3(ambient);
     mat.m_shininess = shininess;
+    mat.m_texture_mix = default_texture_mix;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/red.png", texture_layer_2);
-    mat.m_diffuse = opengl_wrapper::texture::build("./textures/diffuse.png", texture_diffuse);
-    mat.m_specular = opengl_wrapper::texture::build("./textures/specular.png", texture_specular);
+    mat.m_texture2 = opengl_wrapper::texture_t::build("./textures/red.png", texture_layer_2);
+    mat.m_diffuse = opengl_wrapper::texture_t::build("./textures/diffuse.png", texture_diffuse);
+    mat.m_specular = opengl_wrapper::texture_t::build("./textures/specular.png", texture_specular);
 
-    ret.set_material(std::move(mat));
+    ret->set_material(std::move(mat));
 
     return ret;
 }
 
-opengl_wrapper::shape integration::build_torus(opengl_wrapper::texture::pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_torus(opengl_wrapper::texture_t::pointer_t &base_texture) {
     constexpr auto scale = 0.6F;
     constexpr auto shininess = 2.0F;
     constexpr auto rotation_angle = 45.0F;
 
-    opengl_wrapper::shape ret;
-    ret.set_mesh(opengl_wrapper::mesh("./objects/torus.obj"));
+    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>();
+    ret->set_mesh(opengl_wrapper::mesh_t("./objects/torus.obj"));
 
-    opengl_wrapper::transform t;
+    opengl_wrapper::transform_t t;
     t.m_translation = {-1.0F, 0.0F, -1.0F};
     t.m_rotation_axis = {0.0F, 0.0F, 1.0F};
     t.m_rotation_angle = rotation_angle;
     t.m_scale = glm::vec3(scale);
-    ret.set_transform(t);
+    ret->set_transform(t);
 
-    opengl_wrapper::material mat;
+    opengl_wrapper::material_t mat;
     mat.m_ambient = {1.0F, 1.0F, 1.0F};
     mat.m_shininess = shininess;
+    mat.m_texture_mix = default_texture_mix;
     mat.m_texture1 = base_texture;
-    mat.m_texture2 = opengl_wrapper::texture::build("./textures/green.png", texture_layer_2);
+    mat.m_texture2 = opengl_wrapper::texture_t::build("./textures/green.png", texture_layer_2);
 
-    ret.set_material(std::move(mat));
+    ret->set_material(std::move(mat));
 
     return ret;
 }
 
-integration::light_pointer_t integration::build_light(light_type_t type, glm::vec3 position, glm::vec3 direction) {
+integration_t::shape_pointer_t integration_t::build_light_shape(const light_pointer_t &light,
+                                                                opengl_wrapper::texture_t::pointer_t &base_texture) {
+    constexpr auto scale = 0.1F;
+
+    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>();
+    ret->set_mesh(opengl_wrapper::mesh_t("./objects/sphere.obj"));
+
+    opengl_wrapper::transform_t t;
+    t.m_translation = light->m_position;
+    t.m_scale = glm::vec3(scale);
+    ret->set_transform(t);
+
+    opengl_wrapper::material_t mat;
+    mat.m_texture1 = base_texture;
+    ret->set_material(std::move(mat));
+
+    m_light_shapes[light] = ret;
+    return ret;
+}
+
+integration_t::light_pointer_t integration_t::build_light(light_type_t type, glm::vec3 position, glm::vec3 direction) {
     constexpr auto ambient = 0.2F;
     constexpr auto diffuse = 1.0F;
     constexpr auto specular = 0.2F;
-    constexpr auto scale = 0.1F;
     constexpr auto attenuation_constant = 1.0F;
     constexpr auto attenuation_linear = 0.09F;
     constexpr auto attenuation_quadratic = 0.032F;
 
-    light_pointer_t ret = std::make_unique<opengl_wrapper::light>();
+    light_pointer_t ret = std::make_unique<opengl_wrapper::light_t>();
     switch (type) {
     case light_type_t::deactivated:
         return nullptr;
     case light_type_t::ambient:
-        ret = std::make_unique<opengl_wrapper::light>();
+        ret = std::make_unique<opengl_wrapper::light_t>();
         break;
     case light_type_t::directional:
-        ret = std::make_unique<opengl_wrapper::directional_light>();
+        ret = std::make_unique<opengl_wrapper::directional_light_t>();
         break;
     case light_type_t::spot:
-        ret = std::make_unique<opengl_wrapper::spot_light>();
+        ret = std::make_unique<opengl_wrapper::spot_light_t>();
         break;
     }
 
+    ret->m_position = std::move(position);
     ret->m_ambient = glm::vec3(ambient);
     ret->m_diffuse = glm::vec3(diffuse);
     ret->m_specular = glm::vec3(specular);
@@ -512,21 +545,9 @@ integration::light_pointer_t integration::build_light(light_type_t type, glm::ve
     ret->m_attenuation_linear = attenuation_linear;
     ret->m_attenuation_quadratic = attenuation_quadratic;
 
-    ret->m_shape.set_mesh(opengl_wrapper::mesh("./objects/sphere.obj"));
-
-    opengl_wrapper::transform t;
-    t.m_translation = position;
-    t.m_scale = glm::vec3(scale);
-    ret->m_shape.set_transform(t);
-
-    opengl_wrapper::material mat;
-    mat.m_texture1 = opengl_wrapper::texture::build("./textures/white.png", texture_layer_1);
-
-    ret->m_shape.set_material(std::move(mat));
-
     if (light_type_t::directional == type) {
-        auto &direction_light = dynamic_cast<opengl_wrapper::directional_light &>(*ret);
-        direction_light.m_direction = direction;
+        auto &direction_light = dynamic_cast<opengl_wrapper::directional_light_t &>(*ret);
+        direction_light.m_direction = std::move(direction);
         ret->m_attenuation_constant = 1.0F;
         ret->m_attenuation_linear = 0.0F;
         ret->m_attenuation_quadratic = 0.0F;
@@ -534,8 +555,8 @@ integration::light_pointer_t integration::build_light(light_type_t type, glm::ve
         constexpr auto cutoff_begin = 25.0F;
         constexpr auto cutoff_end = 35.0F;
 
-        auto &spot_light = dynamic_cast<opengl_wrapper::spot_light &>(*ret);
-        spot_light.m_direction = direction;
+        auto &spot_light = dynamic_cast<opengl_wrapper::spot_light_t &>(*ret);
+        spot_light.m_direction = std::move(direction);
         spot_light.m_cutoff_begin = cutoff_begin;
         spot_light.m_cutoff_end = cutoff_end;
     }

@@ -1,12 +1,9 @@
 #pragma once
 
-#include "face_vertex_indices.h"
-#include "material.h"
+#include "face.h"
 #include "mesh.h"
 #include "program.h"
 #include "texture.h"
-#include "transform.h"
-#include "vertex.h"
 #include "vertex_array.h"
 #include <filesystem>
 #include <glm/glm.hpp>
@@ -16,36 +13,36 @@
 
 namespace opengl_wrapper {
 
-class program;
+class program_t;
 
-class shape {
+class shape_t {
   public:
-    explicit shape(vertex_array va = vertex_array());
-    shape(const shape &other);
-    shape(shape &&other) noexcept;
-    ~shape() = default;
+    explicit shape_t(vertex_array_t va = vertex_array_t());
+    shape_t(const shape_t &other);
+    shape_t(shape_t &&other) noexcept;
+    ~shape_t() = default;
 
-    shape &operator=(const shape &other);
-    shape &operator=(shape &&other) noexcept;
+    shape_t &operator=(const shape_t &other);
+    shape_t &operator=(shape_t &&other) noexcept;
 
     void load_vertices();
     void bind();
     [[nodiscard]] glm::mat4 model_transformations() const;
 
-    mesh &get_mesh();
-    void set_mesh(mesh m);
+    mesh_t &get_mesh();
+    void set_mesh(mesh_t m);
 
-    transform &get_transform();
-    void set_transform(transform t);
+    transform_t &get_transform();
+    void set_transform(transform_t t);
 
-    material &get_material();
-    void set_material(material m);
+    material_t &get_material();
+    void set_material(material_t m);
 
   private:
-    mesh m_mesh;
-    transform m_transform;
-    material m_material;
-    vertex_array m_vertex_array;
+    mesh_t m_mesh;
+    transform_t m_transform;
+    material_t m_material;
+    vertex_array_t m_vertex_array;
 };
 
 } // namespace opengl_wrapper

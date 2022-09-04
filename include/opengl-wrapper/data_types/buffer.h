@@ -7,14 +7,14 @@
 
 namespace opengl_wrapper {
 
-class buffer {
+class buffer_t {
   public:
     /**
      * @brief Builds a large amount of buffers at the same time.
      * @param amount Amount of buffers.
      * @return Vector with the new buffers.
      */
-    static std::vector<buffer> build(size_t amount);
+    static std::vector<buffer_t> build(size_t amount);
 
     /**
      * @brief Construct a new buffer object.
@@ -22,24 +22,24 @@ class buffer {
      * @param id The buffer id.
      * @param target The buffer target.
      */
-    explicit buffer(identifier_t id = 0, buffer_target_t target = buffer_target_t::undefined);
+    explicit buffer_t(identifier_t id = 0, buffer_target_t target = buffer_target_t::undefined);
 
     /**
      * @brief buffer move-constructor.
      *
      * @param other buffer to be emptied.
      */
-    buffer(buffer &&other) noexcept;
+    buffer_t(buffer_t &&other) noexcept;
 
-    buffer(const buffer &) = delete;
-    buffer &operator=(const buffer &) = delete;
+    buffer_t(const buffer_t &) = delete;
+    buffer_t &operator=(const buffer_t &) = delete;
 
     /**
      * @brief Destroy the buffer object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteBuffers.xhtml
      *
      */
-    ~buffer();
+    ~buffer_t();
 
     /**
      * @brief buffer move-assignment operator.
@@ -47,7 +47,7 @@ class buffer {
      * @param other buffer to be emptied.
      * @return buffer& Reference to this.
      */
-    buffer &operator=(buffer &&other) noexcept;
+    buffer_t &operator=(buffer_t &&other) noexcept;
 
     /**
      * @brief Binds the indicated buffer object. See
@@ -62,8 +62,8 @@ class buffer {
      * @param data Data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    template <class TYPE> void load(const std::vector<TYPE> &data) {
-        graphics::instance().buffer_data(*this, data.size() * sizeof(TYPE), data.data());
+    template <class type_t> void load(const std::vector<type_t> &data) {
+        graphics_t::instance().buffer_data(*this, data.size() * sizeof(type_t), data.data());
     }
 
     /**
@@ -89,6 +89,6 @@ class buffer {
     buffer_target_t m_target;
 };
 
-std::ostream &operator<<(std::ostream &s, const opengl_wrapper::buffer &b);
+std::ostream &operator<<(std::ostream &s, const opengl_wrapper::buffer_t &b);
 
 } // namespace opengl_wrapper

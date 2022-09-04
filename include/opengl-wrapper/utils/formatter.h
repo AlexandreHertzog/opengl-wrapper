@@ -4,7 +4,7 @@
 
 namespace opengl_wrapper {
 
-class formatter {
+class formatter_t {
   public:
     static std::string format_glfw_error_code(int error_code);
 };

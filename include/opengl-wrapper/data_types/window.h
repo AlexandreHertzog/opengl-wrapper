@@ -9,11 +9,11 @@
 
 namespace opengl_wrapper {
 
-class window {
+class window_t {
   public:
     using cursor_pos_cb_t = std::function<void(double, double)>;
-    using framebuffer_cb_t = std::function<void(window &, int, int)>;
-    using key_cb_t = std::function<void(window &, int, int)>;
+    using framebuffer_cb_t = std::function<void(window_t &, int, int)>;
+    using key_cb_t = std::function<void(window_t &, int, int)>;
 
     /**
      * @brief Constructs a window object.
@@ -21,28 +21,28 @@ class window {
      * @param height window height.
      * @param title window title.
      */
-    window(int width, int height, const char *title);
+    window_t(int width, int height, const char *title);
 
     /**
      * @brief window move-constructor.
      * @param other window to be moved.
      */
-    window(window &&other) noexcept;
+    window_t(window_t &&other) noexcept;
 
     /**
      * @brief window destructor.
      */
-    ~window();
+    ~window_t();
 
     /**
      * @brief window move-assignment operator.
      * @param other window to be moved.
      * @return Reference to lhs.
      */
-    window &operator=(window &&other) noexcept;
+    window_t &operator=(window_t &&other) noexcept;
 
-    window(const window &) = delete;
-    window &operator=(const window &) = delete;
+    window_t(const window_t &) = delete;
+    window_t &operator=(const window_t &) = delete;
 
     /**
      * @brief window equality operator with GLFWwindow instances.
@@ -116,7 +116,7 @@ class window {
      */
     void set_input_mode(int mode, int value);
 
-    void draw(shape &s);
+    void draw(shape_t &s);
 
     /**
      * @brief Sets the dimensions of the window viewport.
@@ -159,6 +159,6 @@ class window {
     void register_callbacks();
 };
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window &w);
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window_t &w);
 
 } // namespace opengl_wrapper

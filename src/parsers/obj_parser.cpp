@@ -3,7 +3,7 @@
 #include "utils/exception.h"
 
 namespace opengl_wrapper {
-obj_parser::obj_parser(const std::filesystem::path &path) {
+obj_parser_t::obj_parser_t(const std::filesystem::path &path) {
     if (!path.empty()) {
         open(path);
     }
@@ -11,23 +11,23 @@ obj_parser::obj_parser(const std::filesystem::path &path) {
     m_line_stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 }
 
-void obj_parser::open(const std::filesystem::path &path) {
+void obj_parser_t::open(const std::filesystem::path &path) {
     m_file.open(path);
     if (!m_file) {
-        throw exception("Failed to open wavefront object file: " + path.string());
+        throw exception_t("Failed to open wavefront object file: " + path.string());
     }
     prepare_next_line();
 }
 
-bool obj_parser::is_good() const {
+bool obj_parser_t::is_good() const {
     return m_is_good;
 }
 
-const std::string &obj_parser::get_header() const {
+const std::string &obj_parser_t::get_header() const {
     return m_header;
 }
 
-obj_parser::line_type_t obj_parser::line_type() {
+obj_parser_t::line_type_t obj_parser_t::line_type() {
     m_line_stream.seekg(0);
     m_line_stream >> m_header;
 
@@ -55,20 +55,20 @@ obj_parser::line_type_t obj_parser::line_type() {
     return ret;
 }
 
-void obj_parser::prepare_next_line() {
+void obj_parser_t::prepare_next_line() {
     m_is_good = std::getline(m_file, m_current_line).good();
     if (m_is_good) {
         m_line_stream.str(m_current_line);
     }
 }
 
-template <> void obj_parser::get_line(bool &out) {
+template <> void obj_parser_t::get_line(bool &out) {
     std::string v;
     get_line(v);
     out = "on" == v;
 }
 
-void obj_parser::get_line() {
+void obj_parser_t::get_line() {
     prepare_next_line();
 }
 

@@ -1,26 +1,25 @@
 #pragma once
 
-#include "face_vertex_indices.h"
+#include "face.h"
 #include "types.h"
-#include "vertex.h"
 #include <filesystem>
 #include <string>
 #include <vector>
 
 namespace opengl_wrapper {
 
-class mesh {
+class mesh_t {
   public:
-    mesh() = default;
-    explicit mesh(const std::filesystem::path &wavefront_object_path);
-    mesh(mesh &&other) noexcept;
-    mesh(const mesh &other) = default;
-    ~mesh() = default;
+    mesh_t() = default;
+    explicit mesh_t(const std::filesystem::path &wavefront_object_path);
+    mesh_t(mesh_t &&other) noexcept;
+    mesh_t(const mesh_t &other) = default;
+    ~mesh_t() = default;
 
-    mesh &operator=(mesh &&other) noexcept;
-    mesh &operator=(const mesh &other);
+    mesh_t &operator=(mesh_t &&other) noexcept;
+    mesh_t &operator=(const mesh_t &other);
 
-    [[nodiscard]] const std::vector<vertex> &get_vertices() const;
+    [[nodiscard]] const std::vector<vertex_t> &get_vertices() const;
     [[nodiscard]] const std::string &get_name() const;
 
   private:
@@ -33,7 +32,7 @@ class mesh {
     bool m_smooth_shading{false};
     std::vector<std::vector<face_t>> m_faces;
 
-    std::vector<vertex> m_cached_vertices;
+    std::vector<vertex_t> m_cached_vertices;
 
     void cache_vertices();
 };

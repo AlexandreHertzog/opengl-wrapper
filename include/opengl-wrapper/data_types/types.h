@@ -1,10 +1,15 @@
 #pragma once
 
 #include <array>
+#include <glm/glm.hpp>
 #include <iomanip>
+#include <memory>
 #include <ostream>
 
 namespace opengl_wrapper {
+
+class texture_t;
+using texture_pointer_t = std::shared_ptr<texture_t>;
 
 using identifier_t = unsigned;
 
@@ -70,6 +75,56 @@ enum class polygon_mode_t {
     undefined = -1,
     line = 0x1B01,
     fill = 0x1B02
+};
+
+struct light_t {
+    glm::vec3 m_position{};
+    glm::vec3 m_ambient{};
+    glm::vec3 m_diffuse{};
+    glm::vec3 m_specular{};
+    float m_attenuation_constant{};
+    float m_attenuation_linear{};
+    float m_attenuation_quadratic{};
+
+    light_t() = default;
+    virtual ~light_t() = default;
+    light_t(const light_t &) = default;
+    light_t(light_t &&) = default;
+    light_t &operator=(const light_t &) = default;
+    light_t &operator=(light_t &&) = default;
+};
+
+struct directional_light_t : light_t {
+    glm::vec3 m_direction;
+};
+
+struct spot_light_t : light_t {
+    glm::vec3 m_direction;
+    float m_cutoff_begin{};
+    float m_cutoff_end{};
+};
+
+struct material_t {
+    glm::vec3 m_ambient{};
+    texture_pointer_t m_diffuse{};
+    texture_pointer_t m_specular{};
+    float m_shininess{};
+    texture_pointer_t m_texture1{};
+    texture_pointer_t m_texture2{};
+    float m_texture_mix{};
+};
+
+struct transform_t {
+    glm::vec3 m_translation{0.0F};
+    float m_rotation_angle{0.0F};
+    glm::vec3 m_rotation_axis{1.0F};
+    glm::vec3 m_scale{1.0F};
+};
+
+struct vertex_t {
+    position_t m_pos;
+    tex_coord_t m_tex;
+    direction_t m_nor;
 };
 
 inline std::ostream &operator<<(std::ostream &os, buffer_target_t t) {

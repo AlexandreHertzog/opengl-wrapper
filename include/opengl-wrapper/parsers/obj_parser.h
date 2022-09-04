@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opengl-wrapper/data_types/face_vertex_indices.h"
+#include "opengl-wrapper/data_types/face.h"
 #include "opengl-wrapper/utils/utils.h"
 #include <filesystem>
 #include <fstream>
@@ -8,7 +8,7 @@
 
 namespace opengl_wrapper {
 
-class obj_parser {
+class obj_parser_t {
   public:
     enum class line_type_t {
         undefined = 0,
@@ -23,14 +23,14 @@ class obj_parser {
         face
     };
 
-    explicit obj_parser(const std::filesystem::path &path = "");
+    explicit obj_parser_t(const std::filesystem::path &path = "");
     void open(const std::filesystem::path &path);
 
     line_type_t line_type();
     [[nodiscard]] bool is_good() const;
     [[nodiscard]] const std::string &get_header() const;
 
-    template <class TYPE> void get_line(TYPE &out) {
+    template <class type_t> void get_line(type_t &out) {
         m_line_stream >> out;
         prepare_next_line();
     }
@@ -47,6 +47,6 @@ class obj_parser {
     void prepare_next_line();
 };
 
-template <> void obj_parser::get_line(bool &out);
+template <> void obj_parser_t::get_line(bool &out);
 
 } // namespace opengl_wrapper

@@ -16,7 +16,7 @@ TEST(TextureTest, texture_constructor_gen_textures) {
     EXPECT_CALL(graphics, gl_gen_textures(1)).Times(Exactly(1)).WillOnce(Return(ids));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t1(unit, target);
+    opengl_wrapper::texture_t t1(unit, target);
     EXPECT_EQ(t1.get_id(), ids[0]);
 }
 
@@ -30,7 +30,7 @@ TEST(TextureTest, texture_constructor_no_gen_textures) {
     EXPECT_CALL(graphics, gl_gen_textures(1)).Times(Exactly(0));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t(unit, target, ids[0]);
+    opengl_wrapper::texture_t t(unit, target, ids[0]);
     EXPECT_EQ(t.get_id(), ids[0]);
 }
 
@@ -44,8 +44,8 @@ TEST(TextureTest, texture_constructor_invalid_values) {
     EXPECT_CALL(graphics, gl_gen_textures(1)).Times(Exactly(0));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(0));
 
-    std::unique_ptr<opengl_wrapper::texture> t;
-    EXPECT_DEATH(t.reset(new opengl_wrapper::texture(0, target)), "0 != unit");
+    std::unique_ptr<opengl_wrapper::texture_t> t;
+    EXPECT_DEATH(t.reset(new opengl_wrapper::texture_t(0, target)), "0 != unit");
 }
 
 TEST(TextureTest, texture_move_constructor) {
@@ -58,8 +58,8 @@ TEST(TextureTest, texture_move_constructor) {
     EXPECT_CALL(graphics, gl_gen_textures(1)).Times(Exactly(0));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t1(unit, target, ids[0]);
-    opengl_wrapper::texture t2(std::move(t1));
+    opengl_wrapper::texture_t t1(unit, target, ids[0]);
+    opengl_wrapper::texture_t t2(std::move(t1));
     EXPECT_EQ(t1.get_id(), 0);
     EXPECT_EQ(t1.get_target(), 0);
     EXPECT_EQ(t1.get_unit(), 0);
@@ -81,8 +81,8 @@ TEST(TextureTest, texture_move_assignment_operator) {
     EXPECT_CALL(graphics, gl_gen_textures(1)).Times(Exactly(2)).WillOnce(Return(ids1)).WillOnce(Return(ids2));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(2));
 
-    opengl_wrapper::texture t1(unit1, target1);
-    opengl_wrapper::texture t2(unit2, target2);
+    opengl_wrapper::texture_t t1(unit1, target1);
+    opengl_wrapper::texture_t t2(unit2, target2);
 
     t2 = std::move(t1);
 
@@ -109,7 +109,7 @@ TEST(TextureTest, texture_set_parameter) {
     EXPECT_CALL(graphics, gl_tex_parameter_i(target, pname, param)).Times(Exactly(1));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t1(unit, target);
+    opengl_wrapper::texture_t t1(unit, target);
     t1.bind();
     t1.set_parameter(pname, param);
     EXPECT_EQ(t1.get_id(), ids[0]);
@@ -137,7 +137,7 @@ TEST(TextureTest, texture_set_image) {
         .Times(Exactly(1));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t1(unit, target);
+    opengl_wrapper::texture_t t1(unit, target);
     t1.bind();
     t1.set_image(level, internalformat, width, height, border, format, type, data);
     EXPECT_EQ(t1.get_id(), ids[0]);
@@ -156,7 +156,7 @@ TEST(TextureTest, texture_generate_mipmap) {
     EXPECT_CALL(graphics, gl_generate_mipmap(target)).Times(Exactly(1));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t1(unit, target);
+    opengl_wrapper::texture_t t1(unit, target);
     t1.bind();
     t1.generate_mipmap();
     EXPECT_EQ(t1.get_id(), ids[0]);
@@ -185,7 +185,7 @@ TEST(TextureTest, texture_set_image_from_path) {
     EXPECT_CALL(graphics, gl_generate_mipmap(target)).Times(Exactly(1));
     EXPECT_CALL(graphics, gl_delete_textures(1, A<const GLuint *>())).Times(Exactly(1));
 
-    opengl_wrapper::texture t1(unit, GL_TEXTURE_2D);
+    opengl_wrapper::texture_t t1(unit, GL_TEXTURE_2D);
     t1.set_image_from_path(image_path);
     EXPECT_EQ(t1.get_id(), ids[0]);
 }

@@ -10,19 +10,24 @@
 
 namespace opengl_wrapper {
 
-class buffer;
-class texture;
-class program;
-class shader;
-class texture;
-class vertex_array;
+class buffer_t;
+class texture_t;
+class program_t;
+class shader_t;
+class texture_t;
+class vertex_array_t;
 
-class graphics {
+class graphics_t {
   public:
-    virtual ~graphics() = default;
+    virtual ~graphics_t() = default;
 
-    static graphics &instance();
-    static void set_instance(graphics *instance);
+    graphics_t(const graphics_t &) = delete;
+    graphics_t(graphics_t &&) = delete;
+    graphics_t &operator=(const graphics_t &) = delete;
+    graphics_t &operator=(graphics_t &&) = delete;
+
+    static graphics_t &instance();
+    static void set_instance(graphics_t *instance);
 
     /**
      * @brief select active texture unit
@@ -30,7 +35,7 @@ class graphics {
      * dependent, but must be at least 80. texture must be one of GL_TEXTUREi, where i ranges from zero to the value of
      * GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS minus one. The initial value is GL_TEXTURE0.
      */
-    virtual void activate(const texture &tex) = 0;
+    virtual void activate(const texture_t &tex) = 0;
 
     /**
      * @brief Attaches a shader object to a program object
@@ -38,28 +43,28 @@ class graphics {
      * @param p Specifies the program object to which a shader object will be attached.
      * @param s Specifies the shader object that is to be attached.
      */
-    virtual void attach_shader(const program &p, const shader &s) = 0;
+    virtual void attach_shader(const program_t &p, const shader_t &s) = 0;
 
     /**
      * @brief bind a named buffer object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml
      * @param b Specifies the name of a buffer object.
      */
-    virtual void bind(const buffer &b) = 0;
+    virtual void bind(const buffer_t &b) = 0;
 
     /**
      * @brief bind a named texture_coord to a texturing target
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindTexture.xhtml
      * @param t Texture to be bound.
      */
-    virtual void bind(const texture &t) = 0;
+    virtual void bind(const texture_t &t) = 0;
 
     /**
      * @brief bind a vertex array object.
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindVertexArray.xhtml
      * @param va Vertex array to be bound.
      */
-    virtual void bind(const vertex_array &va) = 0;
+    virtual void bind(const vertex_array_t &va) = 0;
 
     /**
      * @brief creates and initializes a buffer object's data store.
@@ -69,7 +74,7 @@ class graphics {
      * @param data Specifies a pointer to data that will be copied into the data store for initialization, or NULL if no
      * data is to be copied.
      */
-    virtual void buffer_data(const buffer &b, size_t size, const void *data) = 0;
+    virtual void buffer_data(const buffer_t &b, size_t size, const void *data) = 0;
 
     /**
      * @brief clear buffers to preset values.
@@ -90,7 +95,7 @@ class graphics {
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml
      * @param s Specifies the shader object to be compiled.
      */
-    virtual void compile(const shader &s) = 0;
+    virtual void compile(const shader_t &s) = 0;
 
     /**
      * @brief Creates a program object.
@@ -224,7 +229,7 @@ class graphics {
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenerateMipmap.xhtml
      * @param t Texture to have its mipmap generated.
      */
-    virtual void generate_mipmap(const texture &t) = 0;
+    virtual void generate_mipmap(const texture_t &t) = 0;
 
     /**
      * @brief Returns the information log for a program object
@@ -232,7 +237,7 @@ class graphics {
      * @param p Specifies the program object whose information log is to be queried.
      * @return Information log.
      */
-    virtual std::string get_info_log(const program &p) = 0;
+    virtual std::string get_info_log(const program_t &p) = 0;
 
     /**
      * @brief Returns a parameter from a program object
@@ -247,7 +252,7 @@ class graphics {
      * GL_GEOMETRY_OUTPUT_TYPE.
      * @return Requested object parameter.
      */
-    virtual int get_parameter(const program &p, program_parameter_t param) = 0;
+    virtual int get_parameter(const program_t &p, program_parameter_t param) = 0;
 
     /**
      * @brief Returns the information log for a shader object
@@ -255,7 +260,7 @@ class graphics {
      * @param s Specifies the shader object whose information log is to be queried.
      * @return Information log.
      */
-    virtual std::string get_info_log(const shader &s) = 0;
+    virtual std::string get_info_log(const shader_t &s) = 0;
 
     /**
      * @brief Returns a parameter from a shader object
@@ -265,7 +270,7 @@ class graphics {
      * GL_COMPILE_STATUS, GL_INFO_LOG_LENGTH, GL_SHADER_SOURCE_LENGTH.
      * @return Requested object parameter.
      */
-    virtual int get_parameter(const shader &s, shader_parameter_t param) = 0;
+    virtual int get_parameter(const shader_t &s, shader_parameter_t param) = 0;
 
     /**
      * @brief Returns the location of a uniform variable
@@ -274,14 +279,14 @@ class graphics {
      * be queried.
      * @return an integer that represents the location of a specific uniform variable within a program object.
      */
-    virtual int get_uniform_location(const program &p, const char *name) = 0;
+    virtual int get_uniform_location(const program_t &p, const char *name) = 0;
 
     /**
      * @brief Links a program object
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml
      * @param p Specifies the handle of the program object to be linked.
      */
-    virtual void link(const program &p) = 0;
+    virtual void link(const program_t &p) = 0;
 
     /**
      * @brief select a polygon rasterization mode. See
@@ -298,7 +303,7 @@ class graphics {
      * @param num_sources Specifies the number of elements in the string and length arrays.
      * @param string Specifies an array of pointers to strings containing the source code to be loaded into the shader.
      */
-    virtual void set_sources(const shader &s, size_t num_sources, const char **sources) = 0;
+    virtual void set_sources(const shader_t &s, size_t num_sources, const char **sources) = 0;
 
     /**
      * @brief specify a two-dimensional texture_coord image
@@ -388,7 +393,7 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      * @param program Specifies the handle of the program object whose executables are to be used as part of current
      * rendering state.
      */
-    virtual void use(const program &p) = 0;
+    virtual void use(const program_t &p) = 0;
 
     /**
      * @brief define an array of generic vertex attribute data
@@ -534,8 +539,11 @@ be one of GL_TEXTURE_BORDER_COLOR or GL_TEXTURE_SWIZZLE_RGBA.
      */
     virtual int glfw_window_should_close(GLFWwindow *window) = 0;
 
+  protected:
+    graphics_t() = default;
+
   private:
-    static graphics *m_instance;
+    static graphics_t *m_instance; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 };
 
 } // namespace opengl_wrapper

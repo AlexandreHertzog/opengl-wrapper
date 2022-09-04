@@ -1,20 +1,19 @@
 #pragma once
 
 #include "buffer.h"
-#include "vertex.h"
 #include <ostream>
 #include <vector>
 
 namespace opengl_wrapper {
 
-class vertex_array {
+class vertex_array_t {
   public:
     /**
      * @brief Builds a large amount of vertex arrays at the same time.
      * @param amount Amount of vertex arrays.
      * @return Vector with the new vertex arrays.
      */
-    static std::vector<vertex_array> build(size_t amount);
+    static std::vector<vertex_array_t> build(size_t amount);
 
     /**
      * @brief Construct a new vertex_arrays object. See
@@ -22,24 +21,24 @@ class vertex_array {
      *
      * @param size Number of vertex arrays to be generated.
      */
-    explicit vertex_array(identifier_t id = 0);
+    explicit vertex_array_t(identifier_t id = 0);
 
     /**
      * @brief vertex_arrays move-constructor.
      *
      * @param other VectorArrays to be emptied.
      */
-    vertex_array(vertex_array &&other) noexcept;
+    vertex_array_t(vertex_array_t &&other) noexcept;
 
-    vertex_array(const vertex_array &) = delete;
-    vertex_array &operator=(const vertex_array &) = delete;
+    vertex_array_t(const vertex_array_t &) = delete;
+    vertex_array_t &operator=(const vertex_array_t &) = delete;
 
     /**
      * @brief Destroy the Vertex Arrays object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteVertexArrays.xhtml
      *
      */
-    ~vertex_array();
+    ~vertex_array_t();
 
     /**
      * @brief vertex_arrays move-assignment operator.
@@ -47,7 +46,7 @@ class vertex_array {
      * @param other vertex_arrays to be emptied.
      * @return vertex_arrays& Reference to this.
      */
-    vertex_array &operator=(vertex_array &&other) noexcept;
+    vertex_array_t &operator=(vertex_array_t &&other) noexcept;
 
     /**
      * @brief Binds the VertexArray object. See
@@ -70,13 +69,13 @@ class vertex_array {
      * @param data Data to be stored.
      * @param usage Expected usage pattern of the data store.
      */
-    void load(const std::vector<vertex> &vertices);
+    void load(const std::vector<vertex_t> &vertices);
 
   private:
     identifier_t m_id;
-    std::vector<buffer> m_buffers;
+    std::vector<buffer_t> m_buffers;
 };
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_array &va);
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::vertex_array_t &va);
 
 } // namespace opengl_wrapper

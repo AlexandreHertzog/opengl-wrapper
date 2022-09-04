@@ -4,9 +4,9 @@
 
 namespace opengl_wrapper {
 
-class gl_error : public exception {
+class gl_error_t : public exception_t {
   public:
-    explicit gl_error(const std::string &message);
+    explicit gl_error_t(const std::string &message);
 };
 
 } // namespace opengl_wrapper

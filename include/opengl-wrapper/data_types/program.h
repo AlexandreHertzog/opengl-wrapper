@@ -8,34 +8,34 @@
 
 namespace opengl_wrapper {
 
-class shader;
-class shape;
+class shader_t;
+class shape_t;
 
-class program {
+class program_t {
   public:
     /**
      * @brief Construct a new program object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml
      *
      */
-    program();
+    program_t();
 
     /**
      * @brief program move-constructor.
      *
      * @param other program to be emptied.
      */
-    program(program &&other) noexcept;
+    program_t(program_t &&other) noexcept;
 
     /**
      * @brief Destroy the program object. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteProgram.xhtml
      *
      */
-    ~program();
+    ~program_t();
 
-    program(const program &) = delete;
-    program &operator=(const program &) = delete;
+    program_t(const program_t &) = delete;
+    program_t &operator=(const program_t &) = delete;
 
     /**
      * @brief program move-assignment operator.
@@ -43,14 +43,14 @@ class program {
      * @param other program to be emptied.
      * @return program& Reference to this.
      */
-    program &operator=(program &&other) noexcept;
+    program_t &operator=(program_t &&other) noexcept;
 
     /**
      * @brief Equality comparison operator.
      * @param other program to be compared with.
      * @return `true` if the programs have the same id, `false` otherwise.
      */
-    bool operator==(const program &other) const;
+    bool operator==(const program_t &other) const;
 
     /**
      * @brief Attaches a shader to the program. See
@@ -58,7 +58,7 @@ class program {
      *
      * @param shader Compiled shader to be attached.
      */
-    void add_shader(shader shader);
+    void add_shader(shader_t shader);
 
     /**
      * @brief Links the program with the previously defined shaders. See
@@ -76,11 +76,11 @@ class program {
      */
     int get_uniform_location(const char *var_name) const;
 
-    template <class... T> void set_uniform(const char *var_name, const T &...t) {
-        graphics::instance().set_uniform(get_uniform_location(var_name), t...);
+    template <class... type_t> void set_uniform(const char *var_name, const type_t &...t) {
+        graphics_t::instance().set_uniform(get_uniform_location(var_name), t...);
     }
 
-    template <class... T> void set_uniform(const std::string &var_name, const T &...t) {
+    template <class... type_t> void set_uniform(const std::string &var_name, const type_t &...t) {
         set_uniform(var_name.c_str(), t...);
     }
 
@@ -89,14 +89,14 @@ class program {
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml
      *
      */
-    void use();
+    void use() const;
 
     /**
      * @brief Gets the shaders associated with the program. Only valid before linking, after that it returns an empty
      * vector.
      * @return Program shaders.
      */
-    [[nodiscard]] const std::vector<shader> &get_shaders() const;
+    [[nodiscard]] const std::vector<shader_t> &get_shaders() const;
 
     /**
      * @brief Gets the program id.
@@ -111,12 +111,12 @@ class program {
     [[nodiscard]] bool get_linked() const;
 
   private:
-    std::vector<shader> m_shaders;
+    std::vector<shader_t> m_shaders;
     unsigned int m_shader_count;
     identifier_t m_id;
     bool m_linked;
 };
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program &p);
+std::ostream &operator<<(std::ostream &os, const opengl_wrapper::program_t &p);
 
 } // namespace opengl_wrapper

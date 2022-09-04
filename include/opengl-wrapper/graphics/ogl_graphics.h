@@ -4,15 +4,15 @@
 
 namespace opengl_wrapper {
 
-class ogl_graphics : public graphics {
+class ogl_graphics_t : public graphics_t {
   public:
-    ogl_graphics();
-    ~ogl_graphics() override;
+    ogl_graphics_t();
+    ~ogl_graphics_t() override;
 
-    ogl_graphics(const ogl_graphics &) = delete;
-    ogl_graphics(ogl_graphics &&) = delete;
-    ogl_graphics &operator=(ogl_graphics &&) = delete;
-    ogl_graphics &operator=(const ogl_graphics &) = delete;
+    ogl_graphics_t(const ogl_graphics_t &) = delete;
+    ogl_graphics_t(ogl_graphics_t &&) = delete;
+    ogl_graphics_t &operator=(ogl_graphics_t &&) = delete;
+    ogl_graphics_t &operator=(const ogl_graphics_t &) = delete;
 
     // Allocators and deleters
     identifier_t new_program() override;
@@ -27,19 +27,19 @@ class ogl_graphics : public graphics {
     void delete_vertex_arrays(size_t n, const identifier_t *arrays) override;
 
     // Texture functions
-    void activate(const texture &tex) override;
-    void bind(const texture &t) override;
-    void generate_mipmap(const texture &t) override;
+    void activate(const texture_t &tex) override;
+    void bind(const texture_t &t) override;
+    void generate_mipmap(const texture_t &t) override;
     void set_image(size_t width, size_t height, texture_format_t format, const unsigned char *data) override;
     void set_parameter(texture_parameter_t name, texture_parameter_values_t value) override;
 
     // Program functions
-    void attach_shader(const program &p, const shader &s) override;
-    std::string get_info_log(const program &p) override;
-    int get_parameter(const program &p, program_parameter_t param) override;
-    int get_uniform_location(const program &p, const char *name) override;
-    void link(const program &p) override;
-    void use(const program &p) override;
+    void attach_shader(const program_t &p, const shader_t &s) override;
+    std::string get_info_log(const program_t &p) override;
+    int get_parameter(const program_t &p, program_parameter_t param) override;
+    int get_uniform_location(const program_t &p, const char *name) override;
+    void link(const program_t &p) override;
+    void use(const program_t &p) override;
     void set_uniform(int location, float v0) override;
     void set_uniform(int location, int v0) override;
     void set_uniform(int location, const std::array<float, 3> &v) override;
@@ -48,19 +48,19 @@ class ogl_graphics : public graphics {
     void set_uniform(int location, const glm::mat4 &value) override;
 
     // Buffer functions
-    void bind(const buffer &b) override;
-    void buffer_data(const buffer &b, size_t size, const void *data) override;
+    void bind(const buffer_t &b) override;
+    void buffer_data(const buffer_t &b, size_t size, const void *data) override;
 
     // Vertex array functions
-    void bind(const vertex_array &va) override;
+    void bind(const vertex_array_t &va) override;
     void enable_vertex_attrib_array(unsigned index) override;
     void vertex_attrib_pointer(unsigned index, size_t size, size_t stride, unsigned offset) override;
 
     // Shader functions
-    void compile(const shader &s) override;
-    std::string get_info_log(const shader &s) override;
-    int get_parameter(const shader &s, shader_parameter_t param) override;
-    void set_sources(const shader &s, size_t num_sources, const char **sources) override;
+    void compile(const shader_t &s) override;
+    std::string get_info_log(const shader_t &s) override;
+    int get_parameter(const shader_t &s, shader_parameter_t param) override;
+    void set_sources(const shader_t &s, size_t num_sources, const char **sources) override;
 
     void clear() override;
     void set_clear_color(const color_alpha_t &c) override;

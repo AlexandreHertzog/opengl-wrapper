@@ -3,7 +3,7 @@
 
 int main() {
     try {
-        test_app::integration app;
+        test_app::integration_t app;
         app.init_callbacks();
 
         app.build_shapes();

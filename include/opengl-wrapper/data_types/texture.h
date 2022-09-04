@@ -8,9 +8,9 @@
 
 namespace opengl_wrapper {
 
-class texture {
+class texture_t {
   public:
-    using pointer_t = std::shared_ptr<texture>;
+    using pointer_t = std::shared_ptr<texture_t>;
 
     static pointer_t build(const std::filesystem::path &path, int unit);
 
@@ -20,29 +20,29 @@ class texture {
      * @param target OpenGL texture target.
      * @param id Texture ID.
      */
-    explicit texture(int unit, texture_target_t target = texture_target_t::undefined, identifier_t id = 0);
+    explicit texture_t(int unit, texture_target_t target = texture_target_t::undefined, identifier_t id = 0);
 
     /**
      * @brief Texture destructor. See
      * https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteTextures.xhtml
      */
-    ~texture();
+    ~texture_t();
 
     /**
      * @brief Texture move-constructor.
      * @param other Texture to be emptied.
      */
-    texture(texture &&other) noexcept;
+    texture_t(texture_t &&other) noexcept;
 
     /**
      * @brief Texture move-assignment operator.
      * @param other Texture to be emptied.
      * @return Reference to this.
      */
-    texture &operator=(texture &&other) noexcept;
+    texture_t &operator=(texture_t &&other) noexcept;
 
-    texture(const texture &) = delete;
-    texture &operator=(const texture &) = delete;
+    texture_t(const texture_t &) = delete;
+    texture_t &operator=(const texture_t &) = delete;
 
     /**
      * @brief Binds the texture in OpenGL. See
@@ -85,13 +85,13 @@ class texture {
      * @param param Parameter name.
      * @param value Parameter value.
      */
-    template <class T> void set_parameter(texture_parameter_t param, T value) {
+    template <class type_t> void set_parameter(texture_parameter_t param, type_t value) {
         assert(m_id != 0);
         assert(m_target != texture_target_t::undefined);
-        graphics::instance().set_parameter(param, value);
+        graphics_t::instance().set_parameter(param, value);
     }
 };
 
-std::ostream &operator<<(std::ostream &os, const texture &t);
+std::ostream &operator<<(std::ostream &os, const texture_t &t);
 
 } // namespace opengl_wrapper

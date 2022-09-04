@@ -49,15 +49,11 @@ add_library(opengl-wrapper-data-types
         src/data_types/shader.cpp
         src/data_types/shape.cpp
         src/data_types/texture.cpp
-        src/data_types/vertex.cpp
         src/data_types/vertex_array.cpp
         src/data_types/window.cpp
         src/data_types/camera.cpp
-        src/data_types/face_vertex_indices.cpp
+        src/data_types/face.cpp
         src/data_types/mesh.cpp
-        src/data_types/transform.cpp
-        src/data_types/material.cpp
-        src/data_types/light.cpp
         )
 
 target_include_directories(opengl-wrapper-data-types

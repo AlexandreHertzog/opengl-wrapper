@@ -1,7 +1,42 @@
-Checks: 'clang-analyzer*,cert*,cppcore*,misc*,performance*,portability*,
-        bugprone*,-bugprone-easily-swappable-parameters,
-        readability*,-readability-identifier-length
-        google*,
-        hicpp*,
-        llvm-*,-llvm-header-guard
-        modernize-*,-modernize-use-trailing-return-type'
+Checks: 'clang-analyzer*,cert*,cppcore*,misc*,performance*,portability*,bugprone*,readability*,google*,hicpp*,llvm-*,modernize-*,
+        -bugprone-easily-swappable-parameters,
+        -cppcoreguidelines-prefer-member-initializer,
+        -hicpp-move-const-arg,
+        -llvm-header-guard,
+        -misc-non-private-member-variables-in-classes,
+        -modernize-use-trailing-return-type,
+        -performance-move-const-arg,
+        -readability-convert-member-functions-to-static,
+        -readability-identifier-length,
+        -readability-magic-numbers,
+        '
+
+CheckOptions:
+  - { key: readability-identifier-naming.AbstractCase, value: lower_case }
+  - { key: readability-identifier-naming.AbstractSuffix, value: _t }
+  - { key: readability-identifier-naming.ClassCase, value: lower_case }
+  - { key: readability-identifier-naming.ClassSuffix, value: _t }
+  - { key: readability-identifier-naming.ClassConstantCase, value: lower_case }
+  - { key: readability-identifier-naming.ClassConstantPrefix, value: m_ }
+  - { key: readability-identifier-naming.ClassMemberCase, value: lower_case }
+  - { key: readability-identifier-naming.ClassMemberPrefix, value: m_ }
+  - { key: readability-identifier-naming.ClassMethodCase, value: lower_case }
+  - { key: readability-identifier-naming.ConstexprVariableCase, value: lower_case }
+  - { key: readability-identifier-naming.EnumCase, value: lower_case }
+  - { key: readability-identifier-naming.EnumSuffix, value: _t }
+  - { key: readability-identifier-naming.EnumConstantCase, value: lower_case }
+  - { key: readability-identifier-naming.FunctionCase, value: lower_case }
+  - { key: readability-identifier-naming.GlobalConstantCase, value: lower_case }
+  - { key: readability-identifier-naming.MethodCase, value: lower_case }
+  - { key: readability-identifier-naming.NamespaceCase, value: lower_case }
+  - { key: readability-identifier-naming.StaticConstantCase, value: lower_case }
+  - { key: readability-identifier-naming.StructCase, value: lower_case }
+  - { key: readability-identifier-naming.StructCaseSuffix, value: _t }
+  - { key: readability-identifier-naming.PrivateMemberCase, value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
+  - { key: readability-identifier-naming.ProtectedMemberCase, value: lower_case }
+  - { key: readability-identifier-naming.ProtectedMemberPrefix, value: m_ }
+  - { key: readability-identifier-naming.TemplateParameterCase, value: lower_case }
+  - { key: readability-identifier-naming.TemplateParameterSuffix, value: _t }
+  - { key: readability-identifier-naming.ValueTemplateParameterCase, value: lower_case }
+  - { key: readability-identifier-naming.VariableCase, value: lower_case }

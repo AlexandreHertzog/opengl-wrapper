@@ -1,5 +1,5 @@
 #include "mock_graphics.h"
-#include "opengl-wrapper/data_types/face_vertex_indices.h"
+#include "opengl-wrapper/data_types/face.h"
 #include "opengl-wrapper/parsers/obj_parser.h"
 #include "gtest/gtest.h"
 
@@ -9,7 +9,7 @@ using testing::Return;
 TEST(obj_parser_test, parse) {
     using opengl_wrapper::operator==;
 
-    opengl_wrapper::obj_parser parser("./untitled.obj");
+    opengl_wrapper::obj_parser_t parser("./untitled.obj");
 
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec2> texture_coords;
@@ -19,15 +19,15 @@ TEST(obj_parser_test, parse) {
 
     while (parser.is_good()) {
         const auto type = parser.line_type();
-        if (type == opengl_wrapper::obj_parser::line_type_t::object_name) {
+        if (type == opengl_wrapper::obj_parser_t::line_type_t::object_name) {
             parser.get_line(name);
-        } else if (type == opengl_wrapper::obj_parser::line_type_t::vertex) {
+        } else if (type == opengl_wrapper::obj_parser_t::line_type_t::vertex) {
             parser.get_line(vertices);
-        } else if (type == opengl_wrapper::obj_parser::line_type_t::face) {
+        } else if (type == opengl_wrapper::obj_parser_t::line_type_t::face) {
             parser.get_line(faces);
-        } else if (type == opengl_wrapper::obj_parser::line_type_t::texture_coordinate) {
+        } else if (type == opengl_wrapper::obj_parser_t::line_type_t::texture_coordinate) {
             parser.get_line(texture_coords);
-        } else if (type == opengl_wrapper::obj_parser::line_type_t::smoothing) {
+        } else if (type == opengl_wrapper::obj_parser_t::line_type_t::smoothing) {
             parser.get_line(smooth);
         } else {
             parser.get_line();

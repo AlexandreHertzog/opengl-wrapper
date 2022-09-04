@@ -4,34 +4,34 @@
 
 namespace opengl_wrapper {
 
-class image {
+class image_t {
   public:
     /**
      * @brief Creates the image object while loading it from the filesystem.
      * @param path
      */
-    explicit image(const std::filesystem::path &path);
+    explicit image_t(const std::filesystem::path &path);
 
     /**
      * Frees STB buffer.
      */
-    ~image();
+    ~image_t();
 
     /**
      * @brief Image move constructor.
      * @param other Image to be emptied.
      */
-    image(image &&other) noexcept;
+    image_t(image_t &&other) noexcept;
 
     /**
      * @brief Image move-assignment operator.
      * @param other Image to be emptied.
      * @return Reference to this.
      */
-    image &operator=(image &&other) noexcept;
+    image_t &operator=(image_t &&other) noexcept;
 
-    image(const image &) = delete;
-    image &operator=(const image &) = delete;
+    image_t(const image_t &) = delete;
+    image_t &operator=(const image_t &) = delete;
 
     /**
      * @brief Gets the image width.

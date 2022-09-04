@@ -1,7 +1,10 @@
-#include "face_vertex_indices.h"
+#include "face.h"
 #include "utils/utils.h"
 
 namespace opengl_wrapper {
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-pro-bounds-pointer-arithmetic"
 
 std::istream &operator>>(std::istream &is, face_t &f) {
     std::string data;
@@ -26,6 +29,8 @@ std::istream &operator>>(std::istream &is, face_t &f) {
 
     return is;
 }
+
+#pragma clang diagnostic pop
 
 bool operator==(const opengl_wrapper::face_t &lhs, const opengl_wrapper::face_t &rhs) {
     return (lhs.m_vertex_index == rhs.m_vertex_index) && (lhs.m_texture_coord_index == rhs.m_texture_coord_index) &&

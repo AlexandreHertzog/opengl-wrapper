@@ -23,7 +23,7 @@ TEST(ShaderTest, shader_construct_compile_successfull) {
         .WillOnce(SetArgPointee<2>(GL_TRUE));
     EXPECT_CALL(graphics, gl_delete_shader(id));
 
-    opengl_wrapper::shader s(type, source);
+    opengl_wrapper::shader_t s(type, source);
     EXPECT_EQ(s.get_id(), id);
 }
 
@@ -37,7 +37,7 @@ TEST(ShaderTest, shader_construct_no_compile) {
     EXPECT_CALL(graphics, gl_create_shader(type)).Times(Exactly(1)).WillOnce(Return(id));
     EXPECT_CALL(graphics, gl_delete_shader(id));
 
-    opengl_wrapper::shader s(type, source);
+    opengl_wrapper::shader_t s(type, source);
     EXPECT_EQ(s.get_id(), id);
 }
 
@@ -57,8 +57,8 @@ TEST(ShaderTest, shader_construct_compile_failed) {
     EXPECT_CALL(graphics, gl_get_shader_info_log(id, A<GLsizei>(), nullptr, A<char *>())).Times(Exactly(1));
     EXPECT_CALL(graphics, gl_delete_shader(id));
 
-    std::unique_ptr<opengl_wrapper::shader> s;
-    EXPECT_THROW(s.reset(new opengl_wrapper::shader(type, source)), opengl_wrapper::gl_error);
+    std::unique_ptr<opengl_wrapper::shader_t> s;
+    EXPECT_THROW(s.reset(new opengl_wrapper::shader_t(type, source)), opengl_wrapper::gl_error_t);
 }
 
 TEST(ShaderTest, shader_move_constructor) {
@@ -71,8 +71,8 @@ TEST(ShaderTest, shader_move_constructor) {
     EXPECT_CALL(graphics, gl_create_shader(type)).Times(Exactly(1)).WillOnce(Return(id));
     EXPECT_CALL(graphics, gl_delete_shader(id));
 
-    opengl_wrapper::shader s1(type, source);
-    opengl_wrapper::shader s2(std::move(s1));
+    opengl_wrapper::shader_t s1(type, source);
+    opengl_wrapper::shader_t s2(std::move(s1));
 
     EXPECT_EQ(s1.get_id(), 0);
     EXPECT_EQ(s2.get_id(), id);
@@ -92,8 +92,8 @@ TEST(ShaderTest, shader_move_assignment_operator) {
     EXPECT_CALL(graphics, gl_delete_shader(id1));
     EXPECT_CALL(graphics, gl_delete_shader(id2));
 
-    opengl_wrapper::shader s1(type1, source);
-    opengl_wrapper::shader s2(type2, source);
+    opengl_wrapper::shader_t s1(type1, source);
+    opengl_wrapper::shader_t s2(type2, source);
 
     s2 = std::move(s1);
 
@@ -116,6 +116,6 @@ TEST(ShaderTest, shader_construct_from_path) {
         .WillOnce(SetArgPointee<2>(GL_TRUE));
     EXPECT_CALL(graphics, gl_delete_shader(id));
 
-    opengl_wrapper::shader s(type, file_name);
+    opengl_wrapper::shader_t s(type, file_name);
     EXPECT_EQ(s.get_id(), id);
 }

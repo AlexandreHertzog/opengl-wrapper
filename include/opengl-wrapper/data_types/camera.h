@@ -4,17 +4,14 @@
 
 namespace opengl_wrapper {
 
-class camera {
+class camera_t {
   public:
-    explicit camera(glm::vec3 position = {}, glm::vec3 front = {}, glm::vec3 up = {});
+    explicit camera_t(glm::vec3 position = {}, glm::vec3 front = {}, glm::vec3 up = {});
     glm::mat4 look_at(glm::vec3 target);
 
     void set_position(glm::vec3 position);
     [[nodiscard]] const glm::vec3 &get_position() const;
-
     [[nodiscard]] const glm::vec3 &get_front() const;
-
-    void set_up(glm::vec3 up);
     [[nodiscard]] const glm::vec3 &get_up() const;
 
     void set_front(double pitch, double yaw);
