@@ -1,6 +1,5 @@
 #include "window.h"
 
-#include "graphics/graphics.h"
 #include "shape.h"
 #include "utils/glad_error.h"
 #include "utils/glfw_error.h"
@@ -49,24 +48,21 @@ class window_t::manager {
 std::map<const void *, opengl_wrapper::window_t *>
     window_t::manager::m_window_map; // NOLINT(*-non-const-global-variables)
 
-window_t::window_t(int width, int height, const char *title)
-    : m_window(graphics_t::instance().glfw_create_window(width, height, title, nullptr, nullptr)) {
+window_t::window_t(opengl_cpp::glfw_t &glfw, opengl_cpp::gl_t &gl, int width, int height, const char *title)
+    : m_glfw(glfw), m_gl(gl), m_window(m_glfw.create_window(width, height, title, nullptr, nullptr)) {
 
     if (nullptr == m_window) {
         throw glfw_error_t("glfwCreateWindow() failed");
     }
 
     set_as_context();
-
-    if (0 == gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) { // NOLINT(*-reinterpret-cast)
-        throw glad_error_t("gladLoadGLLoader() failed");
-    }
+    m_glfw.load_gl_loader();
 
     manager::m_window_map[m_window] = this;
     register_callbacks();
 }
 
-window_t::window_t(window_t &&other) noexcept : m_window(other.m_window) {
+window_t::window_t(window_t &&other) noexcept : m_glfw(other.m_glfw), m_gl(other.m_gl), m_window(other.m_window) {
     other.m_window = nullptr;
     manager::m_window_map[m_window] = this;
 }
@@ -75,7 +71,7 @@ window_t::~window_t() {
     manager::m_window_map.erase(m_window);
 
     if (nullptr != m_window) {
-        graphics_t::instance().glfw_destroy_window(m_window);
+        m_glfw.destroy_window(m_window);
     }
 }
 
@@ -86,17 +82,9 @@ window_t &window_t::operator=(window_t &&other) noexcept {
     return *this;
 }
 
-bool window_t::operator==(GLFWwindow *other) const {
-    return this->m_window == other;
-}
-
-bool window_t::operator!=(GLFWwindow *other) const {
-    return !(*this == other);
-}
-
 void window_t::set_as_context() {
     assert(m_window != nullptr);
-    graphics_t::instance().glfw_make_context_current(m_window);
+    m_glfw.make_context_current(m_window);
 }
 
 void window_t::set_framebuffer_callback(window_t::framebuffer_cb_t fun) {
@@ -113,32 +101,32 @@ void window_t::set_cursor_pos_callback(window_t::cursor_pos_cb_t fun) {
 
 void window_t::set_should_close(int should_close) {
     assert(m_window != nullptr);
-    graphics_t::instance().glfw_set_window_should_close(m_window, should_close);
+    m_glfw.set_window_should_close(m_window, should_close);
 }
 
 bool window_t::get_should_close() const {
     assert(m_window != nullptr);
-    return graphics_t::instance().glfw_window_should_close(m_window) != 0;
+    return m_glfw.window_should_close(m_window) != 0;
 }
 
 void window_t::swap_buffers() {
     assert(m_window != nullptr);
-    graphics_t::instance().glfw_swap_buffers(m_window);
+    m_glfw.swap_buffers(m_window);
 }
 
 void window_t::poll_events() {
     assert(m_window != nullptr);
-    graphics_t::instance().glfw_poll_events();
+    m_glfw.poll_events();
 }
 
 void window_t::set_input_mode(int mode, int value) {
     assert(nullptr != m_window);
-    graphics_t::instance().glfw_set_input_mode(m_window, mode, value);
+    m_glfw.set_input_mode(m_window, mode, value);
 }
 
-void window_t::draw(opengl_wrapper::shape_t &s) {
+void window_t::draw(shape_t &s) {
     s.bind();
-    graphics_t::instance().draw_arrays(0, s.get_mesh().get_vertices().size());
+    m_gl.draw_arrays(0, s.get_mesh().get_vertices().size());
 }
 
 GLFWwindow *window_t::get_window() const {
@@ -146,37 +134,37 @@ GLFWwindow *window_t::get_window() const {
 }
 
 void window_t::register_callbacks() {
-    graphics_t::instance().glfw_set_framebuffer_size_callback(m_window, manager::callback_framebuffer_size);
-    graphics_t::instance().glfw_set_key_callback(m_window, manager::callback_key);
-    graphics_t::instance().glfw_set_cursor_pos_callback(m_window, manager::callback_cursor_pos);
+    m_glfw.set_framebuffer_size_callback(m_window, manager::callback_framebuffer_size);
+    m_glfw.set_key_callback(m_window, manager::callback_key);
+    m_glfw.set_cursor_pos_callback(m_window, manager::callback_cursor_pos);
 }
 
 void window_t::set_viewport(size_t width, size_t height) {
-    graphics_t::instance().set_viewport(width, height);
+    m_gl.set_viewport(width, height);
 }
 
 void window_t::set_wireframe_mode(bool enable) {
     if (enable) {
-        graphics_t::instance().polygon_mode(polygon_mode_t::line);
+        m_gl.polygon_mode(opengl_cpp::polygon_mode_t::line);
     } else {
-        graphics_t::instance().polygon_mode(polygon_mode_t::fill);
+        m_gl.polygon_mode(opengl_cpp::polygon_mode_t::fill);
     }
 }
 
 void window_t::set_depth_test(bool enable) {
     if (enable) {
-        graphics_t::instance().enable(graphics_feature_t::depth_test);
+        m_gl.enable(opengl_cpp::graphics_feature_t::depth_test);
     } else {
-        graphics_t::instance().disable(graphics_feature_t::depth_test);
+        m_gl.disable(opengl_cpp::graphics_feature_t::depth_test);
     }
 }
 
-void window_t::set_clear_color(const color_alpha_t &c) {
-    graphics_t::instance().set_clear_color(c);
+void window_t::set_clear_color(const glm::vec4 &c) {
+    m_gl.set_clear_color(c);
 }
 
 void window_t::clear() {
-    graphics_t::instance().clear();
+    m_gl.clear();
 }
 
 std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window_t &w) {

@@ -89,7 +89,7 @@ mesh_t &mesh_t::operator=(const opengl_wrapper::mesh_t &other) {
     return *this;
 }
 
-const std::vector<vertex_t> &mesh_t::get_vertices() const {
+const std::vector<opengl_cpp::vertex_t> &mesh_t::get_vertices() const {
     return m_cached_vertices;
 }
 
@@ -102,15 +102,15 @@ void mesh_t::cache_vertices() {
     m_cached_vertices.reserve(m_faces.size() * 3);
     for (const auto &face : m_faces) {
         assert(3 == face.size());
-        vertex_t v1{m_vertices[face[0].m_vertex_index - 1],
-                    {m_texture_coords[face[0].m_texture_coord_index - 1]},
-                    {m_vertex_normals[face[0].m_normal_index - 1]}};
-        vertex_t v2{m_vertices[face[1].m_vertex_index - 1],
-                    {m_texture_coords[face[1].m_texture_coord_index - 1]},
-                    {m_vertex_normals[face[1].m_normal_index - 1]}};
-        vertex_t v3{m_vertices[face[2].m_vertex_index - 1],
-                    {m_texture_coords[face[2].m_texture_coord_index - 1]},
-                    {m_vertex_normals[face[2].m_normal_index - 1]}};
+        opengl_cpp::vertex_t v1{m_vertices[face[0].m_vertex_index - 1],
+                                {m_texture_coords[face[0].m_texture_coord_index - 1]},
+                                {m_vertex_normals[face[0].m_normal_index - 1]}};
+        opengl_cpp::vertex_t v2{m_vertices[face[1].m_vertex_index - 1],
+                                {m_texture_coords[face[1].m_texture_coord_index - 1]},
+                                {m_vertex_normals[face[1].m_normal_index - 1]}};
+        opengl_cpp::vertex_t v3{m_vertices[face[2].m_vertex_index - 1],
+                                {m_texture_coords[face[2].m_texture_coord_index - 1]},
+                                {m_vertex_normals[face[2].m_normal_index - 1]}};
         m_cached_vertices.emplace_back(v1);
         m_cached_vertices.emplace_back(v2);
         m_cached_vertices.emplace_back(v3);

@@ -28,32 +28,13 @@ target_link_libraries(opengl-wrapper-utils
         PRIVATE Boost::log backtrace
         )
 
-add_library(opengl-wrapper-graphics
-        src/graphics/ogl_graphics.cpp
-        src/graphics/graphics.cpp)
-
-target_include_directories(opengl-wrapper-graphics
-        PUBLIC include
-        PRIVATE include/opengl-wrapper/graphics include/opengl-wrapper
-        )
-
-target_link_libraries(opengl-wrapper-graphics
-        PUBLIC glad glfw
-        PRIVATE Boost::log opengl-wrapper-utils glm
-        )
-
 add_library(opengl-wrapper-data-types
-        src/data_types/buffer.cpp
-        src/data_types/image.cpp
-        src/data_types/program.cpp
-        src/data_types/shader.cpp
-        src/data_types/shape.cpp
-        src/data_types/texture.cpp
-        src/data_types/vertex_array.cpp
-        src/data_types/window.cpp
         src/data_types/camera.cpp
         src/data_types/face.cpp
+        src/data_types/image.cpp
         src/data_types/mesh.cpp
+        src/data_types/shape.cpp
+        src/data_types/window.cpp
         )
 
 target_include_directories(opengl-wrapper-data-types
@@ -62,7 +43,7 @@ target_include_directories(opengl-wrapper-data-types
         )
 
 target_link_libraries(opengl-wrapper-data-types
-        PUBLIC opengl-wrapper-graphics glm opengl-wrapper-utils
+        PUBLIC glm opengl-wrapper-utils opengl-cpp
         PRIVATE opengl-wrapper-utils stb opengl-wrapper-parsers Boost::log
         )
 
@@ -81,7 +62,7 @@ target_link_libraries(opengl-wrapper-parsers
 
 add_library(opengl-wrapper INTERFACE)
 target_include_directories(opengl-wrapper PUBLIC INTERFACE include)
-target_link_libraries(opengl-wrapper PUBLIC INTERFACE opengl-wrapper-data-types opengl-wrapper-graphics opengl-wrapper-parsers)
+target_link_libraries(opengl-wrapper PUBLIC INTERFACE opengl-wrapper-data-types opengl-wrapper-parsers)
 
 if (INCLUDE_EXAMPLES)
     add_subdirectory(examples)

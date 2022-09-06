@@ -7,16 +7,12 @@
 
 namespace opengl_wrapper {
 
-shape_t::shape_t(vertex_array_t va) : m_vertex_array(std::move(va)) {
+shape_t::shape_t(opengl_cpp::vertex_array_t va) : m_vertex_array(std::move(va)) {
 }
 
 shape_t::shape_t(opengl_wrapper::shape_t &&other) noexcept
     : m_mesh(std::move(other.m_mesh)), m_transform(std::move(other.m_transform)),
-      m_material(std::move(other.m_material)) {
-}
-
-shape_t::shape_t(const opengl_wrapper::shape_t &other)
-    : m_mesh(other.m_mesh), m_transform(other.m_transform), m_material(other.m_material) {
+      m_material(std::move(other.m_material)), m_vertex_array(std::move(other.m_vertex_array)) {
 }
 
 shape_t &shape_t::operator=(shape_t &&other) noexcept {
@@ -24,17 +20,6 @@ shape_t &shape_t::operator=(shape_t &&other) noexcept {
     m_transform = std::move(other.m_transform);
     m_material = std::move(other.m_material);
     m_vertex_array = std::move(other.m_vertex_array);
-    return *this;
-}
-
-shape_t &shape_t::operator=(const shape_t &other) {
-    if (&other != this) {
-        m_mesh = other.m_mesh;
-        m_transform = other.m_transform;
-        m_material = other.m_material;
-        m_vertex_array = vertex_array_t();
-    }
-
     return *this;
 }
 

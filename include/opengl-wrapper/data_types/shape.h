@@ -2,28 +2,26 @@
 
 #include "face.h"
 #include "mesh.h"
-#include "program.h"
-#include "texture.h"
-#include "vertex_array.h"
 #include <filesystem>
 #include <glm/glm.hpp>
 #include <map>
 #include <memory>
+#include <opengl-cpp/program.h>
+#include <opengl-cpp/texture.h>
+#include <opengl-cpp/vertex_array.h>
 #include <vector>
 
 namespace opengl_wrapper {
 
-class program_t;
-
 class shape_t {
   public:
-    explicit shape_t(vertex_array_t va = vertex_array_t());
-    shape_t(const shape_t &other);
+    explicit shape_t(opengl_cpp::vertex_array_t va);
     shape_t(shape_t &&other) noexcept;
+    shape_t &operator=(shape_t &&other) noexcept;
     ~shape_t() = default;
 
-    shape_t &operator=(const shape_t &other);
-    shape_t &operator=(shape_t &&other) noexcept;
+    shape_t &operator=(const shape_t &other) = delete;
+    shape_t(const shape_t &other) = delete;
 
     void load_vertices();
     void bind();
@@ -42,7 +40,7 @@ class shape_t {
     mesh_t m_mesh;
     transform_t m_transform;
     material_t m_material;
-    vertex_array_t m_vertex_array;
+    opengl_cpp::vertex_array_t m_vertex_array;
 };
 
 } // namespace opengl_wrapper

@@ -1,13 +1,16 @@
 #pragma once
 
-#include "opengl-wrapper/data_types/program.h"
-#include "opengl-wrapper/data_types/texture.h"
-#include "opengl-wrapper/graphics/graphics.h"
 #include <cassert>
 #include <functional>
+#include <opengl-cpp/program.h>
+#include <opengl-cpp/texture.h>
 #include <ostream>
 
+#include <opengl-cpp/backend/glfw.h>
+
 namespace opengl_wrapper {
+
+class shape_t;
 
 class window_t {
   public:
@@ -21,7 +24,7 @@ class window_t {
      * @param height window height.
      * @param title window title.
      */
-    window_t(int width, int height, const char *title);
+    window_t(opengl_cpp::glfw_t &glfw, opengl_cpp::gl_t &gl, int width, int height, const char *title);
 
     /**
      * @brief window move-constructor.
@@ -43,20 +46,6 @@ class window_t {
 
     window_t(const window_t &) = delete;
     window_t &operator=(const window_t &) = delete;
-
-    /**
-     * @brief window equality operator with GLFWwindow instances.
-     * @param other GLFWwindow to test the object against.
-     * @return Whether the GLFWwindow refers to this object.
-     */
-    bool operator==(GLFWwindow *other) const;
-
-    /**
-     * @brief window difference operator with GLFWwindow instances.
-     * @param other GLFWwindow to test the object against.
-     * @return Whether the GLFWwindow does not refer to this object.
-     */
-    bool operator!=(GLFWwindow *other) const;
 
     /**
      * @brief Makes the window context the one being referenced by OpenGL. See
@@ -141,13 +130,15 @@ class window_t {
      * @brief Sets the background color.
      * @param c Color components.
      */
-    void set_clear_color(const color_alpha_t &c);
+    void set_clear_color(const glm::vec4 &c);
 
     void clear();
 
     [[nodiscard]] GLFWwindow *get_window() const;
 
   private:
+    opengl_cpp::gl_t &m_gl;
+    opengl_cpp::glfw_t &m_glfw;
     GLFWwindow *m_window;
 
     cursor_pos_cb_t m_cursor_pos_callback;
