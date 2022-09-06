@@ -2,7 +2,7 @@
 
 #include "utils/exception.h"
 
-namespace opengl_wrapper {
+namespace game_engine {
 obj_parser_t::obj_parser_t(const std::filesystem::path &path) {
     if (!path.empty()) {
         open(path);
@@ -72,4 +72,4 @@ void obj_parser_t::get_line() {
     prepare_next_line();
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

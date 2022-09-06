@@ -6,7 +6,7 @@
 #include <memory>
 #include <opengl-cpp/texture.h>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
 
@@ -54,4 +54,4 @@ struct transform_t {
     glm::vec3 m_scale{1.0F};
 };
 
-} // namespace opengl_wrapper
+} // namespace game_engine

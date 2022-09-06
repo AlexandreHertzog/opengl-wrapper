@@ -1,7 +1,8 @@
 #include "camera.h"
-#include "glm/ext/matrix_transform.hpp"
 
-namespace opengl_wrapper {
+#include <glm/ext/matrix_transform.hpp>
+
+namespace game_engine {
 
 camera_t::camera_t(glm::vec3 position, glm::vec3 front, glm::vec3 up) : m_position(position), m_front(front), m_up(up) {
 }
@@ -34,4 +35,4 @@ void camera_t::set_front(double pitch, double yaw) {
     m_front = glm::normalize(direction);
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

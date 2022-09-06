@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class mesh_t {
   public:
@@ -38,4 +38,4 @@ class mesh_t {
     void cache_vertices();
 };
 
-} // namespace opengl_wrapper
+} // namespace game_engine

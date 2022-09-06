@@ -1,7 +1,7 @@
 #include "face.h"
 #include "utils/utils.h"
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-pro-bounds-pointer-arithmetic"
@@ -32,9 +32,9 @@ std::istream &operator>>(std::istream &is, face_t &f) {
 
 #pragma clang diagnostic pop
 
-bool operator==(const opengl_wrapper::face_t &lhs, const opengl_wrapper::face_t &rhs) {
+bool operator==(const game_engine::face_t &lhs, const game_engine::face_t &rhs) {
     return (lhs.m_vertex_index == rhs.m_vertex_index) && (lhs.m_texture_coord_index == rhs.m_texture_coord_index) &&
            (lhs.m_normal_index == rhs.m_normal_index);
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

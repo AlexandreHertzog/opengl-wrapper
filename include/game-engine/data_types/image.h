@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class image_t {
   public:
@@ -64,4 +64,4 @@ class image_t {
     unsigned char *m_data{};
 };
 
-} // namespace opengl_wrapper
+} // namespace game_engine

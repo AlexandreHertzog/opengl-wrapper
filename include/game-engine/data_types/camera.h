@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class camera_t {
   public:
@@ -22,4 +22,4 @@ class camera_t {
     glm::vec3 m_front;
 };
 
-} // namespace opengl_wrapper
+} // namespace game_engine

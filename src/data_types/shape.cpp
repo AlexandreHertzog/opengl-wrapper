@@ -5,12 +5,12 @@
 #include "utils/exception.h"
 #include <boost/log/trivial.hpp>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 shape_t::shape_t(opengl_cpp::vertex_array_t va) : m_vertex_array(std::move(va)) {
 }
 
-shape_t::shape_t(opengl_wrapper::shape_t &&other) noexcept
+shape_t::shape_t(game_engine::shape_t &&other) noexcept
     : m_mesh(std::move(other.m_mesh)), m_transform(std::move(other.m_transform)),
       m_material(std::move(other.m_material)), m_vertex_array(std::move(other.m_vertex_array)) {
 }
@@ -76,4 +76,4 @@ void shape_t::set_material(material_t m) {
     m_material = std::move(m);
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

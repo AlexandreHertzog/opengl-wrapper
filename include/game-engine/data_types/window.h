@@ -8,7 +8,7 @@
 
 #include <opengl-cpp/backend/glfw.h>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class shape_t;
 
@@ -150,6 +150,6 @@ class window_t {
     void register_callbacks();
 };
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window_t &w);
+std::ostream &operator<<(std::ostream &os, const game_engine::window_t &w);
 
-} // namespace opengl_wrapper
+} // namespace game_engine

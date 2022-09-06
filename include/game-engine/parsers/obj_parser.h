@@ -1,12 +1,12 @@
 #pragma once
 
-#include "opengl-wrapper/data_types/face.h"
-#include "opengl-wrapper/utils/utils.h"
+#include "game-engine/data_types/face.h"
+#include "game-engine/utils/utils.h"
 #include <filesystem>
 #include <fstream>
 #include <vector>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class obj_parser_t {
   public:
@@ -49,4 +49,4 @@ class obj_parser_t {
 
 template <> void obj_parser_t::get_line(bool &out);
 
-} // namespace opengl_wrapper
+} // namespace game_engine

@@ -3,7 +3,7 @@
 #include "parsers/obj_parser.h"
 #include <boost/log/trivial.hpp>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 mesh_t::mesh_t(const std::filesystem::path &wavefront_object_path) {
 
@@ -51,7 +51,7 @@ mesh_t::mesh_t(const std::filesystem::path &wavefront_object_path) {
     }
 }
 
-mesh_t::mesh_t(opengl_wrapper::mesh_t &&other) noexcept
+mesh_t::mesh_t(game_engine::mesh_t &&other) noexcept
     : m_material_library(std::move(other.m_material_library)), m_name(std::move(other.m_name)),
       m_vertices(std::move(other.m_vertices)), m_texture_coords(std::move(other.m_texture_coords)),
       m_vertex_normals(std::move(other.m_vertex_normals)), m_used_material(std::move(other.m_used_material)),
@@ -61,7 +61,7 @@ mesh_t::mesh_t(opengl_wrapper::mesh_t &&other) noexcept
     other.m_smooth_shading = false;
 }
 
-mesh_t &mesh_t::operator=(opengl_wrapper::mesh_t &&other) noexcept {
+mesh_t &mesh_t::operator=(game_engine::mesh_t &&other) noexcept {
     std::swap(m_material_library, other.m_material_library);
     std::swap(m_name, other.m_name);
     std::swap(m_vertices, other.m_vertices);
@@ -74,7 +74,7 @@ mesh_t &mesh_t::operator=(opengl_wrapper::mesh_t &&other) noexcept {
     return *this;
 }
 
-mesh_t &mesh_t::operator=(const opengl_wrapper::mesh_t &other) {
+mesh_t &mesh_t::operator=(const game_engine::mesh_t &other) {
     if (this != &other) {
         m_material_library = other.m_material_library;
         m_name = other.m_name;
@@ -117,4 +117,4 @@ void mesh_t::cache_vertices() {
     }
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

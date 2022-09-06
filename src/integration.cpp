@@ -1,12 +1,12 @@
 #include "integration.h"
-#include "opengl-wrapper/data_types/image.h"
+#include "game-engine/data_types/image.h"
 
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "imgui.h"
 #include <boost/log/trivial.hpp>
 #include <csignal>
-#include <glm/ext/matrix_clip_space.hpp>
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #include <opengl-cpp/program.h>
 
 using std::filesystem::path;
@@ -63,12 +63,12 @@ integration_t::~integration_t() {
 void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-complexity)
     constexpr auto camera_speed = 0.1F;
 
-    m_window.set_framebuffer_callback([&](opengl_wrapper::window_t &w, int width, int height) {
+    m_window.set_framebuffer_callback([&](game_engine::window_t &w, int width, int height) {
         w.set_viewport(width, height);
         render();
     });
 
-    m_window.set_key_callback([&](opengl_wrapper::window_t &w, int key, int action) {
+    m_window.set_key_callback([&](game_engine::window_t &w, int key, int action) {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
             w.set_should_close(1);
         }
@@ -232,11 +232,11 @@ void integration_t::build_ui() {
 
             ImGui::InputScalarN("Position", ImGuiDataType_Float, &light->m_position, 3);
 
-            auto *directional_light = dynamic_cast<opengl_wrapper::directional_light_t *>(light.get());
+            auto *directional_light = dynamic_cast<game_engine::directional_light_t *>(light.get());
             if (nullptr != directional_light) {
                 ImGui::InputScalarN("Direction", ImGuiDataType_Float, &directional_light->m_direction, 3);
             } else {
-                auto *spot_light = dynamic_cast<opengl_wrapper::spot_light_t *>(light.get());
+                auto *spot_light = dynamic_cast<game_engine::spot_light_t *>(light.get());
                 if (nullptr != spot_light) {
                     constexpr auto min_cutoff_begin = 5.0F;
                     constexpr auto max_cutoff_end = 120.0F;
@@ -291,12 +291,12 @@ void integration_t::update_light_uniforms(opengl_cpp::program_t &p) {
         p.set_uniform(prefix + "attenuation_linear", light->m_attenuation_linear);
         p.set_uniform(prefix + "attenuation_quadratic", light->m_attenuation_quadratic);
 
-        auto *direction_light = dynamic_cast<opengl_wrapper::directional_light_t *>(light.get());
+        auto *direction_light = dynamic_cast<game_engine::directional_light_t *>(light.get());
         if (nullptr != direction_light) {
             p.set_uniform(prefix + "type", static_cast<int>(light_type_t::directional));
             p.set_uniform(prefix + "direction", direction_light->m_direction);
         } else {
-            auto *spot_light = dynamic_cast<opengl_wrapper::spot_light_t *>(light.get());
+            auto *spot_light = dynamic_cast<game_engine::spot_light_t *>(light.get());
             if (nullptr != spot_light) {
                 p.set_uniform(prefix + "type", static_cast<int>(light_type_t::spot));
                 p.set_uniform(prefix + "direction", spot_light->m_direction);
@@ -321,7 +321,7 @@ void integration_t::update_projection_uniforms(opengl_cpp::program_t &p) {
     p.set_uniform("uniform_projection", projection);
 }
 
-void integration_t::update_shape_uniforms(opengl_cpp::program_t &p, opengl_wrapper::shape_t &s) {
+void integration_t::update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s) {
     p.set_uniform("uniform_model", s.model_transformations());
     p.set_uniform("uniform_material.has_diffuse", static_cast<bool>(s.get_material().m_diffuse));
     p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
@@ -334,7 +334,7 @@ void integration_t::update_shape_uniforms(opengl_cpp::program_t &p, opengl_wrapp
     p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
 }
 
-void integration_t::shape_debug_ui(opengl_wrapper::shape_t &s) {
+void integration_t::shape_debug_ui(game_engine::shape_t &s) {
     const auto min_translation = -10.0F;
     const auto max_translation = 10.0F;
     const auto min_rotation_angle = -180.0F;
@@ -387,7 +387,7 @@ integration_t::texture_pointer_t integration_t::build_texture(const char *path, 
     ret->set_parameter(texture_parameter_t::min_filter, texture_parameter_values_t::linear_mipmap_linear);
     ret->set_parameter(texture_parameter_t::mag_filter, texture_parameter_values_t::linear);
 
-    opengl_wrapper::image_t image(path);
+    game_engine::image_t image(path);
     ret->set_image(image.get_width(), image.get_height(),
                    image.has_alpha() ? texture_format_t::rgba : texture_format_t::rgb, image.get_data());
     ret->generate_mipmap();
@@ -416,21 +416,21 @@ std::shared_ptr<opengl_cpp::program_t> integration_t::build_light_program() {
     return ret;
 }
 
-integration_t::shape_pointer_t integration_t::build_cube(opengl_wrapper::texture_pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_cube(game_engine::texture_pointer_t &base_texture) {
     constexpr auto rotation_angle = 45.0F;
     constexpr auto scale = 0.5F;
 
-    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(opengl_wrapper::mesh_t("./objects/cube.obj"));
+    shape_pointer_t ret = std::make_shared<game_engine::shape_t>(opengl_cpp::vertex_array_t(m_gl));
+    ret->set_mesh(game_engine::mesh_t("./objects/cube.obj"));
 
-    opengl_wrapper::transform_t t;
+    game_engine::transform_t t;
     t.m_translation = {0.0F, 0.0F, -1.0F};
     t.m_rotation_angle = rotation_angle;
     t.m_rotation_axis = {0.0F, 1.0F, 0.0F};
     t.m_scale = glm::vec3(scale);
     ret->set_transform(t);
 
-    opengl_wrapper::material_t mat;
+    game_engine::material_t mat;
     mat.m_ambient = glm::vec3(default_ambient);
     mat.m_shininess = default_shininess;
     mat.m_texture_mix = default_texture_mix;
@@ -443,19 +443,19 @@ integration_t::shape_pointer_t integration_t::build_cube(opengl_wrapper::texture
     return ret;
 }
 
-integration_t::shape_pointer_t integration_t::build_plane(opengl_wrapper::texture_pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_plane(game_engine::texture_pointer_t &base_texture) {
     constexpr auto scale = 10.0F;
     constexpr glm::vec3 position = {0.0F, -0.5F, 0.0F};
 
-    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(opengl_wrapper::mesh_t("./objects/plane.obj"));
+    shape_pointer_t ret = std::make_shared<game_engine::shape_t>(opengl_cpp::vertex_array_t(m_gl));
+    ret->set_mesh(game_engine::mesh_t("./objects/plane.obj"));
 
-    opengl_wrapper::transform_t t;
+    game_engine::transform_t t;
     t.m_translation = position;
     t.m_scale = glm::vec3(scale);
     ret->set_transform(t);
 
-    opengl_wrapper::material_t mat;
+    game_engine::material_t mat;
     mat.m_ambient = glm::vec3(default_ambient);
     mat.m_shininess = default_shininess;
     mat.m_texture_mix = default_texture_mix;
@@ -466,21 +466,21 @@ integration_t::shape_pointer_t integration_t::build_plane(opengl_wrapper::textur
     return ret;
 }
 
-integration_t::shape_pointer_t integration_t::build_sphere(opengl_wrapper::texture_pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_sphere(game_engine::texture_pointer_t &base_texture) {
     constexpr auto scale = 0.6F;
     constexpr auto ambient = 0.1F;
     constexpr auto shininess = 32.0F;
     constexpr glm::vec3 position = {1.5F, 0.0F, -1.0F};
 
-    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(opengl_wrapper::mesh_t("./objects/sphere.obj"));
+    shape_pointer_t ret = std::make_shared<game_engine::shape_t>(opengl_cpp::vertex_array_t(m_gl));
+    ret->set_mesh(game_engine::mesh_t("./objects/sphere.obj"));
 
-    opengl_wrapper::transform_t t;
+    game_engine::transform_t t;
     t.m_translation = position;
     t.m_scale = glm::vec3(scale);
     ret->set_transform(t);
 
-    opengl_wrapper::material_t mat;
+    game_engine::material_t mat;
     mat.m_ambient = glm::vec3(ambient);
     mat.m_shininess = shininess;
     mat.m_texture_mix = default_texture_mix;
@@ -494,22 +494,22 @@ integration_t::shape_pointer_t integration_t::build_sphere(opengl_wrapper::textu
     return ret;
 }
 
-integration_t::shape_pointer_t integration_t::build_torus(opengl_wrapper::texture_pointer_t &base_texture) {
+integration_t::shape_pointer_t integration_t::build_torus(game_engine::texture_pointer_t &base_texture) {
     constexpr auto scale = 0.6F;
     constexpr auto shininess = 2.0F;
     constexpr auto rotation_angle = 45.0F;
 
-    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(opengl_wrapper::mesh_t("./objects/torus.obj"));
+    shape_pointer_t ret = std::make_shared<game_engine::shape_t>(opengl_cpp::vertex_array_t(m_gl));
+    ret->set_mesh(game_engine::mesh_t("./objects/torus.obj"));
 
-    opengl_wrapper::transform_t t;
+    game_engine::transform_t t;
     t.m_translation = {-1.0F, 0.0F, -1.0F};
     t.m_rotation_axis = {0.0F, 0.0F, 1.0F};
     t.m_rotation_angle = rotation_angle;
     t.m_scale = glm::vec3(scale);
     ret->set_transform(t);
 
-    opengl_wrapper::material_t mat;
+    game_engine::material_t mat;
     mat.m_ambient = {1.0F, 1.0F, 1.0F};
     mat.m_shininess = shininess;
     mat.m_texture_mix = default_texture_mix;
@@ -522,18 +522,18 @@ integration_t::shape_pointer_t integration_t::build_torus(opengl_wrapper::textur
 }
 
 integration_t::shape_pointer_t integration_t::build_light_shape(const light_pointer_t &light,
-                                                                opengl_wrapper::texture_pointer_t &base_texture) {
+                                                                game_engine::texture_pointer_t &base_texture) {
     constexpr auto scale = 0.1F;
 
-    shape_pointer_t ret = std::make_shared<opengl_wrapper::shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(opengl_wrapper::mesh_t("./objects/sphere.obj"));
+    shape_pointer_t ret = std::make_shared<game_engine::shape_t>(opengl_cpp::vertex_array_t(m_gl));
+    ret->set_mesh(game_engine::mesh_t("./objects/sphere.obj"));
 
-    opengl_wrapper::transform_t t;
+    game_engine::transform_t t;
     t.m_translation = light->m_position;
     t.m_scale = glm::vec3(scale);
     ret->set_transform(t);
 
-    opengl_wrapper::material_t mat;
+    game_engine::material_t mat;
     mat.m_texture1 = base_texture;
     ret->set_material(std::move(mat));
 
@@ -549,18 +549,18 @@ integration_t::light_pointer_t integration_t::build_light(light_type_t type, glm
     constexpr auto attenuation_linear = 0.09F;
     constexpr auto attenuation_quadratic = 0.032F;
 
-    light_pointer_t ret = std::make_unique<opengl_wrapper::light_t>();
+    light_pointer_t ret = std::make_unique<game_engine::light_t>();
     switch (type) {
     case light_type_t::deactivated:
         return nullptr;
     case light_type_t::ambient:
-        ret = std::make_unique<opengl_wrapper::light_t>();
+        ret = std::make_unique<game_engine::light_t>();
         break;
     case light_type_t::directional:
-        ret = std::make_unique<opengl_wrapper::directional_light_t>();
+        ret = std::make_unique<game_engine::directional_light_t>();
         break;
     case light_type_t::spot:
-        ret = std::make_unique<opengl_wrapper::spot_light_t>();
+        ret = std::make_unique<game_engine::spot_light_t>();
         break;
     }
 
@@ -573,7 +573,7 @@ integration_t::light_pointer_t integration_t::build_light(light_type_t type, glm
     ret->m_attenuation_quadratic = attenuation_quadratic;
 
     if (light_type_t::directional == type) {
-        auto &direction_light = dynamic_cast<opengl_wrapper::directional_light_t &>(*ret);
+        auto &direction_light = dynamic_cast<game_engine::directional_light_t &>(*ret);
         direction_light.m_direction = std::move(direction);
         ret->m_attenuation_constant = 1.0F;
         ret->m_attenuation_linear = 0.0F;
@@ -582,7 +582,7 @@ integration_t::light_pointer_t integration_t::build_light(light_type_t type, glm
         constexpr auto cutoff_begin = 25.0F;
         constexpr auto cutoff_end = 35.0F;
 
-        auto &spot_light = dynamic_cast<opengl_wrapper::spot_light_t &>(*ret);
+        auto &spot_light = dynamic_cast<game_engine::spot_light_t &>(*ret);
         spot_light.m_direction = std::move(direction);
         spot_light.m_cutoff_begin = cutoff_begin;
         spot_light.m_cutoff_end = cutoff_end;

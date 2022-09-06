@@ -2,7 +2,7 @@
 
 #include <istream>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 struct face_t {
     int m_vertex_index{};
@@ -11,6 +11,6 @@ struct face_t {
 };
 
 std::istream &operator>>(std::istream &is, face_t &f);
-bool operator==(const opengl_wrapper::face_t &lhs, const opengl_wrapper::face_t &rhs);
+bool operator==(const game_engine::face_t &lhs, const game_engine::face_t &rhs);
 
-} // namespace opengl_wrapper
+} // namespace game_engine

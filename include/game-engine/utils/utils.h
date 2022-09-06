@@ -7,7 +7,7 @@
 #include <sstream>
 #include <vector>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 template <typename type_t> std::string between(const type_t &t, char begin, char end) {
     std::stringstream out_stream;
@@ -24,7 +24,7 @@ template <typename type_t> std::string parenthesis(const type_t &t) {
 }
 
 template <typename type_t> std::ostream &operator<<(std::ostream &stream, const std::vector<type_t> &vector) {
-    using opengl_wrapper::operator<<;
+    using game_engine::operator<<;
 
     std::stringstream res;
 
@@ -77,4 +77,4 @@ inline int to_int(const char *s, size_t len, int base = 10) { // NOLINT(cppcoreg
     return ret;
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

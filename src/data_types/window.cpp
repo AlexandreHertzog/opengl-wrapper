@@ -1,19 +1,17 @@
 #include "window.h"
 
 #include "shape.h"
-#include "utils/glad_error.h"
-#include "utils/glfw_error.h"
 #include "utils/utils.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
 #include <iomanip>
 #include <map>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class window_t::manager {
   public:
-    static std::map<const void *, opengl_wrapper::window_t *> m_window_map; // NOLINT(*-non-const-global-variables)
+    static std::map<const void *, game_engine::window_t *> m_window_map; // NOLINT(*-non-const-global-variables)
 
     static void callback_cursor_pos(GLFWwindow *glfw_window, double xpos, double ypos) {
         auto window_it = m_window_map.find(glfw_window);
@@ -45,14 +43,13 @@ class window_t::manager {
     }
 };
 
-std::map<const void *, opengl_wrapper::window_t *>
-    window_t::manager::m_window_map; // NOLINT(*-non-const-global-variables)
+std::map<const void *, game_engine::window_t *> window_t::manager::m_window_map; // NOLINT(*-non-const-global-variables)
 
 window_t::window_t(opengl_cpp::glfw_t &glfw, opengl_cpp::gl_t &gl, int width, int height, const char *title)
     : m_glfw(glfw), m_gl(gl), m_window(m_glfw.create_window(width, height, title, nullptr, nullptr)) {
 
     if (nullptr == m_window) {
-        throw glfw_error_t("glfwCreateWindow() failed");
+        throw exception_t("glfwCreateWindow() failed");
     }
 
     set_as_context();
@@ -167,8 +164,8 @@ void window_t::clear() {
     m_gl.clear();
 }
 
-std::ostream &operator<<(std::ostream &os, const opengl_wrapper::window_t &w) {
+std::ostream &operator<<(std::ostream &os, const game_engine::window_t &w) {
     return os << "window" << parenthesis(&w) << " window=" << w.get_window();
 }
 
-} // namespace opengl_wrapper
+} // namespace game_engine

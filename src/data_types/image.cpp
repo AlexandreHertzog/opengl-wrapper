@@ -1,11 +1,11 @@
-#include "opengl-wrapper/data_types/image.h"
+#include "game-engine/data_types/image.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "opengl-wrapper/utils/exception.h"
+#include "game-engine/utils/exception.h"
 #include "stb_image.h"
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 image_t::image_t(const std::filesystem::path &path) {
     stbi_set_flip_vertically_on_load(1);
@@ -58,4 +58,4 @@ const unsigned char *image_t::get_data() const {
 bool image_t::has_alpha() const {
     return m_num_channels == 4;
 }
-} // namespace opengl_wrapper
+} // namespace game_engine

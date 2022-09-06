@@ -11,7 +11,7 @@
 #include <opengl-cpp/vertex_array.h>
 #include <vector>
 
-namespace opengl_wrapper {
+namespace game_engine {
 
 class shape_t {
   public:
@@ -43,4 +43,4 @@ class shape_t {
     opengl_cpp::vertex_array_t m_vertex_array;
 };
 
-} // namespace opengl_wrapper
+} // namespace game_engine

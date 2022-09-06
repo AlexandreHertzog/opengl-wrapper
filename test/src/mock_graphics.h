@@ -1,14 +1,14 @@
 #pragma once
 
-#include "opengl-wrapper/graphics/graphics.h"
+#include "game-engine/graphics/graphics.h"
 #include "gmock/gmock.h"
 
-namespace opengl_wrapper_test {
+namespace game_engine_test {
 
-class mock_graphics : opengl_wrapper::graphics_t {
+class mock_graphics : game_engine::graphics_t {
   public:
     mock_graphics() {
-        opengl_wrapper::graphics_t::set_instance(this);
+        game_engine::graphics_t::set_instance(this);
     }
 
     MOCK_METHOD(void, gl_activate_texture, (GLenum texture), (override));
@@ -83,4 +83,4 @@ class mock_graphics : opengl_wrapper::graphics_t {
     MOCK_METHOD(int, glfw_window_should_close, (GLFWwindow * window), (override));
 };
 
-} // namespace opengl_wrapper_test
+} // namespace game_engine_test

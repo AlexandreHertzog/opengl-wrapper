@@ -1,9 +1,9 @@
 #pragma once
+#include "game-engine/data_types/camera.h"
+#include "game-engine/data_types/shape.h"
+#include "game-engine/data_types/window.h"
 #include "opengl-cpp/backend/gl_impl.h"
 #include "opengl-cpp/backend/glfw_impl.h"
-#include "opengl-wrapper/data_types/camera.h"
-#include "opengl-wrapper/data_types/shape.h"
-#include "opengl-wrapper/data_types/window.h"
 #include <memory>
 #include <opengl-cpp/program.h>
 #include <opengl-cpp/shader.h>
@@ -28,8 +28,8 @@ class integration_t {
     void render_loop();
 
   private:
-    using light_pointer_t = std::shared_ptr<opengl_wrapper::light_t>;
-    using shape_pointer_t = std::shared_ptr<opengl_wrapper::shape_t>;
+    using light_pointer_t = std::shared_ptr<game_engine::light_t>;
+    using shape_pointer_t = std::shared_ptr<game_engine::shape_t>;
     using shape_vector_t = std::vector<shape_pointer_t>;
     using program_pointer_t = std::shared_ptr<opengl_cpp::program_t>;
     using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
@@ -44,11 +44,11 @@ class integration_t {
     opengl_cpp::gl_impl_t m_gl;
     opengl_cpp::glfw_impl_t m_glfw;
 
-    opengl_wrapper::window_t m_window;
+    game_engine::window_t m_window;
     std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
     std::array<light_pointer_t, light_count> m_lights;
     std::map<light_pointer_t, shape_pointer_t> m_light_shapes;
-    opengl_wrapper::camera_t m_camera;
+    game_engine::camera_t m_camera;
 
     bool m_wireframe{};
     bool m_cursor_enabled{true};
@@ -72,8 +72,8 @@ class integration_t {
     shape_pointer_t build_torus(texture_pointer_t &base_texture);
     shape_pointer_t build_light_shape(const light_pointer_t &light, texture_pointer_t &base_texture);
     integration_t::light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
-    void shape_debug_ui(opengl_wrapper::shape_t &s);
-    void update_shape_uniforms(opengl_cpp::program_t &p, opengl_wrapper::shape_t &s);
+    void shape_debug_ui(game_engine::shape_t &s);
+    void update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s);
     std::string build_light_uniform_prefix(int i);
 };
 
