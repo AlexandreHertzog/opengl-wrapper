@@ -11,8 +11,5 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_library(graphics INTERFACE src/mock_graphics.h)
-target_link_libraries(graphics PUBLIC INTERFACE opengl-wrapper gmock)
-
-add_executable(autotest src/test_buffer.cpp src/test_shader.cpp src/test_texture.cpp src/test_obj_parser.cpp)
-target_link_libraries(autotest PRIVATE graphics gtest_main)
+add_executable(autotest src/test_obj_parser.cpp)
+target_link_libraries(autotest PRIVATE opengl-cpp gmock gtest_main)
