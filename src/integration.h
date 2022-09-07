@@ -52,6 +52,11 @@ class integration_t {
 
     bool m_wireframe{};
     bool m_cursor_enabled{true};
+    bool m_depth_test{true};
+    bool m_depth_view_enabled{true};
+    bool m_depth_view_debug{false};
+    float m_depth_near{0.1F};
+    float m_depth_far{100.0F};
     bool m_first_cursor_iteration = true;
     double m_last_cursor_position_x = 0.0;
     double m_last_cursor_position_y = 0.0;
@@ -61,6 +66,7 @@ class integration_t {
     void build_ui();
     void update_light_uniforms(opengl_cpp::program_t &p);
     void update_projection_uniforms(opengl_cpp::program_t &p);
+    void update_parameter_uniforms(opengl_cpp::program_t &p) const;
     void render();
 
     texture_pointer_t build_texture(const char *path, int texture_layer);

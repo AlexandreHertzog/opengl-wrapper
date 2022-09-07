@@ -39,9 +39,17 @@ struct material_t {
     float texture_mix;
 };
 
+struct depth_params_t {
+    bool debug;
+    bool enabled;
+    float near;
+    float far;
+};
+
 uniform vec3 uniform_view_pos;
 uniform material_t uniform_material;
 uniform light_t uniform_light[LIGHT_COUNT];
+uniform depth_params_t uniform_depth;
 
 vec3 build_light_ambient(light_t light, float attenuation);
 vec3 build_light_diffuse(light_t light, vec3 normals, vec3 light_direction, float attenuation);
@@ -51,6 +59,8 @@ vec3 calculate_light_direction(light_t light);
 float calculate_attenuation(light_t light);
 float calculate_light_intensity(light_t light, vec3 light_direction);
 
+float linearize_depth(float depth);
+
 void main()
 {
     vec4 object_color = mix(texture(uniform_material.texture1, vert_out_tex_coord),
@@ -59,25 +69,34 @@ void main()
 
     vec3 result = vec3(0.0);
 
-    for (int i = 0; i < LIGHT_COUNT; i++) {
-        if (uniform_light[i].type == LIGHT_DEACTIVATED) {
-            continue;
+    if (!uniform_depth.debug) {
+        for (int i = 0; i < LIGHT_COUNT; i++) {
+            if (uniform_light[i].type == LIGHT_DEACTIVATED) {
+                continue;
+            }
+
+            vec3 light_direction = calculate_light_direction(uniform_light[i]);
+            float light_intensity = calculate_light_intensity(uniform_light[i], light_direction);
+
+            if (light_intensity > 0.0) {
+                vec3 normals = normalize(vert_out_normals);
+                float light_attenuation = calculate_attenuation(uniform_light[i]) * light_intensity;
+                vec3 ambient_light = build_light_ambient(uniform_light[i], light_attenuation);
+                vec3 diffuse_light = build_light_diffuse(uniform_light[i], normals, light_direction, light_attenuation);
+                vec3 specular_light = build_light_specular(uniform_light[i], normals, light_direction, light_attenuation);
+                result += ambient_light + diffuse_light + specular_light;
+            }
         }
 
-        vec3 light_direction = calculate_light_direction(uniform_light[i]);
-        float light_intensity = calculate_light_intensity(uniform_light[i], light_direction);
-
-        if (light_intensity > 0.0) {
-            vec3 normals = normalize(vert_out_normals);
-            float light_attenuation = calculate_attenuation(uniform_light[i]) * light_intensity;
-            vec3 ambient_light = build_light_ambient(uniform_light[i], light_attenuation);
-            vec3 diffuse_light = build_light_diffuse(uniform_light[i], normals, light_direction, light_attenuation);
-            vec3 specular_light = build_light_specular(uniform_light[i], normals, light_direction, light_attenuation);
-            result += ambient_light + diffuse_light + specular_light;
+        if (uniform_depth.enabled) {
+            result *= linearize_depth(gl_FragCoord.z);
         }
+
+        frag_out_color = vec4(result, 1.0) * object_color;
+    } else {
+        float d = linearize_depth(gl_FragCoord.z);
+        frag_out_color = vec4(vec3(d), 1.0);
     }
-
-    frag_out_color = vec4(result, 1.0) * object_color;
 }
 
 vec3 build_light_ambient(light_t light, float attenuation) {
@@ -127,4 +146,12 @@ float calculate_light_intensity(light_t light, vec3 direction) {
     float light_angle = dot(direction, normalize(-light.direction));
     float smooth_cutoff = light.cutoff_begin - light.cutoff_end;
     return clamp((light_angle - light.cutoff_end) / smooth_cutoff, 0.0, 1.0);
+}
+
+float linearize_depth(float d) {
+    float n = uniform_depth.near;
+    float f = uniform_depth.far;
+
+    float z = d * 2.0 - 1.0;
+    return 1 - ((2.0 * n * f) / (f + n - z * (f - n))) / f;
 }

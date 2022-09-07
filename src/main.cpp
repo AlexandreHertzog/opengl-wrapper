@@ -10,7 +10,7 @@ int main() {
         app.render_loop();
         return 0;
     } catch (const std::runtime_error &e) {
-        std::cerr << e.what();
+        std::cerr << "Forced termination with error: " << e.what();
         return 1;
     }
 }

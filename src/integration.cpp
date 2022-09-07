@@ -1,8 +1,8 @@
 #include "integration.h"
-#include "game-engine/data_types/image.h"
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "game-engine/data_types/image.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "imgui.h"
 #include <boost/log/trivial.hpp>
@@ -75,6 +75,16 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
         if (GLFW_PRESS == action && GLFW_KEY_F12 == key) {
             m_wireframe = !m_wireframe;
             w.set_wireframe_mode(m_wireframe);
+        }
+        if (GLFW_PRESS == action && GLFW_KEY_F11 == key) {
+            m_depth_test = !m_depth_test;
+            w.set_depth_test(m_depth_test);
+        }
+        if (GLFW_PRESS == action && GLFW_KEY_F10 == key) {
+            m_depth_view_enabled = !m_depth_view_enabled;
+        }
+        if (GLFW_PRESS == action && GLFW_KEY_F9 == key) {
+            m_depth_view_debug = !m_depth_view_debug;
         }
         if (GLFW_PRESS == action && GLFW_KEY_SPACE == key) {
             m_cursor_enabled = !m_cursor_enabled;
@@ -153,7 +163,7 @@ void integration_t::build_shapes() {
 void integration_t::render_loop() {
     constexpr glm::vec4 clear_color = {0.2F, 0.2F, 0.2F, 1.0F};
 
-    m_window.set_depth_test(true);
+    m_window.set_depth_test(m_depth_test);
     m_window.set_clear_color(clear_color);
 
     for (auto &program_shapes : m_program_shape_map) {
@@ -186,6 +196,7 @@ void integration_t::render() {
 
         update_projection_uniforms(*program_shape.first);
         update_light_uniforms(*program_shape.first);
+        update_parameter_uniforms(*program_shape.first);
 
         for (auto &shape : program_shape.second) {
             assert(shape);
@@ -219,6 +230,13 @@ void integration_t::build_ui() {
     //    ImGui::ShowDemoWindow();
 
     ImGui::Begin("OpenGL Wrapper test app");
+
+    if (ImGui::CollapsingHeader("Depth parameters")) {
+        ImGui::Checkbox("Enabled", &m_depth_view_enabled);
+        ImGui::Checkbox("Debug", &m_depth_view_debug);
+        ImGui::SliderFloat("Near", &m_depth_near, 0.1, m_depth_far);
+        ImGui::SliderFloat("Far", &m_depth_far, m_depth_near, 200.0);
+    }
 
     int i = 0;
     for (auto &light : m_lights) {
@@ -319,6 +337,13 @@ void integration_t::update_projection_uniforms(opengl_cpp::program_t &p) {
 
     auto projection = glm::perspective(glm::radians(default_fov), resolution_ratio, clipping_near, clipping_far);
     p.set_uniform("uniform_projection", projection);
+}
+
+void integration_t::update_parameter_uniforms(opengl_cpp::program_t &p) const {
+    p.set_uniform("uniform_depth.debug", m_depth_view_debug);
+    p.set_uniform("uniform_depth.enabled", m_depth_view_enabled);
+    p.set_uniform("uniform_depth.near", m_depth_near);
+    p.set_uniform("uniform_depth.far", m_depth_far);
 }
 
 void integration_t::update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s) {
