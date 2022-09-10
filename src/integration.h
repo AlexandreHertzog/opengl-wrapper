@@ -4,6 +4,7 @@
 #include "game-engine/data_types/window.h"
 #include "opengl-cpp/backend/gl_impl.h"
 #include "opengl-cpp/backend/glfw_impl.h"
+#include "renderer.h"
 #include <memory>
 #include <opengl-cpp/program.h>
 #include <opengl-cpp/shader.h>
@@ -45,6 +46,7 @@ class integration_t {
     opengl_cpp::glfw_impl_t m_glfw;
 
     game_engine::window_t m_window;
+    game_engine::renderer_t m_renderer;
     std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
     std::array<light_pointer_t, light_count> m_lights;
     std::map<light_pointer_t, shape_pointer_t> m_light_shapes;

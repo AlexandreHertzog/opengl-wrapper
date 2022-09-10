@@ -41,7 +41,7 @@ constexpr auto default_texture_mix = 0.8F;
 namespace test_app {
 
 integration_t::integration_t()
-    : m_window(m_glfw, m_gl, resolution_x, resolution_y, "Test application"),
+    : m_window(m_glfw, m_gl, resolution_x, resolution_y, "Test application"), m_renderer(m_gl),
       m_camera(default_camera_pos, default_camera_front, default_camera_up) {
 
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -63,22 +63,22 @@ integration_t::~integration_t() {
 void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-complexity)
     constexpr auto camera_speed = 0.1F;
 
-    m_window.set_framebuffer_callback([&](game_engine::window_t &w, int width, int height) {
-        w.set_viewport(width, height);
+    m_window.set_framebuffer_callback([&](int width, int height) {
+        m_renderer.set_viewport(width, height);
         render();
     });
 
-    m_window.set_key_callback([&](game_engine::window_t &w, int key, int action) {
+    m_window.set_key_callback([&](int key, int action) {
         if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
-            w.set_should_close(1);
+            m_window.set_should_close(1);
         }
         if (GLFW_PRESS == action && GLFW_KEY_F12 == key) {
             m_wireframe = !m_wireframe;
-            w.set_wireframe_mode(m_wireframe);
+            m_renderer.set_wireframe_mode(m_wireframe);
         }
         if (GLFW_PRESS == action && GLFW_KEY_F11 == key) {
             m_depth_test = !m_depth_test;
-            w.set_depth_test(m_depth_test);
+            m_renderer.set_depth_test(m_depth_test);
         }
         if (GLFW_PRESS == action && GLFW_KEY_F10 == key) {
             m_depth_view_enabled = !m_depth_view_enabled;
@@ -88,7 +88,7 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
         }
         if (GLFW_PRESS == action && GLFW_KEY_SPACE == key) {
             m_cursor_enabled = !m_cursor_enabled;
-            w.set_input_mode(GLFW_CURSOR, m_cursor_enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+            m_window.set_input_mode(GLFW_CURSOR, m_cursor_enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
         if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_W == key) {
             m_camera.set_position(m_camera.get_position() + camera_speed * m_camera.get_front());
@@ -163,8 +163,8 @@ void integration_t::build_shapes() {
 void integration_t::render_loop() {
     constexpr glm::vec4 clear_color = {0.2F, 0.2F, 0.2F, 1.0F};
 
-    m_window.set_depth_test(m_depth_test);
-    m_window.set_clear_color(clear_color);
+    m_renderer.set_depth_test(m_depth_test);
+    m_renderer.set_clear_color(clear_color);
 
     for (auto &program_shapes : m_program_shape_map) {
         for (auto &shape : program_shapes.second) {
@@ -188,7 +188,7 @@ void integration_t::render() {
 
     build_ui();
 
-    m_window.clear();
+    m_renderer.clear();
 
     for (auto &program_shape : m_program_shape_map) {
         assert(program_shape.first);
@@ -201,7 +201,7 @@ void integration_t::render() {
         for (auto &shape : program_shape.second) {
             assert(shape);
             update_shape_uniforms(*program_shape.first, *shape);
-            m_window.draw(*shape);
+            m_renderer.draw(*shape);
         }
     }
 

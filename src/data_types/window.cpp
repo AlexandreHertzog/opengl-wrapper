@@ -1,6 +1,5 @@
 #include "window.h"
 
-#include "shape.h"
 #include "utils/utils.h"
 #include <boost/log/trivial.hpp>
 #include <cassert>
@@ -13,14 +12,14 @@ class window_t::manager {
   public:
     static std::map<const void *, game_engine::window_t *> m_window_map; // NOLINT(*-non-const-global-variables)
 
-    static void callback_cursor_pos(GLFWwindow *glfw_window, double xpos, double ypos) {
+    static void callback_cursor_pos(GLFWwindow *glfw_window, double position_x, double position_y) {
         auto window_it = m_window_map.find(glfw_window);
         assert(m_window_map.end() != window_it);
         assert(nullptr != window_it->second);
 
         auto &window = *window_it->second;
         if (window.m_cursor_pos_callback) {
-            window.m_cursor_pos_callback(xpos, ypos);
+            window.m_cursor_pos_callback(position_x, position_y);
         }
     }
 
@@ -30,7 +29,7 @@ class window_t::manager {
         assert(nullptr != window_it->second);
 
         auto &window = *window_it->second;
-        window.m_framebuffer_callback(window, width, height);
+        window.m_framebuffer_callback(width, height);
     }
 
     static void callback_key(GLFWwindow *glfw_window, int key, int, int action, int) { // NOLINT(hicpp-named-parameter)
@@ -39,7 +38,7 @@ class window_t::manager {
         assert(nullptr != window_it->second);
 
         auto &window = *window_it->second;
-        window.m_key_callback(window, key, action);
+        window.m_key_callback(key, action);
     }
 };
 
@@ -121,11 +120,6 @@ void window_t::set_input_mode(int mode, int value) {
     m_glfw.set_input_mode(m_window, mode, value);
 }
 
-void window_t::draw(shape_t &s) {
-    s.bind();
-    m_gl.draw_arrays(0, s.get_mesh().get_vertices().size());
-}
-
 GLFWwindow *window_t::get_window() const {
     return m_window;
 }
@@ -134,34 +128,6 @@ void window_t::register_callbacks() {
     m_glfw.set_framebuffer_size_callback(m_window, manager::callback_framebuffer_size);
     m_glfw.set_key_callback(m_window, manager::callback_key);
     m_glfw.set_cursor_pos_callback(m_window, manager::callback_cursor_pos);
-}
-
-void window_t::set_viewport(size_t width, size_t height) {
-    m_gl.set_viewport(width, height);
-}
-
-void window_t::set_wireframe_mode(bool enable) {
-    if (enable) {
-        m_gl.polygon_mode(opengl_cpp::polygon_mode_t::line);
-    } else {
-        m_gl.polygon_mode(opengl_cpp::polygon_mode_t::fill);
-    }
-}
-
-void window_t::set_depth_test(bool enable) {
-    if (enable) {
-        m_gl.enable(opengl_cpp::graphics_feature_t::depth_test);
-    } else {
-        m_gl.disable(opengl_cpp::graphics_feature_t::depth_test);
-    }
-}
-
-void window_t::set_clear_color(const glm::vec4 &c) {
-    m_gl.set_clear_color(c);
-}
-
-void window_t::clear() {
-    m_gl.clear();
 }
 
 std::ostream &operator<<(std::ostream &os, const game_engine::window_t &w) {

@@ -15,8 +15,8 @@ class shape_t;
 class window_t {
   public:
     using cursor_pos_cb_t = std::function<void(double, double)>;
-    using framebuffer_cb_t = std::function<void(window_t &, int, int)>;
-    using key_cb_t = std::function<void(window_t &, int, int)>;
+    using framebuffer_cb_t = std::function<void(int, int)>;
+    using key_cb_t = std::function<void(int, int)>;
 
     /**
      * @brief Constructs a window object.
@@ -104,35 +104,6 @@ class window_t {
      * @param value The new value of the specified input mode.
      */
     void set_input_mode(int mode, int value);
-
-    void draw(shape_t &s);
-
-    /**
-     * @brief Sets the dimensions of the window viewport.
-     * @param width Viewport width.
-     * @param height Viewport height.
-     */
-    void set_viewport(size_t width, size_t height);
-
-    /**
-     * @brief Sets the wireframe mode the window.
-     * @param enable Enable or disable wireframe mode.
-     */
-    void set_wireframe_mode(bool enable);
-
-    /**
-     * @brief Sets the depth test OpenGL feature.
-     * @param enable Enable or disable depth test.
-     */
-    void set_depth_test(bool enable);
-
-    /**
-     * @brief Sets the background color.
-     * @param c Color components.
-     */
-    void set_clear_color(const glm::vec4 &c);
-
-    void clear();
 
     [[nodiscard]] GLFWwindow *get_window() const;
 

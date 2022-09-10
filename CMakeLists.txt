@@ -38,7 +38,7 @@ target_include_directories(game-engine-data-types
         )
 
 target_link_libraries(game-engine-data-types
-        PUBLIC glm game-engine-utils opengl-cpp
+        PUBLIC glm opengl-cpp
         PRIVATE game-engine-utils stb game-engine-parsers Boost::log
         )
 
@@ -59,7 +59,8 @@ add_library(game-engine INTERFACE)
 target_include_directories(game-engine PUBLIC INTERFACE include)
 target_link_libraries(game-engine PUBLIC INTERFACE game-engine-data-types game-engine-parsers opengl-cpp)
 
-add_executable(game-engine-test src/main.cpp src/integration.cpp src/integration.h)
-target_link_libraries(game-engine-test PRIVATE game-engine Boost::log glm imgui)
+add_executable(game-engine-test src/main.cpp src/integration.cpp src/integration.h src/renderer.cpp)
+target_include_directories(game-engine-test PRIVATE include/game-engine)
+target_link_libraries(game-engine-test PRIVATE game-engine Boost::log glm imgui game-engine-utils)
 
 add_subdirectory(test)
