@@ -61,6 +61,7 @@ target_link_libraries(game-engine PUBLIC INTERFACE game-engine-data-types game-e
 
 add_executable(game-engine-test src/main.cpp src/integration.cpp src/integration.h src/renderer.cpp)
 target_include_directories(game-engine-test PRIVATE include/game-engine)
+set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK")
 target_link_libraries(game-engine-test PRIVATE game-engine Boost::log glm imgui game-engine-utils)
 
 add_subdirectory(test)

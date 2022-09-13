@@ -2,6 +2,7 @@
 
 #include "exception.h"
 #include <algorithm>
+#include <array>
 #include <glm/glm.hpp>
 #include <ostream>
 #include <sstream>
