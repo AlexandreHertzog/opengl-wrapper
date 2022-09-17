@@ -1,6 +1,7 @@
 #include "integration.h"
 
 #include "data_types/image.h"
+#include "utils/configuration.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <boost/log/trivial.hpp>
@@ -12,11 +13,6 @@
 using std::filesystem::path;
 
 namespace {
-
-constexpr auto texture_layer_1 = 0;
-constexpr auto texture_layer_2 = 1;
-constexpr auto texture_diffuse = 2;
-constexpr auto texture_specular = 3;
 
 constexpr auto resolution_x = 1920;
 constexpr auto resolution_y = 1080;
@@ -41,7 +37,8 @@ constexpr auto default_texture_mix = 0.8F;
 namespace game_engine {
 
 integration_t::integration_t()
-    : m_window(m_glfw, m_gl, resolution_x, resolution_y, "Test application"), m_renderer(m_gl),
+    : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory),
+      m_window(m_glfw, m_gl, resolution_x, resolution_y, "Test application"), m_renderer(m_gl),
       m_camera(default_camera_pos, default_camera_front, default_camera_up) {
 
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -130,14 +127,14 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
 }
 
 void integration_t::build_shapes() {
-    auto object_program = build_object_program();
-    auto light_program = build_light_program();
-    auto base_texture = build_texture("./textures/checker.png", texture_layer_1);
+    auto object_program = m_program_factory.build_object_program();
+    auto light_program = m_program_factory.build_light_program();
+    auto base_texture = m_texture_factory.build_texture("./textures/checker.png", configuration::texture_layer_1);
 
-    m_program_shape_map[object_program].emplace_back(build_cube(base_texture));
-    m_program_shape_map[object_program].emplace_back(build_plane(base_texture));
-    m_program_shape_map[object_program].emplace_back(build_sphere(base_texture));
-    m_program_shape_map[object_program].emplace_back(build_torus(base_texture));
+    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_cube(base_texture));
+    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_plane(base_texture));
+    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_sphere(base_texture));
+    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_torus(base_texture));
 
     constexpr glm::vec3 light0_pos = glm::vec3(2.0F);
     constexpr glm::vec3 light0_dir = glm::vec3(-1.0F, -2.0F, -2.0F);
@@ -146,18 +143,18 @@ void integration_t::build_shapes() {
     constexpr glm::vec3 light2_pos = glm::vec3(-3.0F, 2.0F, -3.0F);
     constexpr auto diffuse = 0.2F;
 
-    auto light_texture = build_texture("./textures/white.png", texture_layer_1);
+    auto light_texture = m_texture_factory.build_texture("./textures/white.png", configuration::texture_layer_1);
 
     m_lights[0] = build_light(light_type_t::spot, light0_pos, light0_dir);
-    m_program_shape_map[light_program].emplace_back(build_light_shape(m_lights[0], light_texture));
+    m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[0], light_texture));
 
     m_lights[1] = build_light(light_type_t::directional, light1_pos, light1_dir);
     m_lights[1]->m_diffuse = glm::vec3(diffuse);
-    m_program_shape_map[light_program].emplace_back(build_light_shape(m_lights[1], light_texture));
+    m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[1], light_texture));
 
     m_lights[2] = build_light(light_type_t::directional, light2_pos, glm::vec3());
     m_lights[2]->m_diffuse = glm::vec3(diffuse);
-    m_program_shape_map[light_program].emplace_back(build_light_shape(m_lights[2], light_texture));
+    m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[2], light_texture));
 }
 
 void integration_t::render_loop() {
@@ -352,10 +349,10 @@ void integration_t::update_shape_uniforms(opengl_cpp::program_t &p, shape_t &s) 
     p.set_uniform("uniform_material.has_specular", static_cast<bool>(s.get_material().m_specular));
     p.set_uniform("uniform_material.ambient", s.get_material().m_ambient);
     p.set_uniform("uniform_material.shininess", s.get_material().m_shininess);
-    p.set_uniform("uniform_material.texture1", texture_layer_1);
-    p.set_uniform("uniform_material.texture2", texture_layer_2);
-    p.set_uniform("uniform_material.diffuse", texture_diffuse);
-    p.set_uniform("uniform_material.specular", texture_specular);
+    p.set_uniform("uniform_material.texture1", configuration::texture_layer_1);
+    p.set_uniform("uniform_material.texture2", configuration::texture_layer_2);
+    p.set_uniform("uniform_material.diffuse", configuration::texture_diffuse);
+    p.set_uniform("uniform_material.specular", configuration::texture_specular);
     p.set_uniform("uniform_material.texture_mix", s.get_material().m_texture_mix);
 }
 
@@ -396,173 +393,6 @@ void integration_t::shape_debug_ui(shape_t &s) {
     if (s.get_material().m_specular) {
         ImGui::EndDisabled();
     }
-}
-
-texture_pointer_t integration_t::build_texture(const char *path, int texture_layer) {
-    using opengl_cpp::texture_format_t;
-    using opengl_cpp::texture_parameter_t;
-    using opengl_cpp::texture_parameter_values_t;
-    using opengl_cpp::texture_target_t;
-
-    auto ret = std::make_shared<opengl_cpp::texture_t>(m_gl, texture_layer, texture_target_t::tex_2d);
-    ret->bind();
-
-    ret->set_parameter(texture_parameter_t::wrap_s, texture_parameter_values_t::repeat);
-    ret->set_parameter(texture_parameter_t::wrap_t, texture_parameter_values_t::repeat);
-    ret->set_parameter(texture_parameter_t::min_filter, texture_parameter_values_t::linear_mipmap_linear);
-    ret->set_parameter(texture_parameter_t::mag_filter, texture_parameter_values_t::linear);
-
-    image_t image(path);
-    ret->set_image(image.get_width(), image.get_height(),
-                   image.has_alpha() ? texture_format_t::rgba : texture_format_t::rgb, image.get_data());
-    ret->generate_mipmap();
-    return ret;
-}
-
-std::shared_ptr<opengl_cpp::program_t> integration_t::build_object_program() {
-    using opengl_cpp::shader_t;
-    using opengl_cpp::shader_type_t;
-
-    auto ret = std::make_shared<opengl_cpp::program_t>(m_gl);
-    ret->add_shader(shader_t(m_gl, shader_type_t::vertex, path("shaders/object.vert")));
-    ret->add_shader(shader_t(m_gl, shader_type_t::fragment, path("shaders/object.frag")));
-    ret->link();
-    return ret;
-}
-
-std::shared_ptr<opengl_cpp::program_t> integration_t::build_light_program() {
-    using opengl_cpp::shader_t;
-    using opengl_cpp::shader_type_t;
-
-    auto ret = std::make_shared<opengl_cpp::program_t>(m_gl);
-    ret->add_shader(shader_t(m_gl, shader_type_t::vertex, path("shaders/light.vert")));
-    ret->add_shader(shader_t(m_gl, shader_type_t::fragment, path("shaders/light.frag")));
-    ret->link();
-    return ret;
-}
-
-shape_pointer_t integration_t::build_cube(texture_pointer_t &base_texture) {
-    constexpr auto rotation_angle = 45.0F;
-    constexpr auto scale = 0.5F;
-
-    shape_pointer_t ret = std::make_shared<shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(mesh_t("./objects/cube.obj"));
-
-    transform_t t;
-    t.m_translation = {0.0F, 0.0F, -1.0F};
-    t.m_rotation_angle = rotation_angle;
-    t.m_rotation_axis = {0.0F, 1.0F, 0.0F};
-    t.m_scale = glm::vec3(scale);
-    ret->set_transform(t);
-
-    material_t mat;
-    mat.m_ambient = glm::vec3(default_ambient);
-    mat.m_shininess = default_shininess;
-    mat.m_texture_mix = default_texture_mix;
-    mat.m_texture1 = base_texture;
-    mat.m_texture2 = build_texture("./textures/blue.png", texture_layer_2);
-    mat.m_diffuse = build_texture("./textures/diffuse.png", texture_diffuse);
-    mat.m_specular = build_texture("./textures/specular.png", texture_specular);
-
-    ret->set_material(std::move(mat));
-    return ret;
-}
-
-shape_pointer_t integration_t::build_plane(texture_pointer_t &base_texture) {
-    constexpr auto scale = 10.0F;
-    constexpr glm::vec3 position = {0.0F, -0.5F, 0.0F};
-
-    shape_pointer_t ret = std::make_shared<shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(mesh_t("./objects/plane.obj"));
-
-    transform_t t;
-    t.m_translation = position;
-    t.m_scale = glm::vec3(scale);
-    ret->set_transform(t);
-
-    material_t mat;
-    mat.m_ambient = glm::vec3(default_ambient);
-    mat.m_shininess = default_shininess;
-    mat.m_texture_mix = default_texture_mix;
-    mat.m_texture1 = base_texture;
-    mat.m_texture2 = build_texture("./textures/orange.png", texture_layer_2);
-    mat.m_specular = build_texture("./textures/specular.png", texture_specular);
-    ret->set_material(std::move(mat));
-    return ret;
-}
-
-shape_pointer_t integration_t::build_sphere(texture_pointer_t &base_texture) {
-    constexpr auto scale = 0.6F;
-    constexpr auto ambient = 0.1F;
-    constexpr auto shininess = 32.0F;
-    constexpr glm::vec3 position = {1.5F, 0.0F, -1.0F};
-
-    shape_pointer_t ret = std::make_shared<shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(mesh_t("./objects/sphere.obj"));
-
-    transform_t t;
-    t.m_translation = position;
-    t.m_scale = glm::vec3(scale);
-    ret->set_transform(t);
-
-    material_t mat;
-    mat.m_ambient = glm::vec3(ambient);
-    mat.m_shininess = shininess;
-    mat.m_texture_mix = default_texture_mix;
-    mat.m_texture1 = base_texture;
-    mat.m_texture2 = build_texture("./textures/red.png", texture_layer_2);
-    mat.m_diffuse = build_texture("./textures/diffuse.png", texture_diffuse);
-    mat.m_specular = build_texture("./textures/specular.png", texture_specular);
-
-    ret->set_material(std::move(mat));
-
-    return ret;
-}
-
-shape_pointer_t integration_t::build_torus(texture_pointer_t &base_texture) {
-    constexpr auto scale = 0.6F;
-    constexpr auto shininess = 2.0F;
-    constexpr auto rotation_angle = 45.0F;
-
-    shape_pointer_t ret = std::make_shared<shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(mesh_t("./objects/torus.obj"));
-
-    transform_t t;
-    t.m_translation = {-1.0F, 0.0F, -1.0F};
-    t.m_rotation_axis = {0.0F, 0.0F, 1.0F};
-    t.m_rotation_angle = rotation_angle;
-    t.m_scale = glm::vec3(scale);
-    ret->set_transform(t);
-
-    material_t mat;
-    mat.m_ambient = {1.0F, 1.0F, 1.0F};
-    mat.m_shininess = shininess;
-    mat.m_texture_mix = default_texture_mix;
-    mat.m_texture1 = base_texture;
-    mat.m_texture2 = build_texture("./textures/green.png", texture_layer_2);
-
-    ret->set_material(std::move(mat));
-
-    return ret;
-}
-
-shape_pointer_t integration_t::build_light_shape(const light_pointer_t &light, texture_pointer_t &base_texture) {
-    constexpr auto scale = 0.1F;
-
-    shape_pointer_t ret = std::make_shared<shape_t>(opengl_cpp::vertex_array_t(m_gl));
-    ret->set_mesh(mesh_t("./objects/sphere.obj"));
-
-    transform_t t;
-    t.m_translation = light->m_position;
-    t.m_scale = glm::vec3(scale);
-    ret->set_transform(t);
-
-    material_t mat;
-    mat.m_texture1 = base_texture;
-    ret->set_material(std::move(mat));
-
-    m_light_shapes[light] = ret;
-    return ret;
 }
 
 light_pointer_t integration_t::build_light(light_type_t type, glm::vec3 position, glm::vec3 direction) {

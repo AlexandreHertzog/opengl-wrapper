@@ -3,6 +3,9 @@
 #include "data_types/shape.h"
 #include "data_types/types.h"
 #include "data_types/window.h"
+#include "factories/program_factory.h"
+#include "factories/shape_factory.h"
+#include "factories/texture_factory.h"
 #include "renderer.h"
 #include <memory>
 #include <opengl-cpp/backend/gl_impl.h>
@@ -33,6 +36,10 @@ class integration_t {
     opengl_cpp::gl_impl_t m_gl;
     opengl_cpp::glfw_impl_t m_glfw;
 
+    program_factory_t m_program_factory;
+    texture_factory_t m_texture_factory;
+    shape_factory_t m_shape_factory;
+
     game_engine::window_t m_window;
     game_engine::renderer_t m_renderer;
     std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
@@ -59,14 +66,6 @@ class integration_t {
     void update_parameter_uniforms(opengl_cpp::program_t &p) const;
     void render();
 
-    texture_pointer_t build_texture(const char *path, int texture_layer);
-    program_pointer_t build_object_program();
-    program_pointer_t build_light_program();
-    shape_pointer_t build_cube(texture_pointer_t &base_texture);
-    shape_pointer_t build_plane(texture_pointer_t &base_texture);
-    shape_pointer_t build_sphere(texture_pointer_t &base_texture);
-    shape_pointer_t build_torus(texture_pointer_t &base_texture);
-    shape_pointer_t build_light_shape(const light_pointer_t &light, texture_pointer_t &base_texture);
     light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
     void shape_debug_ui(game_engine::shape_t &s);
     void update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s);
