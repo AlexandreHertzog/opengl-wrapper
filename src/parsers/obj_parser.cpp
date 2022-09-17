@@ -1,7 +1,5 @@
 #include "obj_parser.h"
 
-#include "utils/exception.h"
-
 namespace game_engine {
 obj_parser_t::obj_parser_t(const std::filesystem::path &path) {
     if (!path.empty()) {

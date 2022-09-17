@@ -1,9 +1,8 @@
 #include "shape.h"
 
-#include "glm/ext/matrix_transform.hpp"
 #include "parsers/obj_parser.h"
-#include "utils/exception.h"
 #include <boost/log/trivial.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 namespace game_engine {
 

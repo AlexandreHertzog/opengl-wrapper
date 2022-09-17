@@ -1,6 +1,8 @@
 #include "mesh.h"
 
 #include "parsers/obj_parser.h"
+#include "utils/exception.h"
+#include "utils/utils.h"
 #include <boost/log/trivial.hpp>
 
 namespace game_engine {

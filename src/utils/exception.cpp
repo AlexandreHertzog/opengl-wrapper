@@ -1,4 +1,4 @@
-#include "game-engine/utils/exception.h"
+#include "utils/exception.h"
 
 #include <boost/log/trivial.hpp>
 #include <boost/stacktrace.hpp>

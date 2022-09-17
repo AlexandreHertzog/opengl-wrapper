@@ -1,7 +1,6 @@
 #pragma once
 
-#include "face.h"
-#include "types.h"
+#include "data_types/face.h"
 #include <filesystem>
 #include <opengl-cpp/vertex_array.h>
 #include <string>

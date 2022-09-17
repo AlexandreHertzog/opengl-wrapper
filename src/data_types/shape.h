@@ -1,7 +1,8 @@
 #pragma once
 
-#include "face.h"
-#include "mesh.h"
+#include "data_types/face.h"
+#include "data_types/mesh.h"
+#include "data_types/types.h"
 #include <filesystem>
 #include <glm/glm.hpp>
 #include <map>

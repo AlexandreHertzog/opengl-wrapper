@@ -1,7 +1,7 @@
 #pragma once
 
-#include "game-engine/data_types/face.h"
-#include "game-engine/utils/utils.h"
+#include "data_types/face.h"
+#include "utils/utils.h"
 #include <filesystem>
 #include <fstream>
 #include <vector>

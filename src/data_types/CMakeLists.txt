@@ -1,0 +1,2 @@
+add_library(game-engine-data-types camera.cpp face.cpp image.cpp mesh.cpp shape.cpp window.cpp)
+target_link_libraries(game-engine-data-types PUBLIC glm opengl-cpp PRIVATE game-engine-utils stb game-engine-parsers Boost::log)

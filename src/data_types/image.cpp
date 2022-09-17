@@ -1,9 +1,9 @@
-#include "game-engine/data_types/image.h"
+#include "image.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "game-engine/utils/exception.h"
 #include "stb_image.h"
+#include "utils/exception.h"
 
 namespace game_engine {
 

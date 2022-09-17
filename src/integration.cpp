@@ -1,12 +1,12 @@
 #include "integration.h"
 
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
-#include "game-engine/data_types/image.h"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "imgui.h"
+#include "data_types/image.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 #include <boost/log/trivial.hpp>
 #include <csignal>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <imgui.h>
 #include <opengl-cpp/program.h>
 
 using std::filesystem::path;
