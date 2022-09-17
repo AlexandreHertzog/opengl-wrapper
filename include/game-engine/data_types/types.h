@@ -8,7 +8,12 @@
 
 namespace game_engine {
 
+struct light_t;
+
 using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
+using program_pointer_t = std::shared_ptr<opengl_cpp::program_t>;
+using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
+using light_pointer_t = std::shared_ptr<light_t>;
 
 struct light_t {
     glm::vec3 m_position{};
@@ -35,6 +40,13 @@ struct spot_light_t : light_t {
     glm::vec3 m_direction;
     float m_cutoff_begin{};
     float m_cutoff_end{};
+};
+
+enum class light_type_t {
+    deactivated = 0,
+    ambient = 1,
+    directional = 2,
+    spot = 3
 };
 
 struct material_t {

@@ -1,6 +1,7 @@
 #pragma once
 #include "game-engine/data_types/camera.h"
 #include "game-engine/data_types/shape.h"
+#include "game-engine/data_types/types.h"
 #include "game-engine/data_types/window.h"
 #include "opengl-cpp/backend/gl_impl.h"
 #include "opengl-cpp/backend/glfw_impl.h"
@@ -11,7 +12,7 @@
 #include <opengl-cpp/texture.h>
 #include <vector>
 
-namespace test_app {
+namespace game_engine {
 
 constexpr auto light_count = 10;
 
@@ -29,19 +30,6 @@ class integration_t {
     void render_loop();
 
   private:
-    using light_pointer_t = std::shared_ptr<game_engine::light_t>;
-    using shape_pointer_t = std::shared_ptr<game_engine::shape_t>;
-    using shape_vector_t = std::vector<shape_pointer_t>;
-    using program_pointer_t = std::shared_ptr<opengl_cpp::program_t>;
-    using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
-
-    enum class light_type_t {
-        deactivated = 0,
-        ambient = 1,
-        directional = 2,
-        spot = 3
-    };
-
     opengl_cpp::gl_impl_t m_gl;
     opengl_cpp::glfw_impl_t m_glfw;
 
@@ -79,10 +67,10 @@ class integration_t {
     shape_pointer_t build_sphere(texture_pointer_t &base_texture);
     shape_pointer_t build_torus(texture_pointer_t &base_texture);
     shape_pointer_t build_light_shape(const light_pointer_t &light, texture_pointer_t &base_texture);
-    integration_t::light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
+    light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
     void shape_debug_ui(game_engine::shape_t &s);
     void update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s);
     std::string build_light_uniform_prefix(int i);
 };
 
-} // namespace test_app
+} // namespace game_engine

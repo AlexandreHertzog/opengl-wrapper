@@ -43,4 +43,7 @@ class shape_t {
     opengl_cpp::vertex_array_t m_vertex_array;
 };
 
+using shape_pointer_t = std::shared_ptr<game_engine::shape_t>;
+using shape_vector_t = std::vector<shape_pointer_t>;
+
 } // namespace game_engine
