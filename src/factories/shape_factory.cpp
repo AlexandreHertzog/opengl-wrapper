@@ -76,12 +76,12 @@ shape_pointer_t shape_factory_t::build_torus() {
     return ret;
 }
 
-shape_pointer_t shape_factory_t::build_light_shape(const light_pointer_t &light) {
+shape_pointer_t shape_factory_t::build_light_shape(const light_t &light) {
     shape_pointer_t ret = std::make_shared<shape_t>(opengl_cpp::vertex_array_t(m_gl));
     ret->set_mesh(mesh_t("./objects/sphere.obj"));
 
     transform_t t = configuration::object_light_transforms;
-    t.m_translation = light->m_position;
+    t.m_translation = light.m_position;
     ret->set_transform(t);
 
     material_t mat;

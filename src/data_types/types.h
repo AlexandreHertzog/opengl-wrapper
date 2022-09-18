@@ -18,7 +18,16 @@ using light_pointer_t = std::shared_ptr<light_t>;
 using shape_pointer_t = std::shared_ptr<game_engine::shape_t>;
 using shape_vector_t = std::vector<shape_pointer_t>;
 
+enum class light_type_t {
+    deactivated = 0,
+    ambient = 1,
+    directional = 2,
+    spot = 3
+};
+
 struct light_t {
+    static constexpr auto m_type = light_type_t::ambient;
+
     glm::vec3 m_position{};
     glm::vec3 m_ambient{};
     glm::vec3 m_diffuse{};
@@ -36,20 +45,17 @@ struct light_t {
 };
 
 struct directional_light_t : light_t {
+    static constexpr auto m_type = light_type_t::directional;
+
     glm::vec3 m_direction;
 };
 
 struct spot_light_t : light_t {
+    static constexpr auto m_type = light_type_t::spot;
+
     glm::vec3 m_direction;
     float m_cutoff_begin{};
     float m_cutoff_end{};
-};
-
-enum class light_type_t {
-    deactivated = 0,
-    ambient = 1,
-    directional = 2,
-    spot = 3
 };
 
 struct material_t {

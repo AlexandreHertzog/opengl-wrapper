@@ -14,11 +14,12 @@ using std::filesystem::path;
 namespace game_engine {
 
 integration_t::integration_t()
-    : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory), m_light_factory(m_gl),
+    : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory),
       m_window(m_glfw, m_gl, configuration::viewport_resolution_x, configuration::viewport_resolution_y,
                "Test application"),
-      m_renderer(m_gl), m_camera(configuration::camera_start_position, configuration::camera_start_front,
-                                 configuration::camera_start_up) {
+      m_renderer(m_gl),
+      m_camera(configuration::camera_start_position, configuration::camera_start_front, configuration::camera_start_up),
+      m_light_manager(m_gl) {
 
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -119,19 +120,24 @@ void integration_t::build_shapes() {
 
     auto light_texture = m_texture_factory.build_white_texture();
 
-    m_lights[0] = m_light_factory.build_light(light_type_t::spot, configuration::light_positions[0],
-                                              configuration::light_directions[0]);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[0]));
+    auto *light0 = m_light_manager.add_light<spot_light_t>();
+    assert(nullptr != light0);
+    light0->m_position = configuration::light_positions[0];
+    light0->m_direction = configuration::light_directions[0];
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(*light0));
 
-    m_lights[1] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[1],
-                                              configuration::light_directions[1]);
-    m_lights[1]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[1]));
+    auto *light1 = m_light_manager.add_light<directional_light_t>();
+    assert(nullptr != light1);
+    light1->m_position = configuration::light_positions[1];
+    light1->m_direction = configuration::light_directions[1];
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(*light1));
 
-    m_lights[2] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[2],
-                                              configuration::light_directions[2]);
-    m_lights[2]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[2]));
+    auto *light2 = m_light_manager.add_light<directional_light_t>();
+    assert(nullptr != light2);
+    light2->m_position = configuration::light_positions[2];
+    light2->m_direction = configuration::light_directions[2];
+    light2->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(*light2));
 }
 
 void integration_t::render_loop() {
@@ -163,7 +169,7 @@ void integration_t::render() {
         program_shape.first->use();
 
         update_projection_uniforms(*program_shape.first);
-        update_light_uniforms(*program_shape.first);
+        m_light_manager.update_light_uniforms(*program_shape.first);
         update_parameter_uniforms(*program_shape.first);
 
         assert(program_shape.second);
@@ -203,7 +209,7 @@ void integration_t::build_ui() {
     }
 
     int i = 0;
-    for (auto &light : m_lights) {
+    for (auto &light : m_light_manager) {
         if (!light) {
             continue;
         }
@@ -249,45 +255,6 @@ void integration_t::build_ui() {
     ImGui::End();
 
     ImGui::Render();
-}
-
-void integration_t::update_light_uniforms(opengl_cpp::program_t &p) {
-    int i = 0;
-    for (auto &light : m_lights) {
-        const auto prefix = build_light_uniform_prefix(i++);
-        if (!light) {
-            p.set_uniform(prefix + "type", static_cast<int>(light_type_t::deactivated));
-            continue;
-        }
-
-        p.set_uniform(prefix + "position", light->m_position);
-        p.set_uniform(prefix + "ambient", light->m_ambient);
-        p.set_uniform(prefix + "diffuse", light->m_diffuse);
-        p.set_uniform(prefix + "specular", light->m_specular);
-        p.set_uniform(prefix + "attenuation_constant", light->m_attenuation_constant);
-        p.set_uniform(prefix + "attenuation_linear", light->m_attenuation_linear);
-        p.set_uniform(prefix + "attenuation_quadratic", light->m_attenuation_quadratic);
-
-        auto *direction_light = dynamic_cast<directional_light_t *>(light.get());
-        if (nullptr != direction_light) {
-            p.set_uniform(prefix + "type", static_cast<int>(light_type_t::directional));
-            p.set_uniform(prefix + "direction", direction_light->m_direction);
-        } else {
-            auto *spot_light = dynamic_cast<spot_light_t *>(light.get());
-            if (nullptr != spot_light) {
-                p.set_uniform(prefix + "type", static_cast<int>(light_type_t::spot));
-                p.set_uniform(prefix + "direction", spot_light->m_direction);
-                p.set_uniform(prefix + "cutoff_begin", glm::cos(glm::radians(spot_light->m_cutoff_begin)));
-                p.set_uniform(prefix + "cutoff_end", glm::cos(glm::radians(spot_light->m_cutoff_end)));
-            } else {
-                p.set_uniform(prefix + "type", static_cast<int>(light_type_t::ambient));
-            }
-        }
-    }
-}
-
-std::string integration_t::build_light_uniform_prefix(int i) {
-    return "uniform_light[" + std::to_string(i) + "].";
 }
 
 void integration_t::update_projection_uniforms(opengl_cpp::program_t &p) {

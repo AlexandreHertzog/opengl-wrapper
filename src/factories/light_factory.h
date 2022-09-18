@@ -8,7 +8,7 @@ namespace game_engine {
 class light_factory_t {
   public:
     light_factory_t(opengl_cpp::gl_t &gl);
-    light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
+    light_pointer_t build_light(light_type_t type);
 
   private:
     opengl_cpp::gl_t &m_gl;

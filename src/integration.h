@@ -7,6 +7,7 @@
 #include "factories/program_factory.h"
 #include "factories/shape_factory.h"
 #include "factories/texture_factory.h"
+#include "managers/light_manager.h"
 #include "renderer.h"
 #include "utils/configuration.h"
 #include "utils/program_shapes.h"
@@ -40,13 +41,13 @@ class integration_t {
     program_factory_t m_program_factory;
     texture_factory_t m_texture_factory;
     shape_factory_t m_shape_factory;
-    light_factory_t m_light_factory;
 
     window_t m_window;
     renderer_t m_renderer;
     program_shapes_t m_program_shapes;
-    std::array<light_pointer_t, configuration::light_count> m_lights;
     camera_t m_camera;
+
+    light_manager_t m_light_manager;
 
     bool m_wireframe{};
     bool m_cursor_enabled{true};
@@ -62,14 +63,12 @@ class integration_t {
     double m_yaw = -90.0; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
     void build_ui();
-    void update_light_uniforms(opengl_cpp::program_t &p);
     void update_projection_uniforms(opengl_cpp::program_t &p);
     void update_parameter_uniforms(opengl_cpp::program_t &p) const;
     void render();
 
     void shape_debug_ui(shape_t &s);
     void update_shape_uniforms(opengl_cpp::program_t &p, shape_t &s);
-    std::string build_light_uniform_prefix(int i);
 };
 
 } // namespace game_engine

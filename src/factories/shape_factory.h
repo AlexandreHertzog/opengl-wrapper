@@ -14,7 +14,7 @@ class shape_factory_t {
     shape_pointer_t build_plane();
     shape_pointer_t build_sphere();
     shape_pointer_t build_torus();
-    shape_pointer_t build_light_shape(const light_pointer_t &light);
+    shape_pointer_t build_light_shape(const light_t &light);
 
   private:
     opengl_cpp::gl_t &m_gl;
