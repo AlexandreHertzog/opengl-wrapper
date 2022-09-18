@@ -3,6 +3,7 @@
 #include "data_types/shape.h"
 #include "data_types/types.h"
 #include "data_types/window.h"
+#include "factories/light_factory.h"
 #include "factories/program_factory.h"
 #include "factories/shape_factory.h"
 #include "factories/texture_factory.h"
@@ -39,6 +40,7 @@ class integration_t {
     program_factory_t m_program_factory;
     texture_factory_t m_texture_factory;
     shape_factory_t m_shape_factory;
+    light_factory_t m_light_factory;
 
     game_engine::window_t m_window;
     game_engine::renderer_t m_renderer;
@@ -66,7 +68,6 @@ class integration_t {
     void update_parameter_uniforms(opengl_cpp::program_t &p) const;
     void render();
 
-    light_pointer_t build_light(light_type_t type, glm::vec3 position, glm::vec3 direction);
     void shape_debug_ui(game_engine::shape_t &s);
     void update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s);
     std::string build_light_uniform_prefix(int i);

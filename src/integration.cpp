@@ -37,7 +37,7 @@ constexpr auto default_texture_mix = 0.8F;
 namespace game_engine {
 
 integration_t::integration_t()
-    : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory),
+    : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory), m_light_factory(m_gl),
       m_window(m_glfw, m_gl, resolution_x, resolution_y, "Test application"), m_renderer(m_gl),
       m_camera(default_camera_pos, default_camera_front, default_camera_up) {
 
@@ -145,14 +145,14 @@ void integration_t::build_shapes() {
 
     auto light_texture = m_texture_factory.build_texture("./textures/white.png", configuration::texture_layer_1);
 
-    m_lights[0] = build_light(light_type_t::spot, light0_pos, light0_dir);
+    m_lights[0] = m_light_factory.build_light(light_type_t::spot, light0_pos, light0_dir);
     m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[0], light_texture));
 
-    m_lights[1] = build_light(light_type_t::directional, light1_pos, light1_dir);
+    m_lights[1] = m_light_factory.build_light(light_type_t::directional, light1_pos, light1_dir);
     m_lights[1]->m_diffuse = glm::vec3(diffuse);
     m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[1], light_texture));
 
-    m_lights[2] = build_light(light_type_t::directional, light2_pos, glm::vec3());
+    m_lights[2] = m_light_factory.build_light(light_type_t::directional, light2_pos, glm::vec3());
     m_lights[2]->m_diffuse = glm::vec3(diffuse);
     m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[2], light_texture));
 }
@@ -393,56 +393,6 @@ void integration_t::shape_debug_ui(shape_t &s) {
     if (s.get_material().m_specular) {
         ImGui::EndDisabled();
     }
-}
-
-light_pointer_t integration_t::build_light(light_type_t type, glm::vec3 position, glm::vec3 direction) {
-    constexpr auto ambient = 0.2F;
-    constexpr auto diffuse = 1.0F;
-    constexpr auto specular = 0.2F;
-    constexpr auto attenuation_constant = 1.0F;
-    constexpr auto attenuation_linear = 0.09F;
-    constexpr auto attenuation_quadratic = 0.032F;
-
-    light_pointer_t ret = std::make_unique<light_t>();
-    switch (type) {
-    case light_type_t::deactivated:
-        return nullptr;
-    case light_type_t::ambient:
-        ret = std::make_unique<light_t>();
-        break;
-    case light_type_t::directional:
-        ret = std::make_unique<directional_light_t>();
-        break;
-    case light_type_t::spot:
-        ret = std::make_unique<spot_light_t>();
-        break;
-    }
-
-    ret->m_position = std::move(position);
-    ret->m_ambient = glm::vec3(ambient);
-    ret->m_diffuse = glm::vec3(diffuse);
-    ret->m_specular = glm::vec3(specular);
-    ret->m_attenuation_constant = attenuation_constant;
-    ret->m_attenuation_linear = attenuation_linear;
-    ret->m_attenuation_quadratic = attenuation_quadratic;
-
-    if (light_type_t::directional == type) {
-        auto &direction_light = dynamic_cast<directional_light_t &>(*ret);
-        direction_light.m_direction = std::move(direction);
-        ret->m_attenuation_constant = 1.0F;
-        ret->m_attenuation_linear = 0.0F;
-        ret->m_attenuation_quadratic = 0.0F;
-    } else if (light_type_t::spot == type) {
-        constexpr auto cutoff_begin = 25.0F;
-        constexpr auto cutoff_end = 35.0F;
-
-        auto &spot_light = dynamic_cast<spot_light_t &>(*ret);
-        spot_light.m_direction = std::move(direction);
-        spot_light.m_cutoff_begin = cutoff_begin;
-        spot_light.m_cutoff_end = cutoff_end;
-    }
-
-    return ret;
 }
 
 } // namespace game_engine
