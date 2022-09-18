@@ -9,7 +9,11 @@ class camera_t {
     explicit camera_t(glm::vec3 position = {}, glm::vec3 front = {}, glm::vec3 up = {});
     glm::mat4 look_at(glm::vec3 target);
 
-    void set_position(glm::vec3 position);
+    void step_front();
+    void step_back();
+    void step_left();
+    void step_right();
+
     [[nodiscard]] const glm::vec3 &get_position() const;
     [[nodiscard]] const glm::vec3 &get_front() const;
     [[nodiscard]] const glm::vec3 &get_up() const;

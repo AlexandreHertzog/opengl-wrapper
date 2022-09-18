@@ -43,42 +43,45 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
     });
 
     m_window.set_key_callback([&](int key, int action) {
-        if (GLFW_PRESS == action && GLFW_KEY_ESCAPE == key) {
-            m_window.set_should_close(1);
+        if (GLFW_PRESS != action && GLFW_REPEAT != action) {
+            return;
         }
-        if (GLFW_PRESS == action && GLFW_KEY_F12 == key) {
+        switch (key) {
+        case GLFW_KEY_ESCAPE:
+            m_window.set_should_close(1);
+            break;
+        case GLFW_KEY_F12:
             m_wireframe = !m_wireframe;
             m_renderer.set_wireframe_mode(m_wireframe);
-        }
-        if (GLFW_PRESS == action && GLFW_KEY_F11 == key) {
+            break;
+        case GLFW_KEY_F11:
             m_depth_test = !m_depth_test;
             m_renderer.set_depth_test(m_depth_test);
-        }
-        if (GLFW_PRESS == action && GLFW_KEY_F10 == key) {
+            break;
+        case GLFW_KEY_F10:
             m_depth_view_enabled = !m_depth_view_enabled;
-        }
-        if (GLFW_PRESS == action && GLFW_KEY_F9 == key) {
+            break;
+        case GLFW_KEY_F9:
             m_depth_view_debug = !m_depth_view_debug;
-        }
-        if (GLFW_PRESS == action && GLFW_KEY_SPACE == key) {
+            break;
+        case GLFW_KEY_SPACE:
             m_cursor_enabled = !m_cursor_enabled;
             m_window.set_input_mode(GLFW_CURSOR, m_cursor_enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-        }
-        if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_W == key) {
-            m_camera.set_position(m_camera.get_position() + configuration::camera_speed * m_camera.get_front());
-        }
-        if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_S == key) {
-            m_camera.set_position(m_camera.get_position() - configuration::camera_speed * m_camera.get_front());
-        }
-        if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_A == key) {
-            m_camera.set_position(m_camera.get_position() -
-                                  configuration::camera_speed *
-                                      glm::normalize(glm::cross(m_camera.get_front(), m_camera.get_up())));
-        }
-        if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_D == key) {
-            m_camera.set_position(m_camera.get_position() +
-                                  configuration::camera_speed *
-                                      glm::normalize(glm::cross(m_camera.get_front(), m_camera.get_up())));
+            break;
+        case GLFW_KEY_W:
+            m_camera.step_front();
+            break;
+        case GLFW_KEY_S:
+            m_camera.step_back();
+            break;
+        case GLFW_KEY_A:
+            m_camera.step_left();
+            break;
+        case GLFW_KEY_D:
+            m_camera.step_right();
+            break;
+        default:
+            break;
         }
     });
 
