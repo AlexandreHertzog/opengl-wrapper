@@ -25,7 +25,7 @@ light_pointer_t light_factory_t::build_light(light_type_t type, glm::vec3 positi
 
     ret->m_position = std::move(position);
     ret->m_ambient = glm::vec3(configuration::light_ambient);
-    ret->m_diffuse = glm::vec3(configuration::light_diffuse);
+    ret->m_diffuse = glm::vec3(configuration::light_default_diffuse);
     ret->m_specular = glm::vec3(configuration::light_specular);
     ret->m_attenuation_constant = configuration::light_attenuation_constant;
     ret->m_attenuation_linear = configuration::light_attenuation_linear;

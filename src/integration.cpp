@@ -1,7 +1,6 @@
 #include "integration.h"
 
 #include "data_types/image.h"
-#include "utils/configuration.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <boost/log/trivial.hpp>
@@ -12,34 +11,14 @@
 
 using std::filesystem::path;
 
-namespace {
-
-constexpr auto resolution_x = 1920;
-constexpr auto resolution_y = 1080;
-constexpr auto resolution_ratio = static_cast<float>(resolution_x) / resolution_y;
-constexpr auto default_fov = 45.0F;
-
-constexpr glm::vec3 default_camera_pos = {0.0, 3.0, 8.0};
-constexpr glm::vec3 default_camera_front = {0.0, -0.3, -1.0};
-constexpr glm::vec3 default_camera_up = {0.0, 1.0, 0.0};
-constexpr auto camera_max_angle = 89.0;
-constexpr auto camera_min_angle = -89.0;
-constexpr auto clipping_near = 0.1F;
-constexpr auto clipping_far = 100.0F;
-constexpr auto refresh_rate = 60;
-
-constexpr auto default_ambient = 0.2F;
-constexpr auto default_shininess = 32.0F;
-constexpr auto default_texture_mix = 0.8F;
-
-} // namespace
-
 namespace game_engine {
 
 integration_t::integration_t()
     : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory), m_light_factory(m_gl),
-      m_window(m_glfw, m_gl, resolution_x, resolution_y, "Test application"), m_renderer(m_gl),
-      m_camera(default_camera_pos, default_camera_front, default_camera_up) {
+      m_window(m_glfw, m_gl, configuration::viewport_resolution_x, configuration::viewport_resolution_y,
+               "Test application"),
+      m_renderer(m_gl), m_camera(configuration::camera_start_position, configuration::camera_start_front,
+                                 configuration::camera_start_up) {
 
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -58,8 +37,6 @@ integration_t::~integration_t() {
 }
 
 void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-complexity)
-    constexpr auto camera_speed = 0.1F;
-
     m_window.set_framebuffer_callback([&](int width, int height) {
         m_renderer.set_viewport(width, height);
         render();
@@ -88,18 +65,20 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
             m_window.set_input_mode(GLFW_CURSOR, m_cursor_enabled ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
         if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_W == key) {
-            m_camera.set_position(m_camera.get_position() + camera_speed * m_camera.get_front());
+            m_camera.set_position(m_camera.get_position() + configuration::camera_speed * m_camera.get_front());
         }
         if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_S == key) {
-            m_camera.set_position(m_camera.get_position() - camera_speed * m_camera.get_front());
+            m_camera.set_position(m_camera.get_position() - configuration::camera_speed * m_camera.get_front());
         }
         if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_A == key) {
             m_camera.set_position(m_camera.get_position() -
-                                  camera_speed * glm::normalize(glm::cross(m_camera.get_front(), m_camera.get_up())));
+                                  configuration::camera_speed *
+                                      glm::normalize(glm::cross(m_camera.get_front(), m_camera.get_up())));
         }
         if (((GLFW_PRESS == action) || (GLFW_REPEAT == action)) && GLFW_KEY_D == key) {
             m_camera.set_position(m_camera.get_position() +
-                                  camera_speed * glm::normalize(glm::cross(m_camera.get_front(), m_camera.get_up())));
+                                  configuration::camera_speed *
+                                      glm::normalize(glm::cross(m_camera.get_front(), m_camera.get_up())));
         }
     });
 
@@ -110,15 +89,15 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
             m_first_cursor_iteration = false;
         }
 
-        constexpr auto sensitivity = 0.1;
-        const auto offset_position_x = (position_x - m_last_cursor_position_x) * sensitivity;
-        const auto offset_position_y = (m_last_cursor_position_y - position_y) * sensitivity;
+        const auto offset_position_x = (position_x - m_last_cursor_position_x) * configuration::camera_sensitivity;
+        const auto offset_position_y = (m_last_cursor_position_y - position_y) * configuration::camera_sensitivity;
 
         m_last_cursor_position_x = position_x;
         m_last_cursor_position_y = position_y;
 
         m_yaw += offset_position_x;
-        m_pitch = std::max(std::min(m_pitch + offset_position_y, camera_max_angle), camera_min_angle);
+        m_pitch = std::max(std::min(m_pitch + offset_position_y, configuration::camera_max_angle),
+                           configuration::camera_min_angle);
 
         if (!m_cursor_enabled) {
             m_camera.set_front(m_pitch, m_yaw);
@@ -136,32 +115,26 @@ void integration_t::build_shapes() {
     m_program_shape_map[object_program].emplace_back(m_shape_factory.build_sphere(base_texture));
     m_program_shape_map[object_program].emplace_back(m_shape_factory.build_torus(base_texture));
 
-    constexpr glm::vec3 light0_pos = glm::vec3(2.0F);
-    constexpr glm::vec3 light0_dir = glm::vec3(-1.0F, -2.0F, -2.0F);
-    constexpr glm::vec3 light1_pos = glm::vec3(0.0F, 1.0F, 0.0F);
-    constexpr glm::vec3 light1_dir = glm::vec3(0.0F, -1.0F, 0.0F);
-    constexpr glm::vec3 light2_pos = glm::vec3(-3.0F, 2.0F, -3.0F);
-    constexpr auto diffuse = 0.2F;
-
     auto light_texture = m_texture_factory.build_texture("./textures/white.png", configuration::texture_layer_1);
 
-    m_lights[0] = m_light_factory.build_light(light_type_t::spot, light0_pos, light0_dir);
+    m_lights[0] = m_light_factory.build_light(light_type_t::spot, configuration::light_positions[0],
+                                              configuration::light_directions[0]);
     m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[0], light_texture));
 
-    m_lights[1] = m_light_factory.build_light(light_type_t::directional, light1_pos, light1_dir);
-    m_lights[1]->m_diffuse = glm::vec3(diffuse);
+    m_lights[1] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[1],
+                                              configuration::light_directions[1]);
+    m_lights[1]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
     m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[1], light_texture));
 
-    m_lights[2] = m_light_factory.build_light(light_type_t::directional, light2_pos, glm::vec3());
-    m_lights[2]->m_diffuse = glm::vec3(diffuse);
+    m_lights[2] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[2],
+                                              configuration::light_directions[2]);
+    m_lights[2]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
     m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[2], light_texture));
 }
 
 void integration_t::render_loop() {
-    constexpr glm::vec4 clear_color = {0.2F, 0.2F, 0.2F, 1.0F};
-
     m_renderer.set_depth_test(m_depth_test);
-    m_renderer.set_clear_color(clear_color);
+    m_renderer.set_clear_color(configuration::viewport_clear_color);
 
     for (auto &program_shapes : m_program_shape_map) {
         for (auto &shape : program_shapes.second) {
@@ -178,9 +151,7 @@ void integration_t::render() {
     using std::chrono::duration;
     using std::chrono::high_resolution_clock;
 
-    constexpr auto s_to_us_multiplier = 1000000.0;
-    auto frame_time_us = s_to_us_multiplier / refresh_rate;
-
+    auto frame_time_us = configuration::s_to_us_multiplier / configuration::viewport_refresh_rate;
     auto start_time = high_resolution_clock::now();
 
     build_ui();
@@ -224,15 +195,13 @@ void integration_t::build_ui() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    //    ImGui::ShowDemoWindow();
-
     ImGui::Begin("OpenGL Wrapper test app");
 
     if (ImGui::CollapsingHeader("Depth parameters")) {
         ImGui::Checkbox("Enabled", &m_depth_view_enabled);
         ImGui::Checkbox("Debug", &m_depth_view_debug);
-        ImGui::SliderFloat("Near", &m_depth_near, 0.1, m_depth_far);
-        ImGui::SliderFloat("Far", &m_depth_far, m_depth_near, 200.0);
+        ImGui::SliderFloat("Near", &m_depth_near, configuration::camera_clipping_near, m_depth_far);
+        ImGui::SliderFloat("Far", &m_depth_far, m_depth_near, configuration::camera_clipping_far_max);
     }
 
     int i = 0;
@@ -253,14 +222,11 @@ void integration_t::build_ui() {
             } else {
                 auto *spot_light = dynamic_cast<spot_light_t *>(light.get());
                 if (nullptr != spot_light) {
-                    constexpr auto min_cutoff_begin = 5.0F;
-                    constexpr auto max_cutoff_end = 120.0F;
-
                     ImGui::InputScalarN("Direction", ImGuiDataType_Float, &spot_light->m_direction, 3);
-                    ImGui::SliderFloat("Cutoff begin", &spot_light->m_cutoff_begin, min_cutoff_begin,
-                                       spot_light->m_cutoff_end);
+                    ImGui::SliderFloat("Cutoff begin", &spot_light->m_cutoff_begin,
+                                       configuration::light_cutoff_begin_min, spot_light->m_cutoff_end);
                     ImGui::SliderFloat("Cutoff end", &spot_light->m_cutoff_end, spot_light->m_cutoff_begin,
-                                       max_cutoff_end);
+                                       configuration::light_cutoff_end_max);
                 }
             }
 
@@ -332,7 +298,9 @@ void integration_t::update_projection_uniforms(opengl_cpp::program_t &p) {
     auto view = m_camera.look_at(m_camera.get_position() + m_camera.get_front());
     p.set_uniform("uniform_view", view);
 
-    auto projection = glm::perspective(glm::radians(default_fov), resolution_ratio, clipping_near, clipping_far);
+    auto projection =
+        glm::perspective(glm::radians(configuration::camera_default_fov), configuration::viewport_resolution_ratio,
+                         configuration::camera_clipping_near, configuration::camera_clipping_far);
     p.set_uniform("uniform_projection", projection);
 }
 

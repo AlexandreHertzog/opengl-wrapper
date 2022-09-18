@@ -8,6 +8,7 @@
 #include "factories/shape_factory.h"
 #include "factories/texture_factory.h"
 #include "renderer.h"
+#include "utils/configuration.h"
 #include <memory>
 #include <opengl-cpp/backend/gl_impl.h>
 #include <opengl-cpp/backend/glfw_impl.h>
@@ -17,8 +18,6 @@
 #include <vector>
 
 namespace game_engine {
-
-constexpr auto light_count = 10;
 
 class integration_t {
   public:
@@ -45,7 +44,7 @@ class integration_t {
     game_engine::window_t m_window;
     game_engine::renderer_t m_renderer;
     std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
-    std::array<light_pointer_t, light_count> m_lights;
+    std::array<light_pointer_t, configuration::light_count> m_lights;
     std::map<light_pointer_t, shape_pointer_t> m_light_shapes;
     game_engine::camera_t m_camera;
 
@@ -54,8 +53,8 @@ class integration_t {
     bool m_depth_test{true};
     bool m_depth_view_enabled{true};
     bool m_depth_view_debug{false};
-    float m_depth_near{0.1F};
-    float m_depth_far{100.0F};
+    float m_depth_near{configuration::camera_clipping_near};
+    float m_depth_far{configuration::camera_clipping_far};
     bool m_first_cursor_iteration = true;
     double m_last_cursor_position_x = 0.0;
     double m_last_cursor_position_y = 0.0;
