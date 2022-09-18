@@ -36,10 +36,6 @@ const glm::vec3 &camera_t::get_front() const {
     return m_front;
 }
 
-const glm::vec3 &camera_t::get_up() const {
-    return m_up;
-}
-
 void camera_t::set_front(double pitch, double yaw) {
     glm::vec3 direction;
     direction[0] = static_cast<float>(cos(glm::radians(yaw)) * cos(glm::radians(pitch)));

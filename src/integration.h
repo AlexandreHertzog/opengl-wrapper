@@ -9,6 +9,7 @@
 #include "factories/texture_factory.h"
 #include "renderer.h"
 #include "utils/configuration.h"
+#include "utils/program_shapes.h"
 #include <memory>
 #include <opengl-cpp/backend/gl_impl.h>
 #include <opengl-cpp/backend/glfw_impl.h>
@@ -41,12 +42,11 @@ class integration_t {
     shape_factory_t m_shape_factory;
     light_factory_t m_light_factory;
 
-    game_engine::window_t m_window;
-    game_engine::renderer_t m_renderer;
-    std::map<program_pointer_t, shape_vector_t> m_program_shape_map;
+    window_t m_window;
+    renderer_t m_renderer;
+    program_shapes_t m_program_shapes;
     std::array<light_pointer_t, configuration::light_count> m_lights;
-    std::map<light_pointer_t, shape_pointer_t> m_light_shapes;
-    game_engine::camera_t m_camera;
+    camera_t m_camera;
 
     bool m_wireframe{};
     bool m_cursor_enabled{true};
@@ -67,8 +67,8 @@ class integration_t {
     void update_parameter_uniforms(opengl_cpp::program_t &p) const;
     void render();
 
-    void shape_debug_ui(game_engine::shape_t &s);
-    void update_shape_uniforms(opengl_cpp::program_t &p, game_engine::shape_t &s);
+    void shape_debug_ui(shape_t &s);
+    void update_shape_uniforms(opengl_cpp::program_t &p, shape_t &s);
     std::string build_light_uniform_prefix(int i);
 };
 

@@ -16,7 +16,6 @@ class camera_t {
 
     [[nodiscard]] const glm::vec3 &get_position() const;
     [[nodiscard]] const glm::vec3 &get_front() const;
-    [[nodiscard]] const glm::vec3 &get_up() const;
 
     void set_front(double pitch, double yaw);
 

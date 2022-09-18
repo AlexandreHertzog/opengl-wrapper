@@ -9,11 +9,14 @@
 namespace game_engine {
 
 struct light_t;
+class shape_t;
 
 using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
 using program_pointer_t = std::shared_ptr<opengl_cpp::program_t>;
 using texture_pointer_t = std::shared_ptr<opengl_cpp::texture_t>;
 using light_pointer_t = std::shared_ptr<light_t>;
+using shape_pointer_t = std::shared_ptr<game_engine::shape_t>;
+using shape_vector_t = std::vector<shape_pointer_t>;
 
 struct light_t {
     glm::vec3 m_position{};

@@ -113,37 +113,35 @@ void integration_t::build_shapes() {
     auto light_program = m_program_factory.build_light_program();
     auto base_texture = m_texture_factory.build_texture("./textures/checker.png", configuration::texture_layer_1);
 
-    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_cube(base_texture));
-    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_plane(base_texture));
-    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_sphere(base_texture));
-    m_program_shape_map[object_program].emplace_back(m_shape_factory.build_torus(base_texture));
+    m_program_shapes.add_object(object_program, m_shape_factory.build_cube(base_texture));
+    m_program_shapes.add_object(object_program, m_shape_factory.build_plane(base_texture));
+    m_program_shapes.add_object(object_program, m_shape_factory.build_sphere(base_texture));
+    m_program_shapes.add_object(object_program, m_shape_factory.build_torus(base_texture));
 
     auto light_texture = m_texture_factory.build_texture("./textures/white.png", configuration::texture_layer_1);
 
     m_lights[0] = m_light_factory.build_light(light_type_t::spot, configuration::light_positions[0],
                                               configuration::light_directions[0]);
-    m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[0], light_texture));
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[0], light_texture));
 
     m_lights[1] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[1],
                                               configuration::light_directions[1]);
     m_lights[1]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[1], light_texture));
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[1], light_texture));
 
     m_lights[2] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[2],
                                               configuration::light_directions[2]);
     m_lights[2]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shape_map[light_program].emplace_back(m_shape_factory.build_light_shape(m_lights[2], light_texture));
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[2], light_texture));
 }
 
 void integration_t::render_loop() {
     m_renderer.set_depth_test(m_depth_test);
     m_renderer.set_clear_color(configuration::viewport_clear_color);
 
-    for (auto &program_shapes : m_program_shape_map) {
-        for (auto &shape : program_shapes.second) {
-            assert(shape);
-            shape->load_vertices();
-        }
+    for (auto &program_shape : m_program_shapes) {
+        assert(program_shape.second);
+        program_shape.second->load_vertices();
     }
 
     while (!m_window.get_should_close()) {
@@ -161,7 +159,7 @@ void integration_t::render() {
 
     m_renderer.clear();
 
-    for (auto &program_shape : m_program_shape_map) {
+    for (auto &program_shape : m_program_shapes) {
         assert(program_shape.first);
         program_shape.first->use();
 
@@ -169,11 +167,9 @@ void integration_t::render() {
         update_light_uniforms(*program_shape.first);
         update_parameter_uniforms(*program_shape.first);
 
-        for (auto &shape : program_shape.second) {
-            assert(shape);
-            update_shape_uniforms(*program_shape.first, *shape);
-            m_renderer.draw(*shape);
-        }
+        assert(program_shape.second);
+        update_shape_uniforms(*program_shape.first, *program_shape.second);
+        m_renderer.draw(*program_shape.second);
     }
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -244,12 +240,10 @@ void integration_t::build_ui() {
         }
     }
 
-    for (auto &program_shapes : m_program_shape_map) {
-        for (auto &shape : program_shapes.second) {
-            assert(shape);
-            if (ImGui::CollapsingHeader(shape->get_mesh().get_name().c_str())) {
-                shape_debug_ui(*shape);
-            }
+    for (auto &program_shape : m_program_shapes) {
+        assert(program_shape.second);
+        if (ImGui::CollapsingHeader(program_shape.second->get_mesh().get_name().c_str())) {
+            shape_debug_ui(*program_shape.second);
         }
     }
 
