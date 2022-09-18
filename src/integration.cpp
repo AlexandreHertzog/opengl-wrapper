@@ -111,28 +111,27 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
 void integration_t::build_shapes() {
     auto object_program = m_program_factory.build_object_program();
     auto light_program = m_program_factory.build_light_program();
-    auto base_texture = m_texture_factory.build_texture("./textures/checker.png", configuration::texture_layer_1);
 
-    m_program_shapes.add_object(object_program, m_shape_factory.build_cube(base_texture));
-    m_program_shapes.add_object(object_program, m_shape_factory.build_plane(base_texture));
-    m_program_shapes.add_object(object_program, m_shape_factory.build_sphere(base_texture));
-    m_program_shapes.add_object(object_program, m_shape_factory.build_torus(base_texture));
+    m_program_shapes.add_object(object_program, m_shape_factory.build_cube());
+    m_program_shapes.add_object(object_program, m_shape_factory.build_plane());
+    m_program_shapes.add_object(object_program, m_shape_factory.build_sphere());
+    m_program_shapes.add_object(object_program, m_shape_factory.build_torus());
 
-    auto light_texture = m_texture_factory.build_texture("./textures/white.png", configuration::texture_layer_1);
+    auto light_texture = m_texture_factory.build_white_texture();
 
     m_lights[0] = m_light_factory.build_light(light_type_t::spot, configuration::light_positions[0],
                                               configuration::light_directions[0]);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[0], light_texture));
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[0]));
 
     m_lights[1] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[1],
                                               configuration::light_directions[1]);
     m_lights[1]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[1], light_texture));
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[1]));
 
     m_lights[2] = m_light_factory.build_light(light_type_t::directional, configuration::light_positions[2],
                                               configuration::light_directions[2]);
     m_lights[2]->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[2], light_texture));
+    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(m_lights[2]));
 }
 
 void integration_t::render_loop() {
