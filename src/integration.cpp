@@ -124,20 +124,23 @@ void integration_t::build_shapes() {
     assert(nullptr != light0);
     light0->m_position = configuration::light_positions[0];
     light0->m_direction = configuration::light_directions[0];
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(*light0));
+    light0->m_shape = m_shape_factory.build_light_shape();
+    m_program_shapes.add_object(light_program, light0->m_shape);
 
     auto *light1 = m_light_manager.add_light<directional_light_t>();
     assert(nullptr != light1);
     light1->m_position = configuration::light_positions[1];
     light1->m_direction = configuration::light_directions[1];
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(*light1));
+    light1->m_shape = m_shape_factory.build_light_shape();
+    m_program_shapes.add_object(light_program, light1->m_shape);
 
     auto *light2 = m_light_manager.add_light<directional_light_t>();
     assert(nullptr != light2);
     light2->m_position = configuration::light_positions[2];
     light2->m_direction = configuration::light_directions[2];
     light2->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
-    m_program_shapes.add_object(light_program, m_shape_factory.build_light_shape(*light2));
+    light2->m_shape = m_shape_factory.build_light_shape();
+    m_program_shapes.add_object(light_program, light2->m_shape);
 }
 
 void integration_t::render_loop() {
@@ -215,7 +218,6 @@ void integration_t::build_ui() {
         }
 
         const std::string name = "Light " + std::to_string(i++);
-
         if (ImGui::CollapsingHeader(name.c_str())) {
 
             ImGui::InputScalarN("Position", ImGuiDataType_Float, &light->m_position, 3);

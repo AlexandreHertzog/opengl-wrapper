@@ -1,5 +1,6 @@
 #include "light_manager.h"
 
+#include "data_types/shape.h"
 #include <opengl-cpp/program.h>
 
 namespace game_engine {
@@ -10,6 +11,10 @@ light_manager_t::light_manager_t(opengl_cpp::gl_t &gl) : m_gl(gl), m_light_facto
 void light_manager_t::update_light_uniforms(opengl_cpp::program_t &p) {
     int i = 0;
     for (auto &light : m_values) {
+        if (light->m_shape) {
+            light->m_shape->get_transform().m_translation = light->m_position;
+        }
+
         const auto prefix = build_light_uniform_prefix(i++);
         if (!light) {
             p.set_uniform(prefix + "type", static_cast<int>(light_type_t::deactivated));

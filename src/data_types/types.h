@@ -35,6 +35,7 @@ struct light_t {
     float m_attenuation_constant{};
     float m_attenuation_linear{};
     float m_attenuation_quadratic{};
+    shape_pointer_t m_shape;
 
     light_t() = default;
     virtual ~light_t() = default;
