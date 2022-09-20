@@ -8,9 +8,9 @@
 #include "factories/shape_factory.h"
 #include "factories/texture_factory.h"
 #include "managers/light_manager.h"
+#include "managers/shape_manager.h"
 #include "renderer.h"
 #include "utils/configuration.h"
-#include "utils/program_shapes.h"
 #include <memory>
 #include <opengl-cpp/backend/gl_impl.h>
 #include <opengl-cpp/backend/glfw_impl.h>
@@ -38,16 +38,15 @@ class integration_t {
     opengl_cpp::gl_impl_t m_gl;
     opengl_cpp::glfw_impl_t m_glfw;
 
-    program_factory_t m_program_factory;
     texture_factory_t m_texture_factory;
     shape_factory_t m_shape_factory;
 
     window_t m_window;
     renderer_t m_renderer;
-    program_shapes_t m_program_shapes;
     camera_t m_camera;
 
     light_manager_t m_light_manager;
+    shape_manager_t m_shape_manager;
 
     bool m_wireframe{};
     bool m_cursor_enabled{true};

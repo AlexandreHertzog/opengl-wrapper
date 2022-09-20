@@ -14,12 +14,12 @@ using std::filesystem::path;
 namespace game_engine {
 
 integration_t::integration_t()
-    : m_program_factory(m_gl), m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory),
+    : m_texture_factory(m_gl), m_shape_factory(m_gl, m_texture_factory),
       m_window(m_glfw, m_gl, configuration::viewport_resolution_x, configuration::viewport_resolution_y,
                "Test application"),
       m_renderer(m_gl),
       m_camera(configuration::camera_start_position, configuration::camera_start_front, configuration::camera_start_up),
-      m_light_manager(m_gl) {
+      m_light_manager(m_gl), m_shape_manager(m_gl) {
 
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     m_glfw.window_hint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -110,13 +110,10 @@ void integration_t::init_callbacks() { // NOLINT(readability-function-cognitive-
 }
 
 void integration_t::build_shapes() {
-    auto object_program = m_program_factory.build_object_program();
-    auto light_program = m_program_factory.build_light_program();
-
-    m_program_shapes.add_object(object_program, m_shape_factory.build_cube());
-    m_program_shapes.add_object(object_program, m_shape_factory.build_plane());
-    m_program_shapes.add_object(object_program, m_shape_factory.build_sphere());
-    m_program_shapes.add_object(object_program, m_shape_factory.build_torus());
+    m_shape_manager.add_object_shape(m_shape_factory.build_cube());
+    m_shape_manager.add_object_shape(m_shape_factory.build_plane());
+    m_shape_manager.add_object_shape(m_shape_factory.build_sphere());
+    m_shape_manager.add_object_shape(m_shape_factory.build_torus());
 
     auto light_texture = m_texture_factory.build_white_texture();
 
@@ -125,14 +122,14 @@ void integration_t::build_shapes() {
     light0->m_position = configuration::light_positions[0];
     light0->m_direction = configuration::light_directions[0];
     light0->m_shape = m_shape_factory.build_light_shape();
-    m_program_shapes.add_object(light_program, light0->m_shape);
+    m_shape_manager.add_light_shape(light0->m_shape);
 
     auto *light1 = m_light_manager.add_light<directional_light_t>();
     assert(nullptr != light1);
     light1->m_position = configuration::light_positions[1];
     light1->m_direction = configuration::light_directions[1];
     light1->m_shape = m_shape_factory.build_light_shape();
-    m_program_shapes.add_object(light_program, light1->m_shape);
+    m_shape_manager.add_light_shape(light1->m_shape);
 
     auto *light2 = m_light_manager.add_light<directional_light_t>();
     assert(nullptr != light2);
@@ -140,14 +137,14 @@ void integration_t::build_shapes() {
     light2->m_direction = configuration::light_directions[2];
     light2->m_diffuse = glm::vec3(configuration::light_directional_diffuse);
     light2->m_shape = m_shape_factory.build_light_shape();
-    m_program_shapes.add_object(light_program, light2->m_shape);
+    m_shape_manager.add_light_shape(light2->m_shape);
 }
 
 void integration_t::render_loop() {
     m_renderer.set_depth_test(m_depth_test);
     m_renderer.set_clear_color(configuration::viewport_clear_color);
 
-    for (auto &program_shape : m_program_shapes) {
+    for (auto &program_shape : m_shape_manager) {
         assert(program_shape.second);
         program_shape.second->load_vertices();
     }
@@ -167,7 +164,7 @@ void integration_t::render() {
 
     m_renderer.clear();
 
-    for (auto &program_shape : m_program_shapes) {
+    for (auto &program_shape : m_shape_manager) {
         assert(program_shape.first);
         program_shape.first->use();
 
@@ -247,7 +244,7 @@ void integration_t::build_ui() {
         }
     }
 
-    for (auto &program_shape : m_program_shapes) {
+    for (auto &program_shape : m_shape_manager) {
         assert(program_shape.second);
         if (ImGui::CollapsingHeader(program_shape.second->get_mesh().get_name().c_str())) {
             shape_debug_ui(*program_shape.second);
